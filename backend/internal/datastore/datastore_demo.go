@@ -52,4 +52,6 @@ func DatastoreDemo() {
 	} else {
 		fmt.Println("Successfully got ballot2:", gotBallot2)
 	}
+	// Tally the results
+	fmt.Println(gotPoll.TallyVotes(gotBallot1, gotBallot2))
 }
