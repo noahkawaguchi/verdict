@@ -52,6 +52,13 @@ func DatastoreDemo() {
 	} else {
 		fmt.Println("Successfully got ballot2:", gotBallot2)
 	}
+	// Get ballots only using poll ID
+	pollBallots, err := getPollBallots(ctx, dummyPollID)
+	if  err != nil {
+		log.Println("Failed to get pollBallots:", err)
+	} else {
+		fmt.Println("Successfully got pollBallots:", pollBallots)
+	}
 	// Tally the results
-	fmt.Println(gotPoll.TallyVotes(gotBallot1, gotBallot2))
+	fmt.Println(gotPoll.TallyVotes(pollBallots...))
 }
