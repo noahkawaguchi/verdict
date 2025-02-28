@@ -50,5 +50,6 @@ func (p *Poll) TallyVotes(ballots ...*Ballot) *result {
 			pollResult.results[i].choices[j] = pollResult.newChoiceStats(c, results[i][j])
 		}
 	}
+	pollResult.sortChoices()
 	return pollResult
 }
