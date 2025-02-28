@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: "Verdict API - AWS Lambda & API Gateway"
+
+Globals:
+  Function:
+    Timeout: 5
+    MemorySize: 128
+
+Resources:
+  VerdictFunction:
+    Type: AWS::Serverless::Function 
+    Metadata:
+      BuildMethod: go1.x
+    Properties:
+      CodeUri: .
+      Handler: cmd
+      Runtime: provided.al2023
+      Architectures:
+        - x86_64
+      Events:
+        CreatePoll:
+          Type: Api 
+          Properties:
+            Path: /poll/create
+            Method: GET
+
+Outputs:
+  VerdictAPI:
+    Description: "API Gateway endpoint for Verdict API"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"

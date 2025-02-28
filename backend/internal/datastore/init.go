@@ -22,7 +22,7 @@ var dbClient *dynamodb.Client
 
 // init sets up the dbClient before main executes, once per cold start
 func init() {
-	if os.Getenv("USE_LOCAL_DYNAMO") == "true" {
+	if os.Getenv("AWS_SAM_LOCAL") == "true" {
 		developmentSetup()
 	} else {
 		productionSetup()
