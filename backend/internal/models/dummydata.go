@@ -25,6 +25,11 @@ func dummyBallot2(pollID, userID string) *Ballot {
 	return NewBallot(pollID, userID, []int{4, 0, 1}) // iris, apple, yes
 }
 
-func DummyData(pollID, userID1, userID2 string) (*Poll, *Ballot, *Ballot) {
-	return dummyPoll(pollID), dummyBallot1(pollID, userID1), dummyBallot2(pollID, userID2)
+func dummyBallot3(pollID, userID string) *Ballot {
+	return NewBallot(pollID, userID, []int{0, 2, 1}) // rose, banana, yes
+}
+
+func DummyData(pollID, userID1, userID2, userID3 string) (*Poll, *Ballot, *Ballot, *Ballot) {
+	return dummyPoll(pollID), dummyBallot1(pollID, userID1), 
+		dummyBallot2(pollID, userID2), dummyBallot3(pollID, userID3)
 }

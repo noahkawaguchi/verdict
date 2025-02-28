@@ -42,13 +42,12 @@ func (p *Poll) TallyVotes(ballots ...*Ballot) *result {
 		}
 	}
 	// Convert the results to a result struct
-	pollResult := NewResult(p.Title, len(p.Questions))
+	pollResult := newResult(p.Title, len(ballots), len(p.Questions))
 	for i, q := range p.Questions {
 		pollResult.results[i].prompt = q.Prompt
 		pollResult.results[i].choices = make([]choiceStats, len(q.Choices))
 		for j, c := range q.Choices {
-			pollResult.results[i].choices[j].choice = c
-			pollResult.results[i].choices[j].votes = results[i][j]
+			pollResult.results[i].choices[j] = pollResult.newChoiceStats(c, results[i][j])
 		}
 	}
 	return pollResult
