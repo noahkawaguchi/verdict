@@ -1,6 +1,16 @@
 :root {
+  --dark-background: rgb(40, 40, 40);
+  --light-text: white;
+}
+
+* {
+  box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+
+body {
+  background-color: var(--dark-background);
+  color: var(--light-text);
   text-align: center;
-  background-color: rgb(40, 40, 40);
-  color: white;
 }
