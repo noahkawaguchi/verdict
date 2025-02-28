@@ -30,7 +30,6 @@ func (cpr *createPollRequest) anyEmptyFields() bool {
 		if slices.Contains(q.Choices, "") { // Empty choice
 			return true
 		}
-
 	}
 	return false
 }

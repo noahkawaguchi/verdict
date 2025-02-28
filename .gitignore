@@ -1,4 +1,5 @@
-.DS_Store
+# OS/Editor
+.DS_Store/
 .vscode/
 
 # AWS
@@ -6,4 +7,4 @@
 .sam/
 samconfig.toml
 
-verdict-template
+sam_project_template/

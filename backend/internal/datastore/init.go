@@ -23,9 +23,9 @@ var dbClient *dynamodb.Client
 // init sets up the dbClient before main executes, once per cold start
 func init() {
 	if os.Getenv("USE_LOCAL_DYNAMO") == "true" {
-		developmentSetup("http://localhost:8000") // For locally running go code directly
+		developmentSetup("http://localhost:8000") // For running locally without SAM
 	} else if os.Getenv("AWS_SAM_LOCAL") == "true" {
-		developmentSetup("http://host.docker.internal:8000") // For locally running using SAM
+		developmentSetup("http://host.docker.internal:8000") // For running locally using SAM
 	} else {
 		productionSetup()
 	}
@@ -142,7 +142,7 @@ func ensureLocalTableExists(table *tableInfo, input *dynamodb.CreateTableInput) 
 	return nil
 }
 
-// printLocalTables prints a list of local tables to confirm the database connection
+// printLocalTables prints a list of the tables in the local database.
 func printLocalTables() {
 	result, err := dbClient.ListTables(context.TODO(), &dynamodb.ListTablesInput{})
 	if err != nil {
