@@ -1,7 +1,7 @@
 package models
 
 func dummyPoll(pollID string) *Poll {
-	poll := NewPoll(pollID)
+	poll := NewPoll(pollID, "Flowers, Fruits, and DST")
 	poll.AddQuestion(
 		"What is the best flower?",
 		[]string{"rose", "lily", "tulip", "carnation", "iris"},

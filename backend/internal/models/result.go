@@ -12,18 +12,24 @@ type resultQuestion struct {
 	choices []choiceStats
 }
 
-type result []resultQuestion
-
-func NewResult(numQuestions int) result {
-	return result(make([]resultQuestion, numQuestions))
+type result struct {
+	title   string
+	results []resultQuestion
 }
 
-func (r result) String() string {
-	ret := "\nResults:\n"
-	for _, q := range r {
-		ret += q.prompt + "\n"
+func NewResult(title string, numQuestions int) *result {
+	return &result{
+		title: title,
+		results: make([]resultQuestion, numQuestions),
+	}
+}
+
+func (r *result) String() string {
+	ret := fmt.Sprintf("\nResults for %q:\n", r.title)
+	for _, q := range r.results {
+		ret += fmt.Sprintf("  %v\n", q.prompt)
 		for _, c := range q.choices {
-			ret += fmt.Sprintf("  %v: %d\n", c.choice, c.votes)
+			ret += fmt.Sprintf("    %v: %d\n", c.choice, c.votes)
 		}
 	}
 	return ret

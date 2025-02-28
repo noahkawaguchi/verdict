@@ -7,19 +7,21 @@ type PollQuestion struct {
 
 type Poll struct {
 	PollID    string
+	Title     string
 	Questions []PollQuestion
 }
 
-func NewPoll(pollID string) *Poll {
+func NewPoll(pollID, title string) *Poll {
 	return &Poll{
-		PollID: pollID,
+		PollID:    pollID,
+		Title:     title,
 		Questions: make([]PollQuestion, 0),
 	}
 }
 
 func (p *Poll) AddQuestion(prompt string, choices []string) {
 	p.Questions = append(p.Questions, PollQuestion{
-		Prompt: prompt,
+		Prompt:  prompt,
 		Choices: choices,
 	})
 }
@@ -40,14 +42,14 @@ func (p *Poll) TallyVotes(ballots ...*Ballot) *result {
 		}
 	}
 	// Convert the results to a result struct
-	pollResult := NewResult(len(p.Questions))
+	pollResult := NewResult(p.Title, len(p.Questions))
 	for i, q := range p.Questions {
-		pollResult[i].prompt = q.Prompt
-		pollResult[i].choices = make([]choiceStats, len(q.Choices))
+		pollResult.results[i].prompt = q.Prompt
+		pollResult.results[i].choices = make([]choiceStats, len(q.Choices))
 		for j, c := range q.Choices {
-			pollResult[i].choices[j].choice = c
-			pollResult[i].choices[j].votes = results[i][j]
+			pollResult.results[i].choices[j].choice = c
+			pollResult.results[i].choices[j].votes = results[i][j]
 		}
 	}
-	return &pollResult
+	return pollResult
 }
