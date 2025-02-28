@@ -1,19 +1,12 @@
 package models
 
 func dummyPoll() (*Poll, string) {
-	poll, pollID := NewPoll("Flowers, Fruits, and DST")
-	poll.AddQuestion(
-		"What is the best flower?",
-		[]string{"rose", "lily", "tulip", "carnation", "iris"},
-	)
-	poll.AddQuestion(
-		"What is the best fruit?",
-		[]string{"apple", "orange", "banana"},
-	)
-	poll.AddQuestion(
-		"Should the US end the Daylight Savings Time system?",
-		[]string{"no", "yes"},
-	)
+	questions := []PollQuestion{
+		{"What is the best flower?", []string{"rose", "lily", "tulip", "carnation", "iris"}},
+		{"What is the best fruit?", []string{"apple", "orange", "banana"}},
+		{"Should the US end the Daylight Savings Time system?", []string{"no", "yes"}},
+	}
+	poll, pollID := NewPoll("Flowers, Fruits, and DST", questions)
 	return poll, pollID
 }
 

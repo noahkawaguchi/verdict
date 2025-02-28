@@ -14,10 +14,7 @@ func Router(
 ) (events.APIGatewayProxyResponse, error) {
 	switch request.Path {
 	case "/poll/create":
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusOK,
-			Body:       `{"message": "Nice!"}`,
-		}, nil
+		return createPollHandler(ctx, request)
 	default:
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusNotFound,

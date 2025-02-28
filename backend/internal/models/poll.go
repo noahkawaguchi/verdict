@@ -3,8 +3,8 @@ package models
 import "github.com/google/uuid"
 
 type PollQuestion struct {
-	Prompt  string
-	Choices []string
+	Prompt  string   `json:"prompt"`
+	Choices []string `json:"choices"`
 }
 
 type Poll struct {
@@ -13,21 +13,14 @@ type Poll struct {
 	Questions []PollQuestion
 }
 
-func NewPoll(title string) (*Poll, string) {
+func NewPoll(title string, questions []PollQuestion) (*Poll, string) {
 	pollID := uuid.New().String()
 	poll := &Poll{
 		PollID:    pollID,
 		Title:     title,
-		Questions: make([]PollQuestion, 0),
+		Questions: questions,
 	}
 	return poll, pollID
-}
-
-func (p *Poll) AddQuestion(prompt string, choices []string) {
-	p.Questions = append(p.Questions, PollQuestion{
-		Prompt:  prompt,
-		Choices: choices,
-	})
 }
 
 // TallyVotes accumulates the results of the poll.

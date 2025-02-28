@@ -23,7 +23,7 @@ Resources:
           Type: Api 
           Properties:
             Path: /poll/create
-            Method: GET
+            Method: POST
 
 Outputs:
   VerdictAPI:

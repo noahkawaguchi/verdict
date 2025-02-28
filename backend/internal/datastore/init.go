@@ -22,8 +22,10 @@ var dbClient *dynamodb.Client
 
 // init sets up the dbClient before main executes, once per cold start
 func init() {
-	if os.Getenv("AWS_SAM_LOCAL") == "true" {
-		developmentSetup()
+	if os.Getenv("USE_LOCAL_DYNAMO") == "true" {
+		developmentSetup("http://localhost:8000") // For locally running go code directly
+	} else if os.Getenv("AWS_SAM_LOCAL") == "true" {
+		developmentSetup("http://host.docker.internal:8000") // For locally running using SAM
 	} else {
 		productionSetup()
 	}
@@ -42,11 +44,11 @@ func productionSetup() {
 }
 
 // developmentSetup connects to the local Docker DynamoDB for development purposes.
-func developmentSetup() {
+func developmentSetup(endpoint string) {
 	// Load AWS config for local development
 	cfg, err := config.LoadDefaultConfig(context.TODO(),
-		config.WithRegion("us-east-2"),                   // (Ohio) Required but not used locally
-		config.WithBaseEndpoint("http://localhost:8000"), // Local DynamoDB in Docker
+		config.WithRegion("us-east-2"),    // (Ohio) Required but not used locally
+		config.WithBaseEndpoint(endpoint), // Local DynamoDB in Docker
 		config.WithCredentialsProvider( // Required but not checked locally
 			credentials.NewStaticCredentialsProvider("dummy", "dummy", ""),
 		),
