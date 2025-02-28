@@ -1,7 +1,7 @@
 package models
 
-func dummyPoll(pollID string) *Poll {
-	poll := NewPoll(pollID, "Flowers, Fruits, and DST")
+func dummyPoll() (*Poll, string) {
+	poll, pollID := NewPoll("Flowers, Fruits, and DST")
 	poll.AddQuestion(
 		"What is the best flower?",
 		[]string{"rose", "lily", "tulip", "carnation", "iris"},
@@ -14,7 +14,7 @@ func dummyPoll(pollID string) *Poll {
 		"Should the US end the Daylight Savings Time system?",
 		[]string{"no", "yes"},
 	)
-	return poll
+	return poll, pollID
 }
 
 func dummyBallot1(pollID, userID string) *Ballot {
@@ -29,7 +29,9 @@ func dummyBallot3(pollID, userID string) *Ballot {
 	return NewBallot(pollID, userID, []int{0, 2, 1}) // rose, banana, yes
 }
 
-func DummyData(pollID, userID1, userID2, userID3 string) (*Poll, *Ballot, *Ballot, *Ballot) {
-	return dummyPoll(pollID), dummyBallot1(pollID, userID1), 
-		dummyBallot2(pollID, userID2), dummyBallot3(pollID, userID3)
+func DummyData(userID1, userID2, userID3 string) (*Poll, string, []*Ballot) {
+	poll, pollID := dummyPoll()
+	ballots := []*Ballot{dummyBallot1(pollID, userID1),
+		dummyBallot2(pollID, userID2), dummyBallot3(pollID, userID3)}
+	return poll, pollID, ballots
 }

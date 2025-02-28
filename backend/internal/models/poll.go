@@ -1,5 +1,7 @@
 package models
 
+import "github.com/google/uuid"
+
 type PollQuestion struct {
 	Prompt  string
 	Choices []string
@@ -11,12 +13,14 @@ type Poll struct {
 	Questions []PollQuestion
 }
 
-func NewPoll(pollID, title string) *Poll {
-	return &Poll{
+func NewPoll(title string) (*Poll, string) {
+	pollID := uuid.New().String()
+	poll := &Poll{
 		PollID:    pollID,
 		Title:     title,
 		Questions: make([]PollQuestion, 0),
 	}
+	return poll, pollID
 }
 
 func (p *Poll) AddQuestion(prompt string, choices []string) {
