@@ -3,22 +3,21 @@ import styles from './Header.module.css';
 
 const Header = () => {
   return (
-    <header>
-      <div>
-        <h1>Verdict</h1>
-        <nav className={styles.navbar}>
-          <Link to='/' className={styles.routerLink}>
-            Home
-          </Link>
-          <Link to='/host-poll' className={styles.routerLink}>
-            Host Poll
-          </Link>
-          <Link to='/cast-ballot' className={styles.routerLink}>
-            Cast Ballot
-          </Link>
-        </nav>
-      </div>
-      <hr />
+    <header className={styles.headerBox}>
+      <Link to='/' className={styles.routerLink}>
+        <h2 className={styles.headerTitle}>Verdict</h2>
+      </Link>
+      <nav className={styles.navbar}>
+        <Link to='/create-poll' className={styles.routerLink}>
+          Create Poll
+        </Link>
+        <Link to='/cast-ballot' className={styles.routerLink}>
+          Cast Ballot
+        </Link>
+        <Link to='/view-results' className={styles.routerLink}>
+          View Results
+        </Link>
+      </nav>
     </header>
   );
 };

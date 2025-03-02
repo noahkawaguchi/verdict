@@ -1,16 +1,50 @@
-.routerLink {
-  color: dodgerblue;
+.headerBox {
+  display: flex;
+  flex-wrap: wrap;
+  max-width: fit-content;
+  margin: 20px auto;
+  padding: 5px 15px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50px;
+  border: 1px solid aliceblue;
   background-color: rgb(30, 30, 30);
+  box-shadow: 0px 0px 15px rgba(0, 191, 255, 0.25);
+}
+
+.headerTitle {
+  color: aliceblue;
+  font-weight: normal;
+  letter-spacing: 5px;
+  text-shadow: 0px 0px 10px rgba(0, 191, 255, 0.75);
+  margin: 0px 10px;
+  padding: 5px 0px;
+  transition: text-shadow 0.5s ease;
+}
+
+.headerTitle:hover {
+  text-shadow: 0px 0px 25px aqua;
+}
+
+.routerLink {
+  color: deepskyblue;
   text-decoration: none;
-  padding: 10px;
-  width: max-content;
+  letter-spacing: 1px;
   display: inline-block;
+  padding: 10px;
+  margin: auto;
+  text-shadow: 0px 0px 5px rgba(0, 191, 255, 0.5);
+  transition: color 0.5s ease, text-shadow 0.5s ease;
 }
 
 .routerLink:hover {
   color: aqua;
+  text-shadow: 0px 0px 20px;
 }
 
 .navbar {
-  margin: 15px auto;
+  display: flex;
+  flex-flow: wrap;
+  max-width: fit-content;
+  margin: 5px;
 }
