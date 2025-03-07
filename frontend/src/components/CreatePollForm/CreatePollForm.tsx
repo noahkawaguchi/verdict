@@ -10,17 +10,9 @@ const CreatePollForm = () => {
     setChoices(updatedChoices);
   };
 
-  const addChoice = () => {
-    setChoices([...choices, '']);
-  };
-
-  const removeChoice = (index: number) => {
-    setChoices((prev) => [...prev.slice(0, index), ...prev.slice(index + 1)]);
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('submitted!'); // This will use the hook
+    console.log('submitted!'); // TODO: placeholder
   };
 
   return (
@@ -39,12 +31,19 @@ const CreatePollForm = () => {
             placeholder='Choice'
             required
           />
-          <button onClick={() => removeChoice(index)} disabled={choices.length <= 2}>
+          {/* Specify the type as button so it doesn't try to submit the form */}
+          <button
+            type='button'
+            onClick={() => setChoices((prev) => prev.filter((_, i) => i !== index))}
+            disabled={choices.length <= 2}
+          >
             Remove
           </button>
         </div>
       ))}
-      <button onClick={addChoice}>Add Choice</button>
+      <button type='button' onClick={() => setChoices([...choices, ''])}>
+        Add Choice
+      </button>
       <button type='submit'>Submit</button>
     </form>
   );
