@@ -36,7 +36,7 @@ func createPollHandler(
 	if err = datastore.PutPoll(ctx, poll); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusInternalServerError,
-			Body:       `{"error": "Failed to put the new tile in the database"}`,
+			Body:       `{"error": "Failed to put the new poll in the database"}`,
 		}, nil
 	}
 	return events.APIGatewayProxyResponse{
