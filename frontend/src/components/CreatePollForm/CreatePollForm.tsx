@@ -1,6 +1,11 @@
 import { useState } from 'react';
+import { Question } from '../../types';
 
-const CreatePollForm = () => {
+type CreatePollFormProps = {
+  setQuestion: (question: Question) => void;
+};
+
+const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
   const [prompt, setPrompt] = useState('');
   const [choices, setChoices] = useState(['', '']);
 
@@ -12,7 +17,10 @@ const CreatePollForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('submitted!'); // TODO: placeholder
+    setQuestion({
+      prompt: prompt,
+      choices: choices,
+    });
   };
 
   return (
