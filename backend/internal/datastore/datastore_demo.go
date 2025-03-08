@@ -10,23 +10,21 @@ import (
 
 func DatastoreDemo() {
 	ctx := context.TODO() // This will eventually come from the Lambda handler
-	userID1 := "42"
-	userID2 := "43"
-	userID3 := "44"
-	poll, pollID, ballots := models.DummyData(userID1, userID2, userID3)
+	dummyUserIDs := []string{"41", "42", "43", "44", "45"}
+	poll, pollID, ballots := models.DummyData(dummyUserIDs)
 
 	// Try to put the poll
 	if err := PutPoll(ctx, poll); err != nil {
 		log.Println("Failed to put poll:", err)
 	} else {
-		fmt.Println("Successfully put poll")
+		fmt.Printf("Successfully put poll %q\n", poll.Prompt)
 	}
 	// Try to put the ballots
 	for _, ballot := range ballots {
 		if err := PutBallot(ctx, ballot); err != nil {
 			log.Println("Failed to put ballot:", err)
 		} else {
-			fmt.Println("Successfully put ballot")
+			fmt.Printf("Successfully put the ballot of user %v\n", ballot.UserID)
 		}
 	}
 	// Try to get the poll
@@ -37,7 +35,7 @@ func DatastoreDemo() {
 		fmt.Println("Successfully got poll:", gotPoll)
 	}
 	// Try to get the ballots
-	for _, dummyUserID := range []string{userID1, userID2, userID3} {
+	for _, dummyUserID := range dummyUserIDs {
 		gotBallot, err := getBallot(ctx, pollID, dummyUserID)
 		if err != nil {
 			log.Println("Failed to get ballot:", err)
@@ -50,8 +48,13 @@ func DatastoreDemo() {
 	if  err != nil {
 		log.Println("Failed to get pollBallots:", err)
 	} else {
-		fmt.Println("Successfully got pollBallots:", pollBallots)
+		fmt.Println("Successfully got pollBallots:")
+		for _, pb := range pollBallots {
+			fmt.Println(" ", pb)
+		}
 	}
-	// Tally the results
-	fmt.Println(gotPoll.TallyVotes(pollBallots...))
+	// Compute the results
+	result := models.NewResult(poll, ballots)
+	result.InstantRunoffVoting()
+	fmt.Println(result)
 }

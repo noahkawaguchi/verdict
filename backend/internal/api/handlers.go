@@ -24,14 +24,14 @@ func createPollHandler(
 		}, nil
 	}
 	// Validate the request
-	if req.anyEmptyFields() {
+	if !req.allValidFields() {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
 			Body:       `{"error": "Fields cannot be empty"}`,
 		}, nil
 	}
 	// Create the new poll
-	poll, pollID := models.NewPoll(req.Title, req.Questions)
+	poll, pollID := models.NewPoll(req.Prompt, req.Choices)
 	// Put the new poll in the database
 	if err = datastore.PutPoll(ctx, poll); err != nil {
 		return events.APIGatewayProxyResponse{

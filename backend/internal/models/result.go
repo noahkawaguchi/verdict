@@ -1,61 +1,91 @@
 package models
 
-import (
-	"fmt"
-	"sort"
-)
-
-type choiceStats struct {
-	choice     string
-	votes      int
-	percentage int
-}
-
-type resultQuestion struct {
-	prompt  string
-	choices []choiceStats
-}
+import "fmt"
 
 type result struct {
-	title      string
-	numBallots int
-	results    []resultQuestion
+	poll    *Poll
+	ballots []*Ballot
+	// The slice at each index holds the indices of the ballots currently counting for that choice
+	votes        [][]int
+	winnerIdx    int // Index of the winning choice
+	winningRound int
 }
 
-func newResult(title string, numBallots, numQuestions int) *result {
+func NewResult(poll *Poll, ballots []*Ballot) *result {
+	// Validate that all ballots are for this poll
+	j := 0
+	for _, ballot := range ballots {
+		if ballot.PollID == poll.PollID {
+			ballots[j] = ballot
+			j++
+		}
+	}
+	// Initialize votes to empty slices so nil can be used for elimination
+	votes := make([][]int, len(poll.Choices))
+	for i := range votes {
+		votes[i] = make([]int, 0)
+	}
 	return &result{
-		title:      title,
-		numBallots: numBallots,
-		results:    make([]resultQuestion, numQuestions),
+		poll:         poll,
+		ballots:      ballots[:j],
+		votes:        votes,
+		winnerIdx:    -99,
+		winningRound: 0,
 	}
 }
 
-func (r *result) newChoiceStats(choice string, votes int) choiceStats {
-	return choiceStats{
-		choice:     choice,
-		votes:      votes,
-		percentage: votes * 100 / r.numBallots,
+// InstantRunoffVoting implements ranked choice voting, specifically the instant runoff method, to 
+// calculate the winning choice amongst the submitted ballots.
+func (r *result) InstantRunoffVoting() {
+	// Tally first-choice votes
+	for i, ballot := range r.ballots {
+		choice := ballot.RankOrder[0]
+		r.votes[choice] = append(r.votes[choice], i)
 	}
-}
-
-// sortChoices reorders the choices in each of the questions in the result
-// in descending order of number of votes.
-func (r *result) sortChoices() {
-	for _, q := range r.results {
-		sort.Slice(q.choices, func(i, j int) bool {
-			return q.choices[i].votes > q.choices[j].votes
-		})
+	// Majority check and elimination
+	for i := range len(r.poll.Choices) { // The number of choice ranks
+		// Check if any choice has a strict majority of votes
+		for j, choiceBallots := range r.votes {
+			if float64(len(choiceBallots))/float64(len(r.ballots)) > 0.5 {
+				r.winnerIdx = j
+				r.winningRound = i + 1
+				return
+			}
+		}
+		// Determine which choice is in last place
+		// TODO: Handle ties for last (using votes from previous rounds)
+		minVotesIdx := 0
+		for i := 1; i < len(r.votes); i++ {
+			if r.votes[i] != nil && // Don't consider eliminated choices
+				(r.votes[minVotesIdx] == nil || // Handle the case where the first element is nil
+					len(r.votes[i]) < len(r.votes[minVotesIdx])) {
+				minVotesIdx = i
+			}
+		}
+		// Redistribute the last place choice's votes to other choices
+		for _, ballotIdx := range r.votes[minVotesIdx] {
+			for _, choice := range r.ballots[ballotIdx].RankOrder {
+				// If this choice is not the one being eliminated now and has not been eliminated
+				// in a previous round, redistribute this ballot to the choice
+				if choice != minVotesIdx && r.votes[choice] != nil {
+					r.votes[choice] = append(r.votes[choice], ballotIdx)
+					break
+				}
+			}
+		}
+		// Eliminate the last place choice
+		r.votes[minVotesIdx] = nil
 	}
 }
 
 func (r *result) String() string {
-	ret := fmt.Sprintf("\nResults for %q:\n", r.title)
-	for _, q := range r.results {
-		ret += fmt.Sprintf("  %v\n", q.prompt)
-		for _, c := range q.choices {
-			ret += fmt.Sprintf("    %d/%d (%d%%): %v\n",
-				c.votes, r.numBallots, c.percentage, c.choice)
-		}
+	if r.winnerIdx < 0 {
+		return "The winner has not been computed yet. Call .instantRunoffVoting() first."
 	}
-	return ret
+	return fmt.Sprintf("\nIn the poll %q\nThe choice %q won with %d votes in round %d\n",
+		r.poll.Prompt,
+		r.poll.Choices[r.winnerIdx],
+		len(r.votes[r.winnerIdx]),
+		r.winningRound,
+	)
 }
