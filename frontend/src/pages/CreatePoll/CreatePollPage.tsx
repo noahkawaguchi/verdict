@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import CreatePollForm from '../components/CreatePollForm/CreatePollForm';
-import { Question } from '../types';
-import CreatePollSubmission from '../components/CreatePollSubmission/CreatePollSubmission';
+import CreatePollForm from './CreatePollForm';
+import { Question } from '../../types';
+import CreatePollSubmission from './CreatePollSubmission';
 
 const CreatePollPage = () => {
   const [question, setQuestion] = useState<Question | null>(null);

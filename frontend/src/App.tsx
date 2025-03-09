@@ -1,11 +1,11 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import CreatePollPage from './pages/CreatePollPage';
 import './App.css';
-import HomePage from './pages/HomePage';
-import CastBallotPage from './pages/CastBallotPage';
-import NotFoundPage from './pages/NotFoundPage';
 import MainLayout from './layouts/MainLayout';
-import ViewResultsPage from './pages/ViewResultsPage';
+import HomePage from './pages/HomePage';
+import CreatePollPage from './pages/CreatePoll/CreatePollPage';
+import CastBallotPage from './pages/CastBallot/CastBallotPage';
+import ViewResultsPage from './pages/ViewResults/ViewResultsPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 const App = () => {
   return (
