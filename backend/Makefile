@@ -1,4 +1,4 @@
-.PHONY: all
+.PHONY: dev
 
-all:
-	sam build && sam local start-api
+dev:
+	sam build && sam local start-api --parameter-overrides "StageName=dev FrontendUrl=http://localhost:5173"
