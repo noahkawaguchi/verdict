@@ -8,7 +8,7 @@ const CreatePollPage = () => {
 
   return (
     <>
-      <p>This is the create poll page!</p>
+      <h3>Create a New Poll</h3>
       {question ? (
         <CreatePollSubmission question={question} />
       ) : (

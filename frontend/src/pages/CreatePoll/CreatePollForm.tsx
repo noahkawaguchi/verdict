@@ -30,6 +30,7 @@ const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
         onChange={(e) => setPrompt(e.target.value)}
         placeholder='Prompt'
         required
+        autoFocus
       />
       {choices.map((choice, index) => (
         <div key={index}>
