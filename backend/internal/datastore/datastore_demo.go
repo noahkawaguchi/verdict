@@ -54,7 +54,5 @@ func DatastoreDemo() {
 		}
 	}
 	// Compute the results
-	result := models.NewResult(poll, ballots)
-	result.InstantRunoffVoting()
-	fmt.Println(result)
+	fmt.Println(models.NewResult(poll, ballots))
 }

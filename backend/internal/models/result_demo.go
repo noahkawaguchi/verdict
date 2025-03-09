@@ -12,7 +12,5 @@ func ResultDemo() {
 		dummyUserIDs[i] = strconv.Itoa(i)
 	}
 	poll, _, ballots := DummyData(dummyUserIDs)
-	result := NewResult(poll, ballots)
-	result.InstantRunoffVoting()
-	fmt.Println(result)
+	fmt.Println(NewResult(poll, ballots))
 }

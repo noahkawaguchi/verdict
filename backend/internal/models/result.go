@@ -7,12 +7,12 @@ type result struct {
 	ballots []*Ballot
 	// The slice at each index holds the indices of the ballots currently counting for that choice
 	votes        [][]int
-	winnerIdx    int // Index of the winning choice
+	winnerIdx    int
 	winningRound int
 }
 
 func NewResult(poll *Poll, ballots []*Ballot) *result {
-	// Validate that all ballots are for this poll
+	// Validate that the ballots are for this poll
 	j := 0
 	for _, ballot := range ballots {
 		if ballot.PollID == poll.PollID {
@@ -25,18 +25,20 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 	for i := range votes {
 		votes[i] = make([]int, 0)
 	}
-	return &result{
+	res := &result{
 		poll:         poll,
 		ballots:      ballots[:j],
 		votes:        votes,
 		winnerIdx:    -99,
 		winningRound: 0,
 	}
+	res.instantRunoffVoting() // Compute the result from the constructor
+	return res
 }
 
-// InstantRunoffVoting implements ranked choice voting, specifically the instant runoff method, to 
+// instantRunoffVoting implements ranked-choice voting, specifically the instant runoff method, to
 // calculate the winning choice amongst the submitted ballots.
-func (r *result) InstantRunoffVoting() {
+func (r *result) instantRunoffVoting() {
 	// Tally first-choice votes
 	for i, ballot := range r.ballots {
 		choice := ballot.RankOrder[0]
@@ -80,7 +82,8 @@ func (r *result) InstantRunoffVoting() {
 
 func (r *result) String() string {
 	if r.winnerIdx < 0 {
-		return "The winner has not been computed yet. Call .instantRunoffVoting() first."
+		return "The result was not successfully computed. Was the poll valid with at least one " +
+			"corresponding ballot?"
 	}
 	return fmt.Sprintf("\nIn the poll %q\nThe choice %q won with %d votes in round %d\n",
 		r.poll.Prompt,
