@@ -1,23 +1,26 @@
 package api
 
-import "slices"
+import (
+	"errors"
+	"slices"
+)
 
 type createPollRequest struct {
 	Prompt  string   `json:"prompt"`
 	Choices []string `json:"choices"`
 }
 
-// allValidFields validates that the prompt and choices are non-empty and that there are at least
+// validateFields validates that the prompt and choices are non-empty and that there are at least
 // two choices.
-func (cpr *createPollRequest) allValidFields() bool {
-	if cpr.Prompt == "" { // Empty prompt
-		return false
+func (cpr *createPollRequest) validateFields() error {
+	if cpr.Prompt == "" {
+		return errors.New("prompt cannot be empty")
 	}
-	if len(cpr.Choices) < 2 { // Too few choices
-		return false
+	if len(cpr.Choices) < 2 {
+		return errors.New("there must be at least two choices")
 	}
-	if slices.Contains(cpr.Choices, "") { // Empty choice
-		return false
+	if slices.Contains(cpr.Choices, "") {
+		return errors.New("none of the choices can be empty")
 	}
-	return true
+	return nil
 }
