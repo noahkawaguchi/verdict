@@ -1,8 +1,7 @@
 import { useState, useCallback } from 'react';
+import { backendUrl } from '../config';
 
-const backendUrl = 'http://127.0.0.1:3000';
-
-const useApiRequest = <TRequest, TResponse>(endpoint: string, method: 'POST' | 'PUT') => {
+const useMutationRequest = <TRequest, TResponse>(endpoint: string, method: 'POST' | 'PUT') => {
   const [data, setData] = useState<TResponse | null>(null);
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
@@ -38,4 +37,4 @@ const useApiRequest = <TRequest, TResponse>(endpoint: string, method: 'POST' | '
   return { data, error, loading, sendRequest };
 };
 
-export default useApiRequest;
+export default useMutationRequest;

@@ -13,6 +13,9 @@ pnpm-debug.log*
 node_modules
 dist
 
+# Environment variables
+.env*
+
 # AWS
 .aws-sam/ 
 .sam/
