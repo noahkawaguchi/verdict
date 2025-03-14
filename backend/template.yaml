@@ -22,7 +22,7 @@ Resources:
     Properties:
       StageName: !Ref StageName
       Cors:
-        AllowMethods: "'OPTIONS,POST'"
+        AllowMethods: "'OPTIONS,GET,POST'"
         AllowHeaders: "'Content-Type,Authorization'"
         AllowOrigin: !Sub "'${FrontendUrl}'"
 
@@ -40,8 +40,14 @@ Resources:
         CreatePoll:
           Type: Api 
           Properties:
-            Path: /poll/create
+            Path: /poll
             Method: POST
+            RestApiId: !Ref VerdictApi
+        GetPoll:
+          Type: Api
+          Properties:
+            Path: /poll/{pollId}
+            Method: GET
             RestApiId: !Ref VerdictApi
 
 Outputs:

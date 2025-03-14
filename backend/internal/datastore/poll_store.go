@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
@@ -31,8 +32,8 @@ func PutPoll(ctx context.Context, poll *models.Poll) error {
 	return err
 }
 
-// getPoll retrieves a poll from the database by its PollID.
-func getPoll(ctx context.Context, id string) (*models.Poll, error) {
+// GetPoll retrieves a poll from the database by its PollID.
+func GetPoll(ctx context.Context, id string) (*models.Poll, error) {
 	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(pollsTableInfo.name),
 		Key: map[string]types.AttributeValue{
@@ -41,6 +42,9 @@ func getPoll(ctx context.Context, id string) (*models.Poll, error) {
 	})
 	if err != nil {
 		return nil, err
+	}
+	if out.Item == nil {
+		return nil, fmt.Errorf("poll with id %s not found in the database", id)
 	}
 	// Unmarshal the retrieved poll into a struct
 	var poll models.Poll

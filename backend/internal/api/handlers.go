@@ -15,7 +15,7 @@ func createPollHandler(
 	request events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
 	// Unmarshal the request
-	var req createPollRequest
+	var req pollRequestResponse
 	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode: http.StatusBadRequest,
@@ -42,5 +42,40 @@ func createPollHandler(
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Body:       `{"pollID": "` + pollID + `"}`,
+	}, nil
+}
+
+func createBallotHandler(
+	ctx context.Context,
+	request events.APIGatewayProxyRequest,
+) (events.APIGatewayProxyResponse, error) {
+	// Check for the poll ID
+	pollId := request.PathParameters["pollId"]
+	if pollId == "" {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       `{"error": "missing pollId"}`,
+		}, nil
+	}
+	// Get the poll from the database
+	poll, err := datastore.GetPoll(ctx, pollId)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       `{"error": "` + err.Error() + `"}`,
+		}, nil
+	}
+	// Marshal the struct into JSON
+	body, err := json.Marshal(poll)
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       `{"error": "failed to marshal response"}`,
+		}, nil
+	}
+	// Send the poll information back in the response
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Body:       string(body),
 	}, nil
 }

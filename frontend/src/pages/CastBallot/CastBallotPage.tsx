@@ -7,7 +7,7 @@ import { Question } from '../../types';
 
 const CastBallotPage = () => {
   const { pollID } = useParams<{ pollID?: string }>();
-  const { data, error, loading, sendRequest } = useGetRequest<Question>('/ballot/new');
+  const { data, error, loading, sendRequest } = useGetRequest<Question>('poll');
 
   useEffect(() => {
     if (pollID) sendRequest(pollID);

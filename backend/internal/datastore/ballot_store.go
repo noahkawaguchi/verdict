@@ -38,11 +38,15 @@ func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, erro
 		TableName: aws.String(ballotsTableInfo.name),
 		Key: map[string]types.AttributeValue{
 			ballotsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
-			ballotsTableInfo.sortKey: &types.AttributeValueMemberS{Value: userID},
+			ballotsTableInfo.sortKey:      &types.AttributeValueMemberS{Value: userID},
 		},
 	})
 	if err != nil {
 		return nil, err
+	}
+	if out.Item == nil {
+		return nil, fmt.Errorf("ballot with poll ID %s and user ID %s not found in the database",
+			pollID, userID)
 	}
 	// Unmarshal the retrieved ballot into a struct
 	var ballot models.Ballot
@@ -54,7 +58,7 @@ func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, erro
 func getPollBallots(ctx context.Context, pollID string) ([]*models.Ballot, error) {
 	// Define input to query by pollID
 	input := &dynamodb.QueryInput{
-		TableName: aws.String(ballotsTableInfo.name),
+		TableName:              aws.String(ballotsTableInfo.name),
 		KeyConditionExpression: aws.String(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey)),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
 			":pk": &types.AttributeValueMemberS{Value: pollID},
