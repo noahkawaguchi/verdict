@@ -49,6 +49,12 @@ Resources:
             Path: /poll/{pollId}
             Method: GET
             RestApiId: !Ref VerdictApi
+        CastBallot:
+          Type: Api
+          Properties:
+            Path: /ballot
+            Method: POST
+            RestApiId: !Ref VerdictApi
 
 Outputs:
   VerdictAPI:

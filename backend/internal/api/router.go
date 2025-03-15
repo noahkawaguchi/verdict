@@ -13,27 +13,24 @@ func Router(
 	ctx context.Context,
 	request events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
-	// Define a reusable path not found response
-	pathNotFound := events.APIGatewayProxyResponse{
-		StatusCode: http.StatusNotFound,
-		Body:       `{"error": "Path not found"}`,
-	}
 	// Match the method and path
 	switch request.HTTPMethod {
 	case http.MethodPost:
 		switch request.Path {
 		case "/poll":
 			return createPollHandler(ctx, request)
+		case "/ballot":
+			return castBallotHandler(ctx, request)
 		default:
-			return pathNotFound, nil
+			return response404, nil
 		}
 	case http.MethodGet:
 		if matched, _ := regexp.MatchString("^/poll/.*$", request.Path); matched {
 			return createBallotHandler(ctx, request)
 		} else {
-			return pathNotFound, nil
+			return response404, nil
 		}
 	default:
-		return pathNotFound, nil
+		return response404, nil
 	}
 }

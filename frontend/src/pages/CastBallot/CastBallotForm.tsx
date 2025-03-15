@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { Question } from '../../types';
 import styles from './CastBallot.module.css';
 
-const CastBallotForm: React.FC<{ question: Question }> = ({ question }) => {
+type CastBallotFormProps = {
+  question: Question;
+  setRankOrder: (rankOrder: number[]) => void;
+};
+
+const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder }) => {
   const [ranks, setRanks] = useState(question.choices);
 
   const moveUp = (rankIdx: number) => {
@@ -31,8 +36,8 @@ const CastBallotForm: React.FC<{ question: Question }> = ({ question }) => {
     e.preventDefault();
     // Create an array of indices in the format expected in the backend
     const rankOrder = ranks.map((rank) => question.choices.indexOf(rank));
-    console.log(rankOrder);
-  }
+    setRankOrder(rankOrder);
+  };
 
   return (
     <form onSubmit={handleSubmit}>

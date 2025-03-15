@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/google/uuid"
 	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
@@ -24,12 +25,12 @@ func createPollHandler(
 	}
 	// Create the new poll
 	poll, pollId := models.NewPoll(req.Prompt, req.Choices)
-	// Put the new poll in the database
+	// Put the poll in the database
 	if err := datastore.PutPoll(ctx, poll); err != nil {
-		return response500("failed to put the new poll in the database"), nil
+		return response500("failed to put the poll in the database"), nil
 	}
 	// Send the poll ID back in the response
-	return response200(`{"pollId": "` + pollId + `"}`), nil
+	return response201(`{"pollId": "` + pollId + `"}`), nil
 }
 
 func createBallotHandler(
@@ -53,4 +54,28 @@ func createBallotHandler(
 	}
 	// Send the poll information back in the response
 	return response200(string(body)), nil
+}
+
+func castBallotHandler(
+	ctx context.Context,
+	request events.APIGatewayProxyRequest,
+) (events.APIGatewayProxyResponse, error) {
+	// Unmarshal the request
+	var req ballotRequest
+	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {
+		return response400("invalid request"), nil
+	}
+	// Validate the request
+	if err := req.validateFields(); err != nil {
+		return response400(err.Error()), nil
+	}
+	// Create the new ballot
+	userID := uuid.New().String() // Eventually will only do this for non-authenticated polls
+	ballot := models.NewBallot(req.PollID, userID, req.RankOrder)
+	// Put the ballot in the database
+	if err := datastore.PutBallot(ctx, ballot); err != nil {
+		return response500("failed to put the ballot in the database"), nil
+	}
+	// Send a success message back in the response
+	return response201(`{"message": "successfully cast ballot"}`), nil
 }

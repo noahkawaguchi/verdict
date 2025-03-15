@@ -20,6 +20,6 @@ func NewBallot(pollID, userID string, rankOrder []int) *Ballot {
 
 func (b *Ballot) String() string {
 	shortPollID := b.PollID[:5] + "... "
-	return fmt.Sprintf("Ballot from user %v for poll %v with choices %v",
+	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
 		b.UserID, shortPollID, b.RankOrder)
 }

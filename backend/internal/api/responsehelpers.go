@@ -15,6 +15,15 @@ func response200(body string) events.APIGatewayProxyResponse {
 	}
 }
 
+// response201 creates a 201 Created HTTP response with the provided body.
+func response201(body string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusCreated,
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body:       body,
+	}
+}
+
 // response400 creates a 400 Bad Request HTTP response with a custom error message.
 func response400(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
@@ -22,6 +31,13 @@ func response400(errMsg string) events.APIGatewayProxyResponse {
 		Headers:    map[string]string{"Content-Type": "application/json"},
 		Body:       `{"error": "` + errMsg + `"}`,
 	}
+}
+
+// response404 is a static 404 Not Found HTTP response.
+var response404 = events.APIGatewayProxyResponse{
+	StatusCode: http.StatusNotFound,
+	Headers:    map[string]string{"Content-Type": "application/json"},
+	Body:       `{"error": "path not found"}`,
 }
 
 // response500 creates a 500 Internal Server Error HTTP response with a custom error message.
