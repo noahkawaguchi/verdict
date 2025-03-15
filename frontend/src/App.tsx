@@ -14,8 +14,8 @@ const App = () => {
         <Route element={<MainLayout />}>
           <Route path='/' element={<HomePage />} />
           <Route path='/create-poll' element={<CreatePollPage />} />
-          <Route path='/cast-ballot/:pollID?' element={<CastBallotPage />} />
-          <Route path='/view-results/:pollID?' element={<ViewResultsPage />} />
+          <Route path='/cast-ballot/:pollId?' element={<CastBallotPage />} />
+          <Route path='/view-results/:pollId?' element={<ViewResultsPage />} />
           <Route path='*' element={<NotFoundPage />} />
         </Route>
       </Routes>

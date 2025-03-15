@@ -6,17 +6,17 @@ import CastBallotForm from './CastBallotForm';
 import { Question } from '../../types';
 
 const CastBallotPage = () => {
-  const { pollID } = useParams<{ pollID?: string }>();
+  const { pollId } = useParams<{ pollId?: string }>();
   const { data, error, loading, sendRequest } = useGetRequest<Question>('poll');
 
   useEffect(() => {
-    if (pollID) sendRequest(pollID);
-  }, [sendRequest, pollID]);
+    if (pollId) sendRequest(pollId);
+  }, [sendRequest, pollId]);
 
   return (
     <>
       <h3>Cast a New Ballot</h3>
-      {!pollID ? (
+      {!pollId ? (
         <EnterPollId />
       ) : (
         <>

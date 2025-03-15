@@ -7,7 +7,7 @@ type CreatePollSubmissionProps = {
 };
 
 const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question }) => {
-  const { data, error, loading, sendRequest } = useMutationRequest<Question, { pollID: string }>(
+  const { data, error, loading, sendRequest } = useMutationRequest<Question, { pollId: string }>(
     'poll',
     'POST',
   );
@@ -19,7 +19,7 @@ const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question })
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Failed to create poll: {error.message}</p>;
 
-  return <p>Poll ID: {data?.pollID}</p>;
+  return <p>Poll ID: {data?.pollId}</p>;
 };
 
 export default CreatePollSubmission;
