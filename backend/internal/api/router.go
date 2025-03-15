@@ -18,15 +18,15 @@ func Router(
 	case http.MethodPost:
 		switch request.Path {
 		case "/poll":
-			return createPollHandler(ctx, request)
+			return createPollHandler(ctx, request), nil
 		case "/ballot":
-			return castBallotHandler(ctx, request)
+			return castBallotHandler(ctx, request), nil
 		default:
 			return response404, nil
 		}
 	case http.MethodGet:
 		if matched, _ := regexp.MatchString("^/poll/.*$", request.Path); matched {
-			return createBallotHandler(ctx, request)
+			return createBallotHandler(ctx, request), nil
 		} else {
 			return response404, nil
 		}
