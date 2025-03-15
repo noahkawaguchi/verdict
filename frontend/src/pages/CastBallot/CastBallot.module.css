@@ -1,0 +1,9 @@
+.rank {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rank > * {
+  margin: 5px;
+}
