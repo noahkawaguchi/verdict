@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { backendUrl } from '../config';
 
 const useMutationRequest = <TRequest, TResponse>(endpoint: string, method: 'POST' | 'PUT') => {
@@ -6,8 +6,15 @@ const useMutationRequest = <TRequest, TResponse>(endpoint: string, method: 'POST
   const [error, setError] = useState<Error | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Ref to persist across rerenders and avoid double requests, especially when using React's
+  // StrictMode in development
+  const isSubmitting = useRef(false);
+
   const sendRequest = useCallback(
     async (body: TRequest) => {
+      if (isSubmitting.current) return;
+      isSubmitting.current = true;
+
       setLoading(true);
       setError(null);
 
@@ -29,6 +36,7 @@ const useMutationRequest = <TRequest, TResponse>(endpoint: string, method: 'POST
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {
         setLoading(false);
+        isSubmitting.current = false;
       }
     },
     [endpoint, method],
