@@ -13,7 +13,7 @@ import (
 
 var pollsTableInfo = &tableInfo{
 	name:         "Polls",
-	partitionKey: "PollID",
+	partitionKey: "pollId",
 	// (No sort key)
 }
 

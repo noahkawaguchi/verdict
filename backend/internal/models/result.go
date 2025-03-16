@@ -19,13 +19,13 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 	// Validate that the ballots are for this poll
 	j := 0
 	for _, ballot := range ballots {
-		if ballot.PollID == poll.PollID {
+		if ballot.pollID == poll.pollID {
 			ballots[j] = ballot
 			j++
 		}
 	}
 	// Initialize votes to empty slices so nil can be used for elimination
-	votes := make([][]int, len(poll.Choices))
+	votes := make([][]int, len(poll.choices))
 	for i := range votes {
 		votes[i] = make([]int, 0)
 	}
@@ -45,11 +45,11 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 func (r *result) instantRunoffVoting() {
 	// Tally first-choice votes
 	for i, ballot := range r.ballots {
-		choice := ballot.RankOrder[0]
+		choice := ballot.rankOrder[0]
 		r.votes[choice] = append(r.votes[choice], i)
 	}
 	// Majority check and elimination
-	for i := range len(r.poll.Choices) { // The number of choice ranks
+	for i := range len(r.poll.choices) { // The number of choice ranks
 		// Check if any choice has a strict majority of votes
 		for j, choiceBallots := range r.votes {
 			if float64(len(choiceBallots))/float64(len(r.ballots)) > 0.5 {
@@ -70,7 +70,7 @@ func (r *result) instantRunoffVoting() {
 		}
 		// Redistribute the last place choice's votes to other choices
 		for _, ballotIdx := range r.votes[minVotesIdx] {
-			for _, choice := range r.ballots[ballotIdx].RankOrder {
+			for _, choice := range r.ballots[ballotIdx].rankOrder {
 				// If this choice is not the one being eliminated now and has not been eliminated
 				// in a previous round, redistribute this ballot to the choice
 				if choice != minVotesIdx && r.votes[choice] != nil {
@@ -84,6 +84,19 @@ func (r *result) instantRunoffVoting() {
 	}
 }
 
+func (r *result) String() string {
+	if r.winnerIdx < 0 {
+		return "The result was not successfully computed. Was the poll valid with at least one " +
+			"corresponding ballot?"
+	}
+	return fmt.Sprintf("\nIn the poll %q\nThe choice %q won with %d votes in round %d\n",
+		r.poll.prompt,
+		r.poll.choices[r.winnerIdx],
+		len(r.votes[r.winnerIdx]),
+		r.winningRound,
+	)
+}
+
 func (r *result) MarshalJSON() ([]byte, error) {
 	if r.winnerIdx < 0 {
 		return nil, errors.New("the result was not successfully computed")
@@ -94,22 +107,9 @@ func (r *result) MarshalJSON() ([]byte, error) {
 		NumVotes      int    `json:"numVotes"`
 		WinningRound  int    `json:"winningRound"`
 	}{
-		Prompt:        r.poll.Prompt,
-		WinningChoice: r.poll.Choices[r.winnerIdx],
+		Prompt:        r.poll.prompt,
+		WinningChoice: r.poll.choices[r.winnerIdx],
 		NumVotes:      len(r.votes[r.winnerIdx]),
 		WinningRound:  r.winningRound,
 	})
-}
-
-func (r *result) String() string {
-	if r.winnerIdx < 0 {
-		return "The result was not successfully computed. Was the poll valid with at least one " +
-			"corresponding ballot?"
-	}
-	return fmt.Sprintf("\nIn the poll %q\nThe choice %q won with %d votes in round %d\n",
-		r.poll.Prompt,
-		r.poll.Choices[r.winnerIdx],
-		len(r.votes[r.winnerIdx]),
-		r.winningRound,
-	)
 }

@@ -17,14 +17,14 @@ func DatastoreDemo() {
 	if err := PutPoll(ctx, poll); err != nil {
 		log.Println("Failed to put poll:", err)
 	} else {
-		fmt.Printf("Successfully put poll %q\n", poll.Prompt)
+		fmt.Printf("Successfully put poll %q\n", poll.GetPrompt())
 	}
 	// Try to put the ballots
 	for _, ballot := range ballots {
 		if err := PutBallot(ctx, ballot); err != nil {
 			log.Println("Failed to put ballot:", err)
 		} else {
-			fmt.Printf("Successfully put the ballot of user %v\n", ballot.UserID)
+			fmt.Printf("Successfully put the ballot of user %v\n", ballot.GetUserID())
 		}
 	}
 	// Try to get the poll

@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/google/uuid"
 	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
@@ -15,22 +14,20 @@ func createPollHandler(
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
 	// Unmarshal the request
-	var req pollRequestResponse
-	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {
+	var poll *models.Poll
+	if err := json.Unmarshal([]byte(request.Body), &poll); err != nil {
 		return response400("invalid request")
 	}
-	// Validate the request
-	if err := req.validateFields(); err != nil {
+	// Validate the fields
+	if err := poll.ValidateFields(); err != nil {
 		return response400(err.Error())
 	}
-	// Create the new poll
-	poll, pollId := models.NewPoll(req.Prompt, req.Choices)
 	// Put the poll in the database
 	if err := datastore.PutPoll(ctx, poll); err != nil {
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
-	return response201(`{"pollId": "` + pollId + `"}`)
+	return response201(`{"pollId": "` + poll.GetPollID() + `"}`)
 }
 
 func createBallotHandler(
@@ -38,19 +35,17 @@ func createBallotHandler(
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
 	// Check for the poll ID
-	pollId := request.PathParameters["pollId"]
-	if pollId == "" {
-		return response400("missing pollId")
+	pollID := request.PathParameters["pollId"]
+	if pollID == "" {
+		return response400("missing poll ID")
 	}
 	// Get the poll from the database
-	poll, err := datastore.GetPoll(ctx, pollId)
+	poll, err := datastore.GetPoll(ctx, pollID)
 	if err != nil {
 		return response500(err.Error())
 	}
-	// Omit the poll ID
-	resp := responseFromPoll(poll)
 	// Marshal the struct into JSON
-	body, err := json.Marshal(resp)
+	body, err := json.Marshal(poll)
 	if err != nil {
 		return response500("failed to marshal response")
 	}
@@ -63,17 +58,14 @@ func castBallotHandler(
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
 	// Unmarshal the request
-	var req ballotRequest
-	if err := json.Unmarshal([]byte(request.Body), &req); err != nil {
+	var ballot *models.Ballot
+	if err := json.Unmarshal([]byte(request.Body), &ballot); err != nil {
 		return response400("invalid request")
 	}
 	// Validate the request
-	if err := req.validateFields(); err != nil {
+	if err := ballot.ValidateFields(); err != nil {
 		return response400(err.Error())
 	}
-	// Create the new ballot
-	userID := uuid.New().String() // Eventually will only do this for non-authenticated polls
-	ballot := models.NewBallot(req.PollID, userID, req.RankOrder)
 	// Put the ballot in the database
 	if err := datastore.PutBallot(ctx, ballot); err != nil {
 		return response500("failed to put the ballot in the database")
@@ -87,17 +79,17 @@ func getResultHandler(
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
 	// Check for the poll ID
-	pollId := request.PathParameters["pollId"]
-	if pollId == "" {
-		return response400("missing pollId")
+	pollID := request.PathParameters["pollId"]
+	if pollID == "" {
+		return response400("missing poll ID")
 	}
 	// Get the poll from the database
-	poll, err := datastore.GetPoll(ctx, pollId)
+	poll, err := datastore.GetPoll(ctx, pollID)
 	if err != nil {
 		return response500(err.Error())
 	}
 	// Get all the ballots from the database for this poll
-	ballots, err := datastore.GetPollBallots(ctx, pollId)
+	ballots, err := datastore.GetPollBallots(ctx, pollID)
 	if err != nil {
 		return response500(err.Error())
 	}
@@ -109,5 +101,5 @@ func getResultHandler(
 		return response500("failed to marshal response")
 	}
 	// Send the poll information back in the response
-	return response200(string(body))	
+	return response200(string(body))
 }
