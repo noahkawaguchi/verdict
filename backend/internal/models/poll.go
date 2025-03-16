@@ -35,7 +35,8 @@ func (p *Poll) GetPrompt() string {
 	return p.prompt
 }
 
-// ValidateFields ensures that all fields are non-empty and that there are at least two choices.
+// ValidateFields ensures that all fields are non-empty, that there are at least two choices, and 
+// that choices are unique.
 func (p *Poll) ValidateFields() error {
 	if p.prompt == "" {
 		return errors.New("prompt cannot be empty")
@@ -45,6 +46,14 @@ func (p *Poll) ValidateFields() error {
 	}
 	if slices.Contains(p.choices, "") {
 		return errors.New("none of the choices can be empty")
+	}
+	// Use a "set" to validate uniqueness
+	seen := make(map[string]struct{})
+	for _, choice := range p.choices {
+		if _, exists := seen[choice]; exists {
+			return errors.New("choices must be unique")
+		}
+		seen[choice] = struct{}{}
 	}
 	return nil
 }
