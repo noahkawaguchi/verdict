@@ -3,12 +3,23 @@ package api
 import (
 	"errors"
 	"slices"
+
+	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-// pollRequestResponse serves as the body for both POST requests and GET responses.
+// pollRequestResponse serves as the body for both POST requests and GET responses at the /poll
+// endpoint.
 type pollRequestResponse struct {
 	Prompt  string   `json:"prompt"`
 	Choices []string `json:"choices"`
+}
+
+// responseFromPoll creates a pollRequestResponse from a Poll.
+func responseFromPoll(poll *models.Poll) pollRequestResponse {
+	return pollRequestResponse{
+		Prompt:  poll.Prompt,
+		Choices: poll.Choices,
+	}
 }
 
 // validateFields ensures that the prompt and choices are non-empty and that there are at least

@@ -8,8 +8,8 @@ import (
 
 type Poll struct {
 	PollID  string
-	Prompt  string   `json:"prompt"`
-	Choices []string `json:"choices"`
+	Prompt  string
+	Choices []string
 }
 
 func NewPoll(prompt string, choices []string) (*Poll, string) {

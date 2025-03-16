@@ -47,8 +47,10 @@ func createBallotHandler(
 	if err != nil {
 		return response500(err.Error())
 	}
+	// Omit the poll ID
+	resp := responseFromPoll(poll)
 	// Marshal the struct into JSON
-	body, err := json.Marshal(poll)
+	body, err := json.Marshal(resp)
 	if err != nil {
 		return response500("failed to marshal response")
 	}
