@@ -81,3 +81,33 @@ func castBallotHandler(
 	// Send a success message back in the response
 	return response201(`{"message": "successfully cast ballot"}`)
 }
+
+func getResultHandler(
+	ctx context.Context,
+	request events.APIGatewayProxyRequest,
+) events.APIGatewayProxyResponse {
+	// Check for the poll ID
+	pollId := request.PathParameters["pollId"]
+	if pollId == "" {
+		return response400("missing pollId")
+	}
+	// Get the poll from the database
+	poll, err := datastore.GetPoll(ctx, pollId)
+	if err != nil {
+		return response500(err.Error())
+	}
+	// Get all the ballots from the database for this poll
+	ballots, err := datastore.GetPollBallots(ctx, pollId)
+	if err != nil {
+		return response500(err.Error())
+	}
+	// Calculate the result
+	result := models.NewResult(poll, ballots)
+	// Marshal the struct into JSON (using its custom MarshalJSON method)
+	body, err := json.Marshal(result)
+	if err != nil {
+		return response500("failed to marshal response")
+	}
+	// Send the poll information back in the response
+	return response200(string(body))	
+}

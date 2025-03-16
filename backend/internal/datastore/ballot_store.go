@@ -54,8 +54,8 @@ func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, erro
 	return &ballot, err
 }
 
-// getPollBallots retrieves all ballots for a specific poll.
-func getPollBallots(ctx context.Context, pollID string) ([]*models.Ballot, error) {
+// GetPollBallots retrieves all ballots for a specific poll.
+func GetPollBallots(ctx context.Context, pollID string) ([]*models.Ballot, error) {
 	// Define input to query by pollID
 	input := &dynamodb.QueryInput{
 		TableName:              aws.String(ballotsTableInfo.name),

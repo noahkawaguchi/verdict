@@ -27,6 +27,8 @@ func Router(
 	case http.MethodGet:
 		if matched, _ := regexp.MatchString("^/poll/.*$", request.Path); matched {
 			return createBallotHandler(ctx, request), nil
+		} else if matched, _ := regexp.MatchString("^/result/.*$", request.Path); matched {
+			return getResultHandler(ctx, request), nil
 		} else {
 			return response404, nil
 		}

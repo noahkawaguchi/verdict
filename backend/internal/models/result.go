@@ -1,6 +1,10 @@
 package models
 
-import "fmt"
+import (
+	"encoding/json"
+	"errors"
+	"fmt"
+)
 
 type result struct {
 	poll    *Poll
@@ -78,6 +82,23 @@ func (r *result) instantRunoffVoting() {
 		// Eliminate the last place choice
 		r.votes[minVotesIdx] = nil
 	}
+}
+
+func (r *result) MarshalJSON() ([]byte, error) {
+	if r.winnerIdx < 0 {
+		return nil, errors.New("the result was not successfully computed")
+	}
+	return json.Marshal(&struct {
+		Prompt        string `json:"prompt"`
+		WinningChoice string `json:"winningChoice"`
+		NumVotes      int    `json:"numVotes"`
+		WinningRound  int    `json:"winningRound"`
+	}{
+		Prompt:        r.poll.Prompt,
+		WinningChoice: r.poll.Choices[r.winnerIdx],
+		NumVotes:      len(r.votes[r.winnerIdx]),
+		WinningRound:  r.winningRound,
+	})
 }
 
 func (r *result) String() string {
