@@ -40,7 +40,7 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 	return res
 }
 
-// instantRunoffVoting implements ranked-choice voting, specifically the instant runoff method, to
+// instantRunoffVoting implements ranked choice voting, specifically the instant runoff method, to
 // calculate the winning choice amongst the submitted ballots.
 func (r *result) instantRunoffVoting() {
 	// Tally first-choice votes

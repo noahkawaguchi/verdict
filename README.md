@@ -1,6 +1,6 @@
 # Verdict
 
-A full-stack web app for creating ranked-choice polls and voting in them.
+A full-stack web app for creating ranked choice polls and voting in them.
 
 ## Tech Stack
 

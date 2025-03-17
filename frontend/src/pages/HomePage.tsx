@@ -5,7 +5,7 @@ const HomePage = () => {
     <>
       <h3>Welcome to Verdict</h3>
       <p>
-        <i>A place for ranked-choice voting</i>
+        <i>A place for ranked choice voting</i>
       </p>
       <h4>
         Check this project out on{' '}
