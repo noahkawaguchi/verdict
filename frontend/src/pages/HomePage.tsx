@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const HomePage = () => {
   return (
     <>
@@ -16,7 +18,7 @@ const HomePage = () => {
         </a>
       </h4>
       <p>
-        Or <a href='/create-poll'>create a new poll</a>
+        Or <Link to='/create-poll'>create a new poll</Link>
       </p>
     </>
   );
