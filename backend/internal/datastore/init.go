@@ -22,10 +22,10 @@ var dbClient *dynamodb.Client
 
 // init sets up the dbClient before main executes, once per cold start
 func init() {
-	if os.Getenv("USE_LOCAL_DYNAMO") == "true" {
-		developmentSetup("http://localhost:8000") // For running locally without SAM
-	} else if os.Getenv("AWS_SAM_LOCAL") == "true" {
-		developmentSetup("http://host.docker.internal:8000") // For running locally using SAM
+	if os.Getenv("USE_LOCAL_DYNAMO") == "true" { // Local development without SAM
+		developmentSetup("http://localhost:8000") 
+	} else if os.Getenv("AWS_SAM_LOCAL") == "true" { // Local development with SAM
+		developmentSetup("http://host.docker.internal:8000") 
 	} else {
 		productionSetup()
 	}
@@ -34,31 +34,31 @@ func init() {
 func productionSetup() {
 	// Load AWS config for production (region and credentials automatically detected from
 	// environment variables)
-	cfg, err := config.LoadDefaultConfig(context.TODO())
-	if err != nil {
-		log.Printf("Unable to load SDK config (production).\ndbClient will be nil:\n%v\n", err)
-		return
+	if cfg, err := config.LoadDefaultConfig(context.TODO()); err != nil {
+		log.Printf("Unable to load SDK config (production).\ndbClient will be nil:\n%s\n",
+			err.Error())
+	} else { // Set the DynamoDB client
+		dbClient = dynamodb.NewFromConfig(cfg)
 	}
-	// Set the DynamoDB client
-	dbClient = dynamodb.NewFromConfig(cfg)
 }
 
 // developmentSetup connects to the local Docker DynamoDB for development purposes.
 func developmentSetup(endpoint string) {
-	// Load AWS config for local development
-	cfg, err := config.LoadDefaultConfig(context.TODO(),
+	// Set up AWS config for local development
+	configFunctions := []func(*config.LoadOptions) error{
 		config.WithRegion("us-east-2"),    // (Ohio) Required but not used locally
 		config.WithBaseEndpoint(endpoint), // Local DynamoDB in Docker
 		config.WithCredentialsProvider( // Required but not checked locally
 			credentials.NewStaticCredentialsProvider("dummy", "dummy", ""),
 		),
-	)
-	if err != nil {
-		log.Printf("Unable to load SDK config (development).\ndbClient will be nil:\n%v\n", err)
-		return
 	}
-	// Set the DynamoDB client
-	dbClient = dynamodb.NewFromConfig(cfg)
+	if cfg, err := config.LoadDefaultConfig(context.TODO(), configFunctions...); err != nil {
+		log.Printf("Unable to load SDK config (development).\ndbClient will be nil:\n%s\n",
+			err.Error())
+		return
+	} else { // Set the DynamoDB client
+		dbClient = dynamodb.NewFromConfig(cfg)
+	}
 	// Create the tables if they don't exist
 	ballotsTableInput := &dynamodb.CreateTableInput{
 		TableName: aws.String(ballotsTableInfo.name),
@@ -84,8 +84,8 @@ func developmentSetup(endpoint string) {
 		},
 		BillingMode: types.BillingModePayPerRequest,
 	}
-	if err = ensureLocalTableExists(ballotsTableInfo, ballotsTableInput); err != nil {
-		log.Printf("Failed to ensure Ballots table exists: %v\n", err)
+	if err := ensureLocalTableExists(ballotsTableInfo, ballotsTableInput); err != nil {
+		log.Printf("Failed to ensure Ballots table exists: %s\n", err.Error())
 	}
 	pollsTableInput := &dynamodb.CreateTableInput{
 		TableName: aws.String(pollsTableInfo.name),
@@ -103,8 +103,8 @@ func developmentSetup(endpoint string) {
 		},
 		BillingMode: types.BillingModePayPerRequest,
 	}
-	if err = ensureLocalTableExists(pollsTableInfo, pollsTableInput); err != nil {
-		log.Printf("Failed to ensure Polls table exists: %v\n", err)
+	if err := ensureLocalTableExists(pollsTableInfo, pollsTableInput); err != nil {
+		log.Printf("Failed to ensure Polls table exists: %s\n", err.Error())
 	}
 	printLocalTables()
 }
@@ -113,41 +113,42 @@ func developmentSetup(endpoint string) {
 // development. For production, create the table from the AWS console instead of in code.
 func ensureLocalTableExists(table *tableInfo, input *dynamodb.CreateTableInput) error {
 	// Check if the table exists
-	_, err := dbClient.DescribeTable(context.TODO(), &dynamodb.DescribeTableInput{
-		TableName: aws.String(table.name),
-	})
-	if err == nil { // Already exists
-		fmt.Printf("The table %v already existed\n", table.name)
+	if _, err := dbClient.DescribeTable(
+		context.TODO(),
+		&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
+	); err == nil { // Already exists
+		fmt.Printf("The table %s already existed\n", table.name)
 		printLocalTables()
 		return nil
 	}
 	// Need to create it
-	fmt.Printf("Creating the table %v...\n", table.name)
-	_, err = dbClient.CreateTable(context.TODO(), input)
-	if err != nil {
+	fmt.Printf("Creating the table %s...\n", table.name)
+	if _, err := dbClient.CreateTable(context.TODO(), input); err != nil {
 		return err
 	}
 	// Wait (forever) for the table to be created (only used in local development)
-	fmt.Printf("Waiting for the table %v to be created...\n", table.name)
+	fmt.Printf("Waiting for the table %s to be created...\n", table.name)
 	for {
-		out, err := dbClient.DescribeTable(context.TODO(), &dynamodb.DescribeTableInput{
-			TableName: aws.String(table.name),
-		})
-		if err == nil && out.Table.TableStatus == types.TableStatusActive {
+		if out, err := dbClient.DescribeTable(
+			context.TODO(),
+			&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
+		); err == nil && out.Table.TableStatus == types.TableStatusActive {
 			break
 		}
 		time.Sleep(1 * time.Second)
 	}
-	fmt.Printf("The table %v has now been created\n", table.name)
+	fmt.Printf("The table %s has now been created\n", table.name)
 	return nil
 }
 
 // printLocalTables prints a list of the tables in the local database.
 func printLocalTables() {
-	result, err := dbClient.ListTables(context.TODO(), &dynamodb.ListTablesInput{})
-	if err != nil {
-		log.Printf("Failed to list tables: %v\n", err)
-		return
+	if result, err := dbClient.ListTables(
+		context.TODO(),
+		&dynamodb.ListTablesInput{},
+	); err != nil {
+		log.Printf("Failed to list tables: %s\n", err.Error())
+	} else {
+		fmt.Println("Local tables:", result.TableNames)
 	}
-	fmt.Println("Local tables:", result.TableNames)
 }
