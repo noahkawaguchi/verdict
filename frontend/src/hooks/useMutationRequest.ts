@@ -47,12 +47,12 @@ const useMutationRequest = <TRequest, TResponse>(
           },
           body: JSON.stringify(body),
         });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        const parsedBody = await response.json();
+        if (response.ok) {
+          setData(parsedBody);
+        } else {
+          throw new Error(parsedBody.error);
         }
-        const responseData = await response.json();
-        setData(responseData);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {

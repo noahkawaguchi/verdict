@@ -93,6 +93,10 @@ func getResultHandler(
 	if err != nil {
 		return response500(err.Error())
 	}
+	// Handle the case where no ballots are found 
+	if len(ballots) == 0 {
+		return response404("no ballots found for the specified poll")
+	}
 	// Calculate the result
 	result := models.NewResult(poll, ballots)
 	// Marshal the struct into JSON (using its custom MarshalJSON method)

@@ -20,7 +20,7 @@ const useGetRequest = <TResponse>(endpoint: string) => {
 
   /**
    * Sends a GET request using the specified path parameter.
-   * 
+   *
    * @param pathParameter - The desired path parameter. Do not include a slash.
    */
   const sendRequest = useCallback(
@@ -35,12 +35,12 @@ const useGetRequest = <TResponse>(endpoint: string) => {
             'Content-Type': 'application/json',
           },
         });
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        const parsedBody = await response.json();
+        if (response.ok) {
+          setData(parsedBody);
+        } else {
+          throw new Error(parsedBody.error);
         }
-        const responseData = await response.json();
-        setData(responseData);
       } catch (err) {
         setError(err instanceof Error ? err : new Error('Unknown error'));
       } finally {

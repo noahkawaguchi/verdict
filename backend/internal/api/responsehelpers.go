@@ -33,11 +33,13 @@ func response400(errMsg string) events.APIGatewayProxyResponse {
 	}
 }
 
-// response404 is a static 404 Not Found HTTP response.
-var response404 = events.APIGatewayProxyResponse{
-	StatusCode: http.StatusNotFound,
-	Headers:    map[string]string{"Content-Type": "application/json"},
-	Body:       `{"error": "path not found"}`,
+// response404 creates a 404 Not Found HTTP response with a custom error message.
+func response404(errMsg string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusNotFound,
+		Headers:    map[string]string{"Content-Type": "application/json"},
+		Body:       `{"error": "` + errMsg + `"}`,
+	}
 }
 
 // response500 creates a 500 Internal Server Error HTTP response with a custom error message.
