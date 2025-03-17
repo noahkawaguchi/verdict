@@ -13,8 +13,8 @@ import (
 
 var ballotsTableInfo = &tableInfo{
 	name:         "Ballots",
-	partitionKey: "pollId",
-	sortKey:      "userId",
+	partitionKey: "PollID",
+	sortKey:      "UserID",
 }
 
 // PutBallot creates a new ballot entry in the database.

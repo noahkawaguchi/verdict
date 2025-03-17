@@ -35,7 +35,7 @@ func (p *Poll) GetPrompt() string {
 	return p.prompt
 }
 
-// ValidateFields ensures that all fields are non-empty, that there are at least two choices, and 
+// ValidateFields ensures that all fields are non-empty, that there are at least two choices, and
 // that choices are unique.
 func (p *Poll) ValidateFields() error {
 	if p.prompt == "" {
@@ -101,9 +101,9 @@ func (p *Poll) UnmarshalJSON(data []byte) error {
 // to DynamoDB.
 func (p *Poll) MarshalDynamoDBAttributeValue() (types.AttributeValue, error) {
 	m, err := attributevalue.MarshalMap(struct {
-		PollID  string   `dynamodbav:"pollId"`
-		Prompt  string   `dynamodbav:"prompt"`
-		Choices []string `dynamodbav:"choices"`
+		PollID  string
+		Prompt  string
+		Choices []string
 	}{
 		PollID:  p.pollID,
 		Prompt:  p.prompt,
@@ -125,9 +125,9 @@ func (p *Poll) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error {
 	}
 	// Create a struct for custom unmarshaling
 	var result struct {
-		PollID  string   `dynamodbav:"pollId"`
-		Prompt  string   `dynamodbav:"prompt"`
-		Choices []string `dynamodbav:"choices"`
+		PollID  string
+		Prompt  string
+		Choices []string
 	}
 	// Try to unmarshal using the custom struct
 	if err := attributevalue.UnmarshalMap(m.Value, &result); err != nil {

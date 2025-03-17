@@ -85,9 +85,9 @@ func (b *Ballot) UnmarshalJSON(data []byte) error {
 // to DynamoDB.
 func (b *Ballot) MarshalDynamoDBAttributeValue() (types.AttributeValue, error) {
 	m, err := attributevalue.MarshalMap(struct {
-		PollID    string `dynamodbav:"pollId"`
-		UserID    string `dynamodbav:"userId"`
-		RankOrder []int  `dynamodbav:"rankOrder"`
+		PollID    string
+		UserID    string
+		RankOrder []int
 	}{
 		PollID:    b.pollID,
 		UserID:    b.userID,
@@ -109,9 +109,9 @@ func (b *Ballot) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error 
 	}
 	// Create a struct for custom unmarshaling
 	var result struct {
-		PollID    string `dynamodbav:"pollId"`
-		UserID    string `dynamodbav:"userId"`
-		RankOrder []int  `dynamodbav:"rankOrder"`
+		PollID    string
+		UserID    string
+		RankOrder []int
 	}
 	// Try to unmarshal using the custom struct
 	if err := attributevalue.UnmarshalMap(m.Value, &result); err != nil {
