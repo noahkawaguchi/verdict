@@ -10,7 +10,8 @@ export type Ballot = {
 
 export type Result = {
   prompt: string;
+  totalVotes: number;
+  winningVotes: number;
   winningChoice: string;
-  numVotes: number;
   winningRound: number;
 };

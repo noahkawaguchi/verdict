@@ -25,7 +25,7 @@ const ViewResultsPage = () => {
           {data && (
             <p>
               In the poll "{data.prompt}," the choice "{data.winningChoice}" won with{' '}
-              {data.numVotes} votes in round {data.winningRound}
+              {data.winningVotes} out of {data.totalVotes} votes in round {data.winningRound}.
             </p>
           )}
         </>

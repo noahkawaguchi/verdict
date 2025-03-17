@@ -89,10 +89,12 @@ func (r *result) String() string {
 		return "The result was not successfully computed. Was the poll valid with at least one " +
 			"corresponding ballot?"
 	}
-	return fmt.Sprintf("\nIn the poll %q\nThe choice %q won with %d votes in round %d\n",
+	return fmt.Sprintf("\nIn the poll \"%s,\" the choice %q won with "+
+		"%d out of %d votes in round %d.\n",
 		r.poll.prompt,
 		r.poll.choices[r.winnerIdx],
 		len(r.votes[r.winnerIdx]),
+		len(r.ballots),
 		r.winningRound,
 	)
 }
@@ -103,13 +105,15 @@ func (r *result) MarshalJSON() ([]byte, error) {
 	}
 	return json.Marshal(&struct {
 		Prompt        string `json:"prompt"`
+		TotalVotes    int    `json:"totalVotes"`
+		WinningVotes  int    `json:"winningVotes"`
 		WinningChoice string `json:"winningChoice"`
-		NumVotes      int    `json:"numVotes"`
 		WinningRound  int    `json:"winningRound"`
 	}{
 		Prompt:        r.poll.prompt,
+		TotalVotes:    len(r.ballots),
+		WinningVotes:  len(r.votes[r.winnerIdx]),
 		WinningChoice: r.poll.choices[r.winnerIdx],
-		NumVotes:      len(r.votes[r.winnerIdx]),
 		WinningRound:  r.winningRound,
 	})
 }
