@@ -5,6 +5,11 @@ type CreatePollFormProps = {
   setQuestion: (question: Question) => void;
 };
 
+/**
+ * A form for entering the prompt and choices for a new poll.
+ * 
+ * @param setQuestion - Function to update the question in the parent component.
+ */
 const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
   const [prompt, setPrompt] = useState('');
   const [choices, setChoices] = useState(['', '']);

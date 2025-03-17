@@ -6,6 +6,11 @@ import CastBallotForm from './CastBallotForm';
 import { Question } from '../../types';
 import CastBallotSubmission from './CastBallotSubmission';
 
+/**
+ * Manages the display of `EnterPollId`, `CastBallotForm`, and `CastBallotSubmission` components.
+ * Manages the timing of API requests to provide the voter with a ballot and to submit their 
+ * choices.
+ */
 const CastBallotPage = () => {
   const { pollId } = useParams<{ pollId?: string }>();
   const { data, error, loading, sendRequest } = useGetRequest<Question>('poll');

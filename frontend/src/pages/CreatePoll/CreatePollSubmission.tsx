@@ -6,6 +6,12 @@ type CreatePollSubmissionProps = {
   question: Question;
 };
 
+/**
+ * Makes a POST request to create the new poll. 
+ * Displays loading, error, or links to vote in the poll and view its results.
+ * 
+ * @param question - The completed question to be used in the new poll.
+ */
 const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question }) => {
   // Get the base URL to dynamically combine with the poll ID later
   const baseUrl = `${window.location.protocol}//${window.location.host}`;

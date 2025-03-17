@@ -4,6 +4,7 @@ import useGetRequest from '../../hooks/useGetRequest';
 import { Result } from '../../types';
 import { useEffect } from 'react';
 
+/** Displays `EnterPollId` if one is not provided, then displays the results of the poll. */
 const ViewResultsPage = () => {
   const { pollId } = useParams<{ pollId?: string }>();
   const { data, error, loading, sendRequest } = useGetRequest<Result>('result');
@@ -23,8 +24,8 @@ const ViewResultsPage = () => {
           {error && <p>Failed to get result: {error.message}</p>}
           {data && (
             <p>
-              In the poll "{data.prompt}," the choice "{data.winningChoice}" won with {data.numVotes} votes in
-              round {data.winningRound}
+              In the poll "{data.prompt}," the choice "{data.winningChoice}" won with{' '}
+              {data.numVotes} votes in round {data.winningRound}
             </p>
           )}
         </>

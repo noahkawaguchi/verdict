@@ -3,6 +3,7 @@ import CreatePollForm from './CreatePollForm';
 import { Question } from '../../types';
 import CreatePollSubmission from './CreatePollSubmission';
 
+/** Manages the display of `CreatePollForm` and `CreatePollSubmission` components. */
 const CreatePollPage = () => {
   const [question, setQuestion] = useState<Question | null>(null);
 
