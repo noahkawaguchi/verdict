@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"math"
+	"math/rand/v2"
+	"slices"
 )
 
 type result struct {
@@ -45,8 +48,8 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 func (r *result) instantRunoffVoting() {
 	// Tally first-choice votes
 	for i, ballot := range r.ballots {
-		choice := ballot.rankOrder[0]
-		r.votes[choice] = append(r.votes[choice], i)
+		firstChoiceIdx := ballot.rankOrder[0]
+		r.votes[firstChoiceIdx] = append(r.votes[firstChoiceIdx], i)
 	}
 	// Majority check and elimination
 	for i := range len(r.poll.choices) { // The number of choice ranks
@@ -58,29 +61,73 @@ func (r *result) instantRunoffVoting() {
 				return
 			}
 		}
-		// Determine which choice is in last place
-		// TODO: Handle ties for last (using votes from previous rounds)
-		minVotesIdx := 0
-		for i := 1; i < len(r.votes); i++ {
-			if r.votes[i] != nil && // Don't consider eliminated choices
-				(r.votes[minVotesIdx] == nil || // Handle the case where the first element is nil
-					len(r.votes[i]) < len(r.votes[minVotesIdx])) {
-				minVotesIdx = i
+		// Find the choice(s) in last place
+		minVotes := math.MaxInt
+		var minIndices []int
+		for j, choiceBallots := range r.votes {
+			if choiceBallots != nil { // Don't consider eliminated choices
+				if len(choiceBallots) < minVotes { // New last place found
+					minVotes = len(choiceBallots)
+					minIndices = []int{j}
+				} else if len(choiceBallots) == minVotes { // Tie for last
+					minIndices = append(minIndices, j)
+				}
 			}
 		}
-		// Redistribute the last place choice's votes to other choices
-		for _, ballotIdx := range r.votes[minVotesIdx] {
+		// Break ties for last if necessary
+		var loserIdx int
+		if len(minIndices) > 1 {
+			loserIdx = r.breakTiesForLast(minIndices)
+		} else {
+			loserIdx = minIndices[0]
+		}
+		// Redistribute the losing choice's votes to other choices
+		for _, ballotIdx := range r.votes[loserIdx] {
 			for _, choice := range r.ballots[ballotIdx].rankOrder {
 				// If this choice is not the one being eliminated now and has not been eliminated
 				// in a previous round, redistribute this ballot to the choice
-				if choice != minVotesIdx && r.votes[choice] != nil {
+				if choice != loserIdx && r.votes[choice] != nil {
 					r.votes[choice] = append(r.votes[choice], ballotIdx)
 					break
 				}
 			}
 		}
-		// Eliminate the last place choice
-		r.votes[minVotesIdx] = nil
+		// Eliminate the losing choice
+		r.votes[loserIdx] = nil
+	}
+}
+
+// breakTiesForLast handles cases in instant runoff voting where multiple choices are tied for
+// last place. 
+func (r *result) breakTiesForLast(tiedIndices []int) int {
+	tieBreakVotes := make([]int, len(r.votes))
+	// Tally votes using the highest rank that is one of the tied candidates
+	for _, ballot := range r.ballots {
+		for _, choiceIdx := range ballot.rankOrder {
+			if slices.Contains(tiedIndices, choiceIdx) {
+				tieBreakVotes[choiceIdx]++
+				break
+			}
+		}
+	}
+	// Find the choice(s) in last place
+	minVotes := math.MaxInt
+	var minIndices []int
+	for _, tiedIdx := range tiedIndices {
+		if tieBreakVotes[tiedIdx] < minVotes { // New last place found
+			minVotes = tieBreakVotes[tiedIdx]
+			minIndices = []int{tiedIdx}
+		} else if tieBreakVotes[tiedIdx] == minVotes { // Tie for last again
+			minIndices = append(minIndices, tiedIdx)
+		}
+	}
+	switch len(minIndices) {
+	case 1: // Single minimum found
+		return minIndices[0]
+	case len(tiedIndices): // No choices were eliminated
+		return minIndices[rand.IntN(len(minIndices))] // Choose randomly to avoid infinite recursion
+	default:
+		return r.breakTiesForLast(minIndices)
 	}
 }
 
