@@ -9,10 +9,10 @@ const CreatePollPage = () => {
   return (
     <>
       <h3>Create a New Poll</h3>
-      {question ? (
-        <CreatePollSubmission question={question} />
-      ) : (
+      {!question ? (
         <CreatePollForm setQuestion={setQuestion} />
+      ) : (
+        <CreatePollSubmission question={question} />
       )}
     </>
   );

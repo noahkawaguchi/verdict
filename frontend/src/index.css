@@ -1,13 +1,14 @@
 :root {
   --dark-background: rgb(40, 40, 40);
   --light-text: white;
+  --main-blue-rgb: 0, 191, 255; /* deepskyblue */
+  --highlight-blue: aqua;
 }
 
 * {
   box-sizing: border-box;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-
 
 body {
   background-color: var(--dark-background);

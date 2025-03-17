@@ -1,0 +1,27 @@
+a {
+  color: rgb(var(--main-blue-rgb));
+}
+
+a:hover {
+  color: var(--highlight-blue);
+}
+
+input, button {
+  font-size: 0.9rem;
+  padding: 5px;
+  border-radius: 5px;
+}
+
+button:enabled:hover {
+  background-color: var(--highlight-blue);
+}
+
+form > * {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+form * {
+  margin-left: 5px;
+  margin-right: 5px;
+}

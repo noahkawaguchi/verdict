@@ -41,11 +41,11 @@ const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder 
 
   return (
     <form onSubmit={handleSubmit}>
-      <p>Prompt: {question.prompt}</p>
+      <p><i>Prompt:</i> {question.prompt}</p>
       {ranks.map((choice, idx) => (
         <div key={idx} className={styles.rank}>
           <p>
-            Rank {idx + 1}: {choice}
+            <i>Rank {idx + 1}:</i> {choice}
           </p>
           <button type='button' onClick={() => moveUp(idx)}>
             Move up
