@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -32,22 +33,35 @@ func PutPoll(ctx context.Context, poll *models.Poll) error {
 	return err
 }
 
-// GetPoll retrieves a poll from the database by its PollID.
-func GetPoll(ctx context.Context, id string) (*models.Poll, error) {
+// getPoll retrieves a poll from the database by its poll ID.
+func getPoll(ctx context.Context, pollID string) (*models.Poll, error) {
 	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(pollsTableInfo.name),
 		Key: map[string]types.AttributeValue{
-			pollsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: id},
+			pollsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
 		},
 	})
 	if err != nil {
 		return nil, err
 	}
 	if out.Item == nil {
-		return nil, fmt.Errorf("poll with id %s not found in the database", id)
+		return nil, fmt.Errorf("poll with id %s not found in the database", pollID)
 	}
 	// Unmarshal the retrieved poll into a struct
 	var poll models.Poll
 	err = attributevalue.UnmarshalMap(out.Item, &poll)
 	return &poll, err
+}
+
+// GetPollData retrieves a poll's information from the database in JSON string format.
+func GetPollData(ctx context.Context, pollID string) (string, error) {
+	poll, err := getPoll(ctx, pollID)
+	if err != nil {
+		return "", err
+	}
+	body, err := json.Marshal(poll)
+	if err != nil {
+		return "", err
+	}
+	return string(body), nil
 }

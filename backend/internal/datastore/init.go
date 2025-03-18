@@ -33,7 +33,8 @@ func init() {
 
 func productionSetup() {
 	// Load AWS config for production (region and credentials automatically detected from
-	// environment variables)
+	// environment variables, `context.TODO()` because the persistent client does not need the 
+	// context of each invocation)
 	if cfg, err := config.LoadDefaultConfig(context.TODO()); err != nil {
 		log.Printf("Unable to load SDK config (production).\ndbClient will be nil:\n%s\n",
 			err.Error())

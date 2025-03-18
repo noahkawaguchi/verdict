@@ -28,7 +28,7 @@ func DatastoreDemo() {
 		}
 	}
 	// Try to get the poll
-	gotPoll, err := GetPoll(ctx, pollID)
+	gotPoll, err := getPoll(ctx, pollID)
 	if err != nil {
 		log.Println("Failed to get poll:", err)
 	} else {
@@ -44,7 +44,7 @@ func DatastoreDemo() {
 		}
 	}
 	// Get ballots only using poll ID
-	pollBallots, err := GetPollBallots(ctx, pollID)
+	_, pollBallots, err := GetPollWithBallots(ctx, pollID)
 	if err != nil {
 		log.Println("Failed to get pollBallots:", err)
 	} else {

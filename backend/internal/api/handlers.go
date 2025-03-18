@@ -35,18 +35,12 @@ func createBallotHandler(
 	if pollID == "" {
 		return response400("missing poll ID")
 	}
-	// Get the poll from the database
-	poll, err := datastore.GetPoll(ctx, pollID)
-	if err != nil {
+	// Retrieve the poll data from the database
+	if body, err := datastore.GetPollData(ctx, pollID); err != nil {
 		return response500(err.Error())
+	} else {
+		return response200(body)
 	}
-	// Marshal the struct into JSON
-	body, err := json.Marshal(poll)
-	if err != nil {
-		return response500("failed to marshal response")
-	}
-	// Send the poll information back in the response
-	return response200(string(body))
 }
 
 func castBallotHandler(
@@ -75,17 +69,12 @@ func getResultHandler(
 	if pollID == "" {
 		return response400("missing poll ID")
 	}
-	// Get the poll from the database
-	poll, err := datastore.GetPoll(ctx, pollID)
+	// Get the poll and its ballots from the database
+	poll, ballots, err := datastore.GetPollWithBallots(ctx, pollID)
 	if err != nil {
 		return response500(err.Error())
 	}
-	// Get all the ballots from the database for this poll
-	ballots, err := datastore.GetPollBallots(ctx, pollID)
-	if err != nil {
-		return response500(err.Error())
-	}
-	// Handle the case where no ballots are found 
+	// Handle the case where no ballots are found
 	if len(ballots) == 0 {
 		return response404("no ballots found for the specified poll")
 	}
