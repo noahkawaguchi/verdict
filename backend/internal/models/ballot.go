@@ -35,7 +35,10 @@ func (b *Ballot) GetUserID() string {
 // and the rank order is a permutation of its indices.
 func (b *Ballot) ValidateFields() error {
 	if b.pollID == "" {
-		return errors.New("missing poll ID")
+		return errors.New("poll ID cannot be empty")
+	}
+	if b.userID == "" {
+		return errors.New("user ID cannot be empty")
 	}
 	if len(b.rankOrder) < 2 {
 		return errors.New("there must be at least two rankings")

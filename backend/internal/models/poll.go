@@ -17,14 +17,12 @@ type Poll struct {
 	choices []string
 }
 
-func NewPoll(prompt string, choices []string) (*Poll, string) {
-	pollID := uuid.New().String()
-	poll := &Poll{
-		pollID:  pollID,
+func NewPoll(prompt string, choices []string) *Poll {
+	return &Poll{
+		pollID:  uuid.New().String(),
 		prompt:  prompt,
 		choices: choices,
 	}
-	return poll, pollID
 }
 
 func (p *Poll) GetPollID() string {
@@ -35,8 +33,8 @@ func (p *Poll) GetPrompt() string {
 	return p.prompt
 }
 
-// ValidateFields ensures that all fields are non-empty, that there are at least two choices, and
-// that choices are unique.
+// ValidateFields ensures that the prompt and choices are non-empty, that there are at least two 
+// choices, and that choices are unique.
 func (p *Poll) ValidateFields() error {
 	if p.prompt == "" {
 		return errors.New("prompt cannot be empty")
