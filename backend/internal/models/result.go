@@ -19,14 +19,6 @@ type result struct {
 }
 
 func NewResult(poll *Poll, ballots []*Ballot) *result {
-	// Validate that the ballots are for this poll
-	j := 0
-	for _, ballot := range ballots {
-		if ballot.pollID == poll.pollID {
-			ballots[j] = ballot
-			j++
-		}
-	}
 	// Initialize votes to empty slices so nil can be used for elimination
 	votes := make([][]int, len(poll.choices))
 	for i := range votes {
@@ -34,7 +26,7 @@ func NewResult(poll *Poll, ballots []*Ballot) *result {
 	}
 	res := &result{
 		poll:         poll,
-		ballots:      ballots[:j],
+		ballots:      ballots,
 		votes:        votes,
 		winnerIdx:    -99,
 		winningRound: 0,
