@@ -57,13 +57,9 @@ func castBallotHandler(
 	ctx context.Context,
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
-	// Unmarshal the request
-	var ballot *models.Ballot
-	if err := json.Unmarshal([]byte(request.Body), &ballot); err != nil {
-		return response400("invalid request")
-	}
-	// Validate the request
-	if err := ballot.ValidateFields(); err != nil {
+	// Unmarshal and validate the request
+	ballot, err := models.ValidatedBallotFromJSON(request.Body)
+	if err != nil {
 		return response400(err.Error())
 	}
 	// Put the ballot in the database
