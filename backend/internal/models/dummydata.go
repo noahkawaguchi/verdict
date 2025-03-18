@@ -3,11 +3,11 @@ package models
 import "math/rand"
 
 func dummyPoll() (*Poll, string) {
-	poll := NewPoll(
+	poll, pollID := NewPoll(
 		"What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"},
 	)
-	return poll, poll.GetPollID()
+	return poll, pollID
 }
 
 func dummyBallot(pollID, userID string) *Ballot {

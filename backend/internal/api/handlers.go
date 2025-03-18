@@ -13,13 +13,9 @@ func createPollHandler(
 	ctx context.Context,
 	request events.APIGatewayProxyRequest,
 ) events.APIGatewayProxyResponse {
-	// Unmarshal the request
-	var poll *models.Poll
-	if err := json.Unmarshal([]byte(request.Body), &poll); err != nil {
-		return response400("invalid request")
-	}
-	// Validate the fields
-	if err := poll.ValidateFields(); err != nil {
+	// Unmarshal and validate the request
+	poll, pollID, err := models.ValidatedPollFromJSON(request.Body)
+	if err != nil {
 		return response400(err.Error())
 	}
 	// Put the poll in the database
@@ -27,7 +23,7 @@ func createPollHandler(
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
-	return response201(`{"pollId": "` + poll.GetPollID() + `"}`)
+	return response201(`{"pollId": "` + pollID + `"}`)
 }
 
 func createBallotHandler(

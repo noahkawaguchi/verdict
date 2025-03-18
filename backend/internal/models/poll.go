@@ -17,43 +17,13 @@ type Poll struct {
 	choices []string
 }
 
-func NewPoll(prompt string, choices []string) *Poll {
+func NewPoll(prompt string, choices []string) (*Poll, string) {
+	pollID := uuid.New().String()
 	return &Poll{
-		pollID:  uuid.New().String(),
+		pollID:  pollID,
 		prompt:  prompt,
 		choices: choices,
-	}
-}
-
-func (p *Poll) GetPollID() string {
-	return p.pollID
-}
-
-func (p *Poll) GetPrompt() string {
-	return p.prompt
-}
-
-// ValidateFields ensures that the prompt and choices are non-empty, that there are at least two 
-// choices, and that choices are unique.
-func (p *Poll) ValidateFields() error {
-	if p.prompt == "" {
-		return errors.New("prompt cannot be empty")
-	}
-	if len(p.choices) < 2 {
-		return errors.New("there must be at least two choices")
-	}
-	if slices.Contains(p.choices, "") {
-		return errors.New("none of the choices can be empty")
-	}
-	// Use a "set" to validate uniqueness
-	seen := make(map[string]struct{})
-	for _, choice := range p.choices {
-		if _, exists := seen[choice]; exists {
-			return errors.New("choices must be unique")
-		}
-		seen[choice] = struct{}{}
-	}
-	return nil
+	}, pollID
 }
 
 func (p *Poll) String() string {
@@ -65,6 +35,46 @@ func (p *Poll) String() string {
 	return ret
 }
 
+// ValidatedPollFromJSON unmarshals the provided JSON into a new poll. If the prompt or any of the
+// choices are empty, there are fewer than two choices, or choices are not unique, it returns an
+// error.
+func ValidatedPollFromJSON(jsonString string) (*Poll, string, error) {
+	// Create an auxiliary struct with exported fields to unmarshal the data
+	aux := &struct {
+		PollID  string   `json:"pollId"`
+		Prompt  string   `json:"prompt"`
+		Choices []string `json:"choices"`
+	}{}
+	if err := json.Unmarshal([]byte(jsonString), &aux); err != nil {
+		return nil, "", errors.New("invalid JSON")
+	}
+	// Create a new poll ID here
+	aux.PollID = uuid.New().String()
+	// Validate the other fields
+	if aux.Prompt == "" {
+		return nil, "", errors.New("prompt cannot be empty")
+	}
+	if len(aux.Choices) < 2 {
+		return nil, "", errors.New("there must be at least two choices")
+	}
+	if slices.Contains(aux.Choices, "") {
+		return nil, "", errors.New("none of the choices can be empty")
+	}
+	// Use a "set" to validate uniqueness
+	seen := make(map[string]struct{})
+	for _, choice := range aux.Choices {
+		if _, exists := seen[choice]; exists {
+			return nil, "", errors.New("choices must be unique")
+		}
+		seen[choice] = struct{}{}
+	}
+	return &Poll{
+		pollID:  aux.PollID,
+		prompt:  aux.Prompt,
+		choices: aux.Choices,
+	}, aux.PollID, nil
+}
+
 // MarshalJSON is a custom marshaler that omits the poll ID.
 func (p *Poll) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
@@ -74,25 +84,6 @@ func (p *Poll) MarshalJSON() ([]byte, error) {
 		Prompt:  p.prompt,
 		Choices: p.choices,
 	})
-}
-
-// UnmarshalJSON is custom unmarshaler that handles new poll creation when the data comes directly
-// from JSON.
-func (p *Poll) UnmarshalJSON(data []byte) error {
-	// Create an auxiliary struct to unmarshal only the prompt and choices
-	aux := &struct {
-		Prompt  string   `json:"prompt"`
-		Choices []string `json:"choices"`
-	}{}
-	if err := json.Unmarshal(data, &aux); err != nil {
-		return err
-	}
-	// Create a new poll ID here
-	p.pollID = uuid.New().String()
-	// Set the unmarshaled values back to the main struct
-	p.prompt = aux.Prompt
-	p.choices = aux.Choices
-	return nil
 }
 
 // MarshalDynamoDBAttributeValue is a custom marshaler to control how the struct is serialized
