@@ -2,7 +2,6 @@ package api
 
 import (
 	"context"
-	"encoding/json"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
@@ -19,7 +18,7 @@ func createPollHandler(
 		return response400(err.Error())
 	}
 	// Put the poll in the database
-	if err := datastore.PutPoll(ctx, poll); err != nil {
+	if err = datastore.PutPoll(ctx, poll); err != nil {
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
@@ -53,7 +52,7 @@ func castBallotHandler(
 		return response400(err.Error())
 	}
 	// Put the ballot in the database
-	if err := datastore.PutBallot(ctx, ballot); err != nil {
+	if err = datastore.PutBallot(ctx, ballot); err != nil {
 		return response500("failed to put the ballot in the database")
 	}
 	// Send a success message back in the response
@@ -79,12 +78,9 @@ func getResultHandler(
 		return response404("no ballots found for the specified poll")
 	}
 	// Calculate the result
-	result := models.NewResult(poll, ballots)
-	// Marshal the struct into JSON (using its custom MarshalJSON method)
-	body, err := json.Marshal(result)
-	if err != nil {
-		return response500("failed to marshal response")
+	if body, err := models.CalculateResultData(poll, ballots); err != nil {
+		return response500(err.Error())
+	} else {
+		return response200(body)
 	}
-	// Send the poll information back in the response
-	return response200(string(body))
 }

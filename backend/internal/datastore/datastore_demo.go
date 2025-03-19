@@ -54,5 +54,9 @@ func DatastoreDemo() {
 		}
 	}
 	// Compute the results
-	fmt.Println(models.NewResult(poll, ballots))
+	if body, err := models.CalculateResultData(poll, ballots); err != nil {
+		log.Println(err.Error())
+	} else {
+		fmt.Println(body)
+	}
 }
