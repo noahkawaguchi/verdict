@@ -32,7 +32,7 @@ func PutBallot(ctx context.Context, ballot *models.Ballot) error {
 	return err
 }
 
-// getBallot retrieves a ballot from the database by its PollID and UserID.
+// getBallot retrieves a ballot from the database by its poll ID and user ID.
 func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, error) {
 	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(ballotsTableInfo.name),

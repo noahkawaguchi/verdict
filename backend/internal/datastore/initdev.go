@@ -1,3 +1,5 @@
+//go:build dev
+
 package datastore
 
 import (
@@ -14,32 +16,12 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-type tableInfo struct {
-	name, partitionKey, sortKey string
-}
-
-var dbClient *dynamodb.Client
-
-// init sets up the dbClient before main executes, once per cold start
+// init sets up the dbClient before main executes, once per cold start.
 func init() {
-	if os.Getenv("USE_LOCAL_DYNAMO") == "true" { // Local development without SAM
-		developmentSetup("http://localhost:8000") 
-	} else if os.Getenv("AWS_SAM_LOCAL") == "true" { // Local development with SAM
-		developmentSetup("http://host.docker.internal:8000") 
-	} else {
-		productionSetup()
-	}
-}
-
-func productionSetup() {
-	// Load AWS config for production (region and credentials automatically detected from
-	// environment variables, `context.TODO()` because the persistent client does not need the 
-	// context of each invocation)
-	if cfg, err := config.LoadDefaultConfig(context.TODO()); err != nil {
-		log.Printf("Unable to load SDK config (production).\ndbClient will be nil:\n%s\n",
-			err.Error())
-	} else { // Set the DynamoDB client
-		dbClient = dynamodb.NewFromConfig(cfg)
+	if os.Getenv("AWS_SAM_LOCAL") == "true" { // Running the Lambda function locally with SAM
+		developmentSetup("http://host.docker.internal:8000")
+	} else { // Just running the code in development, not using SAM
+		developmentSetup("http://localhost:8000")
 	}
 }
 
