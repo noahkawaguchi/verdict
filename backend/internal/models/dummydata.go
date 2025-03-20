@@ -3,7 +3,7 @@ package models
 import "math/rand"
 
 func dummyPoll() (*Poll, string) {
-	poll, pollID := NewPoll(
+	poll, pollID, _ := NewValidatedPoll(
 		"What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"},
 	)
@@ -15,7 +15,8 @@ func dummyBallot(pollID, userID string) *Ballot {
 	rand.Shuffle(len(ranks), func(i, j int) {
 		ranks[i], ranks[j] = ranks[j], ranks[i]
 	})
-	return NewBallot(pollID, userID, ranks)
+	ballot, _ := NewValidatedBallot(pollID, userID, ranks)
+	return ballot
 }
 
 func DummyData(userIDs []string) (*Poll, string, []*Ballot) {

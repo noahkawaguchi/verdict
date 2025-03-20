@@ -9,19 +9,23 @@ import (
 )
 
 func threeOptionPoll() (*models.Poll, string) {
-	return models.NewPoll("What is the best fruit?", []string{"apple", "banana", "clementine"})
+	poll, pollID, _ := models.NewValidatedPoll("What is the best fruit?",
+		[]string{"apple", "banana", "clementine"})
+	return poll, pollID
 }
 
 func fourOptionPoll() (*models.Poll, string) {
-	return models.NewPoll("What is the best fruit?",
+	poll, pollID, _ := models.NewValidatedPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"})
+	return poll, pollID
 }
 
 func ballotClosure(pollID string) func([]int) *models.Ballot {
 	userID := 0
 	return func(rankOrder []int) *models.Ballot {
 		userID++
-		return models.NewBallot(pollID, strconv.Itoa(userID), rankOrder)
+		ballot, _ := models.NewValidatedBallot(pollID, strconv.Itoa(userID), rankOrder)
+		return ballot
 	}
 }
 

@@ -8,6 +8,69 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
+func TestNewValidatedBallot_Invalid(t *testing.T) {
+	tests := []struct {
+		errMsg    string
+		pollID    string
+		userID    string
+		rankOrder []int
+	}{
+		{
+			errMsg:    "poll ID cannot be empty",
+			userID:    "user1",
+			rankOrder: []int{0, 1, 2},
+		},
+		{
+			errMsg: "poll ID cannot be empty",
+			userID: "user1",
+		},
+		{
+			errMsg:    "poll ID cannot be empty",
+			rankOrder: []int{0, 1, 2},
+		},
+		{
+			errMsg:    "poll ID cannot be empty",
+			pollID:    "",
+			userID:    "user1",
+			rankOrder: []int{0, 1, 2},
+		},
+		{
+			errMsg: "there must be at least two rankings",
+			pollID: "poll3",
+			userID: "user3",
+		},
+		{"there must be at least two rankings", "poll2", "user2", []int{0}},
+		{"there must be at least two rankings", "poll2", "user2", []int{}},
+		{"not a valid rank order", "poll2", "user2", []int{3, 5, 1, 2, 4}},
+		{"not a valid rank order", "poll3", "user3", []int{0, 1, 1, 1}},
+	}
+	for _, test := range tests {
+		_, err := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
+		if err == nil || err.Error() != test.errMsg {
+			t.Errorf("expected error with message %q, got %v", test.errMsg, err)
+		}
+	}
+}
+
+func TestNewValidatedBallot_Valid(t *testing.T) {
+	tests := []struct {
+		pollID    string
+		userID    string
+		rankOrder []int
+	}{
+		{"poll1", "user1", []int{0, 1, 2}},
+		{"poll2", "user2", []int{3, 0, 1, 2, 4}},
+		{"poll2", "user4", []int{4, 1, 0, 3, 2}},
+	}
+	for _, test := range tests {
+		if _, err := models.NewValidatedBallot(
+			test.pollID, test.userID, test.rankOrder,
+		); err != nil {
+			t.Errorf("expected success, got %v", err)
+		}
+	}
+}
+
 func TestValidatedBallotFromJSON_Invalid(t *testing.T) {
 	tests := []struct {
 		errMsg     string
@@ -63,7 +126,7 @@ func TestBallotMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"poll5", "user5", []int{3, 2, 0, 1, 5, 4}},
 	}
 	for _, test := range tests {
-		inputBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+		inputBallot, _ := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
 		av, err := attributevalue.MarshalMap(inputBallot)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)

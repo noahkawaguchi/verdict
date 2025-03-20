@@ -19,18 +19,19 @@ type Ballot struct {
 	rankOrder []int
 }
 
-func NewBallot(pollID, userID string, rankOrder []int) *Ballot {
-	return &Ballot{
+// NewValidatedBallot creates a new ballot. If the poll ID or user ID are empty, if the rank order 
+// has fewer than two rankings, or if the rank order is not a permutation of its indices, it 
+// returns an error.
+func NewValidatedBallot(pollID, userID string, rankOrder []int) (*Ballot, error) {
+	ballot := &Ballot{
 		pollID:    pollID,
 		userID:    userID,
 		rankOrder: rankOrder,
 	}
-}
-
-func (b *Ballot) String() string {
-	shortPollID := b.pollID[:5] + "... "
-	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
-		b.userID, shortPollID, b.rankOrder)
+	if err := ballot.validate(); err != nil {
+		return nil, err
+	}
+	return ballot, nil
 }
 
 // ValidatedBallotFromJSON unmarshals the provided JSON into a new ballot. If no user ID is
@@ -51,26 +52,45 @@ func ValidatedBallotFromJSON(jsonString string) (*Ballot, error) {
 	if aux.UserID == "" {
 		aux.UserID = uuid.New().String()
 	}
-	// Validate the other fields
-	if aux.PollID == "" {
-		return nil, errors.New("poll ID cannot be empty")
-	}
-	if len(aux.RankOrder) < 2 {
-		return nil, errors.New("there must be at least two rankings")
-	}
-	// Copy the slice to avoid changing the original underlying array
-	sortCopy := slices.Clone(aux.RankOrder)
-	slices.Sort(sortCopy)
-	for i, v := range sortCopy {
-		if v != i {
-			return nil, errors.New("not a valid rank order")
-		}
-	}
-	return &Ballot{
+	ballot := &Ballot{
 		pollID:    aux.PollID,
 		userID:    aux.UserID,
 		rankOrder: aux.RankOrder,
-	}, nil
+	}
+	// Validate the fields
+	if err := ballot.validate(); err != nil {
+		return nil, err
+	}
+	return ballot, nil
+}
+
+func (b *Ballot) String() string {
+	shortPollID := b.pollID[:5] + "... "
+	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
+		b.userID, shortPollID, b.rankOrder)
+}
+
+// validate ensures that none of the fields are empty, there are at least two rankings, and the
+// rank order is a permutation of its indices.
+func (b *Ballot) validate() error {
+	if b.pollID == "" {
+		return errors.New("poll ID cannot be empty")
+	}
+	if b.userID == "" {
+		return errors.New("user ID cannot be empty")
+	}
+	if len(b.rankOrder) < 2 {
+		return errors.New("there must be at least two rankings")
+	}
+	// Copy the slice to avoid changing the original underlying array
+	sortCopy := slices.Clone(b.rankOrder)
+	slices.Sort(sortCopy)
+	for i, v := range sortCopy {
+		if v != i {
+			return errors.New("not a valid rank order")
+		}
+	}
+	return nil
 }
 
 // MarshalDynamoDBAttributeValue is a custom marshaler to control how the struct is serialized

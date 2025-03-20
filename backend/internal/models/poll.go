@@ -17,13 +17,18 @@ type Poll struct {
 	choices []string
 }
 
-func NewPoll(prompt string, choices []string) (*Poll, string) {
-	pollID := uuid.New().String()
-	return &Poll{
-		pollID:  pollID,
+// NewValidatedPoll creates a new poll. If the prompt or any of the choices are empty, there are 
+// fewer than two choices, or choices are not unique, it returns an error.
+func NewValidatedPoll(prompt string, choices []string) (*Poll, string, error) {
+	poll := &Poll{
+		pollID:  uuid.New().String(),
 		prompt:  prompt,
 		choices: choices,
-	}, pollID
+	}
+	if err := poll.validate(); err != nil {
+		return nil, "", err
+	}
+	return poll, poll.pollID, nil
 }
 
 func (p *Poll) String() string {
@@ -48,31 +53,40 @@ func ValidatedPollFromJSON(jsonString string) (*Poll, string, error) {
 	if err := json.Unmarshal([]byte(jsonString), &aux); err != nil {
 		return nil, "", errors.New("invalid JSON")
 	}
-	// Create a new poll ID here
-	aux.PollID = uuid.New().String()
+	// Create a poll with a new poll ID
+	poll := &Poll{
+		pollID:  uuid.New().String(),
+		prompt:  aux.Prompt,
+		choices: aux.Choices,
+	}
 	// Validate the other fields
-	if aux.Prompt == "" {
-		return nil, "", errors.New("prompt cannot be empty")
+	if err := poll.validate(); err != nil {
+		return nil, "", err
 	}
-	if len(aux.Choices) < 2 {
-		return nil, "", errors.New("there must be at least two choices")
+	return poll, poll.pollID, nil
+}
+
+// validate ensures that the prompt and all choices are non-empty, that there are at least two
+// choices, and that all choices are unique.
+func (p *Poll) validate() error {
+	if p.prompt == "" {
+		return errors.New("prompt cannot be empty")
 	}
-	if slices.Contains(aux.Choices, "") {
-		return nil, "", errors.New("none of the choices can be empty")
+	if len(p.choices) < 2 {
+		return errors.New("there must be at least two choices")
+	}
+	if slices.Contains(p.choices, "") {
+		return errors.New("none of the choices can be empty")
 	}
 	// Use a "set" to validate uniqueness
 	seen := make(map[string]struct{})
-	for _, choice := range aux.Choices {
+	for _, choice := range p.choices {
 		if _, exists := seen[choice]; exists {
-			return nil, "", errors.New("choices must be unique")
+			return errors.New("choices must be unique")
 		}
 		seen[choice] = struct{}{}
 	}
-	return &Poll{
-		pollID:  aux.PollID,
-		prompt:  aux.Prompt,
-		choices: aux.Choices,
-	}, aux.PollID, nil
+	return nil
 }
 
 // MarshalJSON is a custom marshaler that omits the poll ID.
