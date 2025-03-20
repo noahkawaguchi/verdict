@@ -29,7 +29,7 @@ func ballotClosure(pollID string) func([]int) *models.Ballot {
 	}
 }
 
-func expectedJSON(totalVotes, winningVotes, winningChoiceIdx, winningRound int) string {
+func expectedResultJSON(totalVotes, winningVotes, winningChoiceIdx, winningRound int) string {
 	winningChoice := []string{"apple", "banana", "clementine", "durian"}[winningChoiceIdx]
 	return fmt.Sprintf(
 		`{"prompt":"What is the best fruit?","totalVotes":%d,"winningVotes":%d,`+
@@ -50,7 +50,7 @@ func TestResult_SimpleMajority(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	if body != expectedJSON(3, 2, 2, 1) {
+	if body != expectedResultJSON(3, 2, 2, 1) {
 		t.Errorf("unexpected result: %s", body)
 	}
 }
@@ -69,7 +69,7 @@ func TestResult_Runoff(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	if body != expectedJSON(5, 3, 1, 2) {
+	if body != expectedResultJSON(5, 3, 1, 2) {
 		t.Errorf("unexpected result: %s", body)
 	}
 }
@@ -103,7 +103,7 @@ func TestResult_TieForLast(t *testing.T) {
 		Round 3:
 			- 2 now has 4/6 votes, a strict majority, and wins.
 	*/
-	if body != expectedJSON(6, 4, 2, 3) {
+	if body != expectedResultJSON(6, 4, 2, 3) {
 		t.Errorf("unexpected result: %s", body)
 	}
 }
@@ -144,7 +144,7 @@ func TestResult_InfiniteTieForLast(t *testing.T) {
 			- Ballot state if 2 was eliminated: [0, 0, 3, 0, 3, 3, 3, 3]
 			- In either case, 3 now has 5 out of 8 votes, a strict majority, and wins.
 	*/
-	if body != expectedJSON(8, 5, 3, 3) {
+	if body != expectedResultJSON(8, 5, 3, 3) {
 		t.Errorf("unexpected result: %s", body)
 	}
 }

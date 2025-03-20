@@ -53,29 +53,3 @@ func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, erro
 	err = attributevalue.UnmarshalMap(out.Item, &ballot)
 	return &ballot, err
 }
-
-// GetPollWithBallots retrieves a poll and all of its ballots from the database.
-func GetPollWithBallots(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error) {
-	// Get the poll
-	poll, err := getPoll(ctx, pollID)
-	if err != nil {
-		return nil, nil, err
-	}
-	// Define input to query by pollID
-	input := &dynamodb.QueryInput{
-		TableName:              aws.String(ballotsTableInfo.name),
-		KeyConditionExpression: aws.String(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey)),
-		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":pk": &types.AttributeValueMemberS{Value: pollID},
-		},
-	}
-	// Perform the query
-	out, err := dbClient.Query(ctx, input)
-	if err != nil {
-		return nil, nil, err
-	}
-	// Unmarshal the retrieved items
-	var ballots []*models.Ballot
-	err = attributevalue.UnmarshalListOfMaps(out.Items, &ballots)
-	return poll, ballots, err
-}
