@@ -9,7 +9,7 @@ type CastBallotFormProps = {
 
 /**
  * A form for casting a ballot. Allows the voter to rank their choices.
- * 
+ *
  * @param question - The question to pose to the voter.
  * @param setRankOrder - A function to update the rank order in the parent component.
  */
@@ -47,16 +47,18 @@ const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder 
 
   return (
     <form onSubmit={handleSubmit}>
-      <p><i>Prompt:</i> {question.prompt}</p>
+      <p>
+        <i>Prompt:</i> {question.prompt}
+      </p>
       {ranks.map((choice, idx) => (
         <div key={idx} className={styles.rank}>
           <p>
             <i>Rank {idx + 1}:</i> {choice}
           </p>
-          <button type='button' onClick={() => moveUp(idx)}>
+          <button type='button' onClick={() => moveUp(idx)} hidden={idx === 0}>
             Move up
           </button>
-          <button type='button' onClick={() => moveDown(idx)}>
+          <button type='button' onClick={() => moveDown(idx)} hidden={idx === ranks.length - 1}>
             Move down
           </button>
         </div>
