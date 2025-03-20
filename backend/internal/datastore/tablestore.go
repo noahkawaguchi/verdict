@@ -11,16 +11,18 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
+var dbClient *dynamodb.Client
+
 type tableInfo struct {
 	name, partitionKey, sortKey string
 }
 
-var dbClient *dynamodb.Client
+type TableStore struct {}
 
 // GetPollWithBallots retrieves a poll and all of its ballots from the database.
-func GetPollWithBallots(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error) {
+func (ts *TableStore) GetPollWithBallots(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error) {
 	// Get the poll
-	poll, err := getPoll(ctx, pollID)
+	poll, err := ts.getPoll(ctx, pollID)
 	if err != nil {
 		return nil, nil, err
 	}

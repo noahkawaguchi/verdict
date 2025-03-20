@@ -6,33 +6,55 @@ import (
 	"regexp"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-// Router directs API Gateway requests to the correct handler.
-func Router(
-	ctx context.Context,
-	request events.APIGatewayProxyRequest,
+type datastore interface {
+	PutPoll(ctx context.Context, poll *models.Poll) error
+	GetPollData(ctx context.Context, pollID string) (string, error)
+	PutBallot(ctx context.Context, ballot *models.Ballot) error
+	GetPollWithBallots(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error)
+}
+
+type handler struct {
+	ctx context.Context
+	req events.APIGatewayProxyRequest
+	ds  datastore
+}
+
+// Router creates a handler to handle the request.
+func Router(ds datastore) func(
+	ctx context.Context, request events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
-	// Match the method and path
-	switch request.HTTPMethod {
+	return func(
+		ctx context.Context, request events.APIGatewayProxyRequest,
+	) (events.APIGatewayProxyResponse, error) {
+		h := &handler{ctx, request, ds}
+		return h.route(), nil
+	}
+}
+
+// route matches the method and path of the request and calls the relevant method.
+func (h *handler) route() events.APIGatewayProxyResponse {
+	switch h.req.HTTPMethod {
 	case http.MethodPost:
-		switch request.Path {
+		switch h.req.Path {
 		case "/poll":
-			return createPollHandler(ctx, request), nil
+			return h.createPoll()
 		case "/ballot":
-			return castBallotHandler(ctx, request), nil
+			return h.castBallot()
 		default:
-			return response404("path not found"), nil
+			return response404("path not found")
 		}
 	case http.MethodGet:
-		if matched, _ := regexp.MatchString("^/poll/.*$", request.Path); matched {
-			return createBallotHandler(ctx, request), nil
-		} else if matched, _ := regexp.MatchString("^/result/.*$", request.Path); matched {
-			return getResultHandler(ctx, request), nil
+		if matched, _ := regexp.MatchString("^/poll/.*$", h.req.Path); matched {
+			return h.createBallot()
+		} else if matched, _ := regexp.MatchString("^/result/.*$", h.req.Path); matched {
+			return h.getResult()
 		} else {
-			return response404("path not found"), nil
+			return response404("path not found")
 		}
 	default:
-		return response404("path not found"), nil
+		return response404("path not found")
 	}
 }

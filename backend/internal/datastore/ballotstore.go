@@ -18,7 +18,7 @@ var ballotsTableInfo = &tableInfo{
 }
 
 // PutBallot creates a new ballot entry in the database.
-func PutBallot(ctx context.Context, ballot *models.Ballot) error {
+func (ts *TableStore) PutBallot(ctx context.Context, ballot *models.Ballot) error {
 	// Marshal the struct into a DynamoDB-compatible map
 	av, err := attributevalue.MarshalMap(ballot)
 	if err != nil {
@@ -33,7 +33,7 @@ func PutBallot(ctx context.Context, ballot *models.Ballot) error {
 }
 
 // getBallot retrieves a ballot from the database by its poll ID and user ID.
-func getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, error) {
+func (ts *TableStore) getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, error) {
 	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(ballotsTableInfo.name),
 		Key: map[string]types.AttributeValue{

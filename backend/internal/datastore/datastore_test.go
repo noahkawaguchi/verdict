@@ -35,15 +35,16 @@ func TestBallotStore(t *testing.T) {
 		{"poll2", "user3", []int{3, 4, 2, 0, 1, 5}},
 	}
 
+	ts := &TableStore{}
 	for _, test := range tests {
 		inputBallot, err := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
 		if err != nil {
 			t.Error("unexpected error creating ballot:", err)
 		}
-		if err = PutBallot(context.TODO(), inputBallot); err != nil {
+		if err = ts.PutBallot(context.TODO(), inputBallot); err != nil {
 			t.Error("unexpected error putting ballot:", err)
 		}
-		gotBallot, err := getBallot(context.TODO(), test.pollID, test.userID)
+		gotBallot, err := ts.getBallot(context.TODO(), test.pollID, test.userID)
 		if err != nil {
 			t.Error("unexpected error getting ballot:", err)
 		}
@@ -66,15 +67,16 @@ func TestPollStore(t *testing.T) {
 		{"How big is 42?", []string{"at least 42", "at most 42", "7"}},
 	}
 
+	ts := &TableStore{}
 	for _, test := range tests {
 		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
 		if err != nil {
 			t.Error("unexpected error creating poll:", err)
 		}
-		if err = PutPoll(context.TODO(), inputPoll); err != nil {
+		if err = ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
-		gotPoll, err := getPoll(context.TODO(), inputPollID)
+		gotPoll, err := ts.getPoll(context.TODO(), inputPollID)
 		if err != nil {
 			t.Error("unexpected error getting poll:", err)
 		}
@@ -105,15 +107,16 @@ func TestGetPollData(t *testing.T) {
 		{"How big is 42?", []string{"at least 42", "at most 42", "7"}},
 	}
 
+	ts := &TableStore{}
 	for _, test := range tests {
 		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
 		if err != nil {
 			t.Error("unexpected error creating poll:", err)
 		}
-		if err = PutPoll(context.TODO(), inputPoll); err != nil {
+		if err = ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
-		gotPollData, err := GetPollData(context.TODO(), inputPollID)
+		gotPollData, err := ts.GetPollData(context.TODO(), inputPollID)
 		if err != nil {
 			t.Error("unexpected error getting poll data:", err)
 		}
@@ -188,12 +191,13 @@ func TestGetPollWithBallots(t *testing.T) {
 		},
 	}
 
+	ts := &TableStore{}
 	for _, test := range tests {
 		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
 		if err != nil {
 			t.Error("unexpected error creating poll:", err)
 		}
-		if err := PutPoll(context.TODO(), inputPoll); err != nil {
+		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
 		inputBallots := make([]*models.Ballot, len(test.ballots))
@@ -203,11 +207,11 @@ func TestGetPollWithBallots(t *testing.T) {
 				t.Error("unexpected error creating ballot:", err)
 			}
 			inputBallots[i] = inputBallot
-			if err := PutBallot(context.TODO(), inputBallot); err != nil {
+			if err := ts.PutBallot(context.TODO(), inputBallot); err != nil {
 				t.Error("unexpected error putting ballot:", err)
 			}
 		}
-		gotPoll, gotBallots, err := GetPollWithBallots(context.TODO(), inputPollID)
+		gotPoll, gotBallots, err := ts.GetPollWithBallots(context.TODO(), inputPollID)
 		if err != nil {
 			t.Error("unexpected error getting poll with ballots:", err)
 		}
