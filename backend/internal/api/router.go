@@ -11,7 +11,7 @@ import (
 
 type datastore interface {
 	PutPoll(ctx context.Context, poll *models.Poll) error
-	GetPollData(ctx context.Context, pollID string) (string, error)
+	GetPoll(ctx context.Context, pollID string) (*models.Poll, error)
 	PutBallot(ctx context.Context, ballot *models.Ballot) error
 	GetPollWithBallots(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error)
 }

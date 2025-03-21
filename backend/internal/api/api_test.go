@@ -18,8 +18,8 @@ func (m *mockDatastore) PutPoll(ctx context.Context, poll *models.Poll) error {
 	return nil
 }
 
-func (m *mockDatastore) GetPollData(ctx context.Context, pollID string) (string, error) {
-	return "", nil
+func (m *mockDatastore) GetPoll(ctx context.Context, pollID string) (*models.Poll, error) {
+	return nil, nil
 }
 
 func (m *mockDatastore) PutBallot(ctx context.Context, ballot *models.Ballot) error {

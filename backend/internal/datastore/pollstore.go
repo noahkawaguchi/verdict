@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -33,8 +32,8 @@ func (ts *TableStore) PutPoll(ctx context.Context, poll *models.Poll) error {
 	return err
 }
 
-// getPoll retrieves a poll from the database by its poll ID.
-func (ts *TableStore) getPoll(ctx context.Context, pollID string) (*models.Poll, error) {
+// GetPoll retrieves a poll from the database by its poll ID.
+func (ts *TableStore) GetPoll(ctx context.Context, pollID string) (*models.Poll, error) {
 	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
 		TableName: aws.String(pollsTableInfo.name),
 		Key: map[string]types.AttributeValue{
@@ -51,17 +50,4 @@ func (ts *TableStore) getPoll(ctx context.Context, pollID string) (*models.Poll,
 	var poll models.Poll
 	err = attributevalue.UnmarshalMap(out.Item, &poll)
 	return &poll, err
-}
-
-// GetPollData retrieves a poll's information from the database in JSON string format.
-func (ts *TableStore) GetPollData(ctx context.Context, pollID string) (string, error) {
-	poll, err := ts.getPoll(ctx, pollID)
-	if err != nil {
-		return "", err
-	}
-	body, err := json.Marshal(poll)
-	if err != nil {
-		return "", err
-	}
-	return string(body), nil
 }

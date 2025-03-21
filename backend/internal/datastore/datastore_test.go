@@ -4,7 +4,6 @@ package datastore
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
@@ -70,49 +69,12 @@ func TestPollStore(t *testing.T) {
 		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
-		gotPoll, err := ts.getPoll(context.TODO(), inputPoll.GetPollID())
+		gotPoll, err := ts.GetPoll(context.TODO(), inputPoll.GetPollID())
 		if err != nil {
 			t.Error("unexpected error getting poll:", err)
 		}
 		if !cmp.Equal(gotPoll, inputPoll, cmp.AllowUnexported(models.Poll{})) {
 			t.Error("got poll did not match input poll:", gotPoll)
-		}
-	}
-}
-
-func expectedPollJSON(prompt string, choices []string) string {
-	choicesJSON, err := json.Marshal(choices)
-	if err != nil {
-		return ""
-	}
-	return fmt.Sprintf(`{"prompt":%q,"choices":%s}`, prompt, string(choicesJSON))
-}
-
-func TestGetPollData(t *testing.T) {
-	createLocalTable(pollsTableInfo, createPollsTableInput)
-	t.Cleanup(func() { deleteLocalTable(pollsTableInfo) })
-
-	tests := []struct {
-		prompt  string
-		choices []string
-	}{
-		{"What is the best number?", []string{"1", "99", "100", "42"}},
-		{"Why is the best number 42?", []string{"wabi-sabi", "randomness", "trick question"}},
-		{"How big is 42?", []string{"at least 42", "at most 42", "7"}},
-	}
-
-	ts := &TableStore{}
-	for _, test := range tests {
-		inputPoll := models.NewPoll(test.prompt, test.choices)
-		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
-			t.Error("unexpected error putting poll:", err)
-		}
-		gotPollData, err := ts.GetPollData(context.TODO(), inputPoll.GetPollID())
-		if err != nil {
-			t.Error("unexpected error getting poll data:", err)
-		}
-		if gotPollData != expectedPollJSON(test.prompt, test.choices) {
-			t.Error("got poll data did not match input:", gotPollData)
 		}
 	}
 }

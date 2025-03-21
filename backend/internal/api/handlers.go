@@ -13,7 +13,7 @@ func (h *handler) createPoll() events.APIGatewayProxyResponse {
 	if err := json.Unmarshal([]byte(h.req.Body), &poll); err != nil {
 		return response400("invalid JSON")
 	}
-	// Validate the fields 
+	// Validate the fields
 	if err := poll.Validate(); err != nil {
 		return response400(err.Error())
 	}
@@ -31,11 +31,16 @@ func (h *handler) createBallot() events.APIGatewayProxyResponse {
 	if pollID == "" {
 		return response400("missing poll ID")
 	}
-	// Retrieve the poll data from the database
-	if body, err := h.ds.GetPollData(h.ctx, pollID); err != nil {
+	// Retrieve the poll from the database
+	poll, err := h.ds.GetPoll(h.ctx, pollID)
+	if err != nil {
 		return response500(err.Error())
+	}
+	// Marshal the response
+	if body, err := json.Marshal(poll); err != nil {
+		return response500("failed to marshal response")
 	} else {
-		return response200(body)
+		return response200(string(body))
 	}
 }
 
