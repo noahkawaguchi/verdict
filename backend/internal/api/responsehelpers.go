@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 )
@@ -29,7 +30,7 @@ func response400(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusBadRequest,
 		Headers:    map[string]string{"Content-Type": "application/json"},
-		Body:       `{"error": "` + errMsg + `"}`,
+		Body:       `{"error":"` + errMsg + `"}`,
 	}
 }
 
@@ -38,7 +39,20 @@ func response404(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusNotFound,
 		Headers:    map[string]string{"Content-Type": "application/json"},
-		Body:       `{"error": "` + errMsg + `"}`,
+		Body:       `{"error":"` + errMsg + `"}`,
+	}
+}
+
+// response405 creates a 405 Method Not Allowed HTTP response with a custom error message and a
+// custom header specifying the allowed methods.
+func response405(receivedMethod string, allowedMethods ...string) events.APIGatewayProxyResponse {
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusMethodNotAllowed,
+		Headers: map[string]string{
+			"Content-Type": "application/json",
+			"Allow":        strings.Join(allowedMethods, ", "),
+		},
+		Body: `{"error":"method ` + receivedMethod + ` not allowed"}`,
 	}
 }
 
@@ -47,6 +61,6 @@ func response500(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Headers:    map[string]string{"Content-Type": "application/json"},
-		Body:       `{"error": "` + errMsg + `"}`,
+		Body:       `{"error":"` + errMsg + `"}`,
 	}
 }

@@ -22,7 +22,7 @@ type handler struct {
 	ds  datastore
 }
 
-// Router creates a handler to handle the request.
+// Router returns a function that creates a handler to handle the request.
 func Router(ds datastore) func(
 	ctx context.Context, request events.APIGatewayProxyRequest,
 ) (events.APIGatewayProxyResponse, error) {
@@ -44,7 +44,7 @@ func (h *handler) route() events.APIGatewayProxyResponse {
 		case "/ballot":
 			return h.castBallot()
 		default:
-			return response404("path not found")
+			return response404("path not found for method POST: " + h.req.Path)
 		}
 	case http.MethodGet:
 		if matched, _ := regexp.MatchString("^/poll/.*$", h.req.Path); matched {
@@ -52,9 +52,9 @@ func (h *handler) route() events.APIGatewayProxyResponse {
 		} else if matched, _ := regexp.MatchString("^/result/.*$", h.req.Path); matched {
 			return h.getResult()
 		} else {
-			return response404("path not found")
+			return response404("path not found for method GET: " + h.req.Path)
 		}
 	default:
-		return response404("path not found")
+		return response405(h.req.HTTPMethod, "OPTIONS", "GET", "POST")
 	}
 }
