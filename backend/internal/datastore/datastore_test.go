@@ -37,11 +37,8 @@ func TestBallotStore(t *testing.T) {
 
 	ts := &TableStore{}
 	for _, test := range tests {
-		inputBallot, err := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
-		if err != nil {
-			t.Error("unexpected error creating ballot:", err)
-		}
-		if err = ts.PutBallot(context.TODO(), inputBallot); err != nil {
+		inputBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+		if err := ts.PutBallot(context.TODO(), inputBallot); err != nil {
 			t.Error("unexpected error putting ballot:", err)
 		}
 		gotBallot, err := ts.getBallot(context.TODO(), test.pollID, test.userID)
@@ -202,10 +199,7 @@ func TestGetPollWithBallots(t *testing.T) {
 		}
 		inputBallots := make([]*models.Ballot, len(test.ballots))
 		for i, b := range test.ballots {
-			inputBallot, err := models.NewValidatedBallot(inputPollID, b.userID, b.rankOrder)
-			if err != nil {
-				t.Error("unexpected error creating ballot:", err)
-			}
+			inputBallot := models.NewBallot(inputPollID, b.userID, b.rankOrder)
 			inputBallots[i] = inputBallot
 			if err := ts.PutBallot(context.TODO(), inputBallot); err != nil {
 				t.Error("unexpected error putting ballot:", err)

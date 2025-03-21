@@ -19,60 +19,17 @@ type Ballot struct {
 	rankOrder []int
 }
 
-// NewValidatedBallot creates a new ballot. If the poll ID or user ID are empty, if the rank order 
-// has fewer than two rankings, or if the rank order is not a permutation of its indices, it 
-// returns an error.
-func NewValidatedBallot(pollID, userID string, rankOrder []int) (*Ballot, error) {
-	ballot := &Ballot{
+func NewBallot(pollID, userID string, rankOrder []int) *Ballot {
+	return &Ballot{
 		pollID:    pollID,
 		userID:    userID,
 		rankOrder: rankOrder,
 	}
-	if err := ballot.validate(); err != nil {
-		return nil, err
-	}
-	return ballot, nil
 }
 
-// ValidatedBallotFromJSON unmarshals the provided JSON into a new ballot. If no user ID is
-// provided, a new one is generated. If the poll ID or rank order are missing, if rank order has
-// fewer than two rankings, or if the rank order is not a permutation of its indices, it returns an
-// error.
-func ValidatedBallotFromJSON(jsonString string) (*Ballot, error) {
-	// Create an auxiliary struct with exported fields to unmarshal the data
-	aux := &struct {
-		PollID    string `json:"pollId"`
-		UserID    string `json:"userId"`
-		RankOrder []int  `json:"rankOrder"`
-	}{}
-	if err := json.Unmarshal([]byte(jsonString), &aux); err != nil {
-		return nil, errors.New("invalid JSON")
-	}
-	// Create a new user ID if it's not provided
-	if aux.UserID == "" {
-		aux.UserID = uuid.New().String()
-	}
-	ballot := &Ballot{
-		pollID:    aux.PollID,
-		userID:    aux.UserID,
-		rankOrder: aux.RankOrder,
-	}
-	// Validate the fields
-	if err := ballot.validate(); err != nil {
-		return nil, err
-	}
-	return ballot, nil
-}
-
-func (b *Ballot) String() string {
-	shortPollID := b.pollID[:5] + "... "
-	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
-		b.userID, shortPollID, b.rankOrder)
-}
-
-// validate ensures that none of the fields are empty, there are at least two rankings, and the
+// Validate ensures that none of the fields are empty, there are at least two rankings, and the
 // rank order is a permutation of its indices.
-func (b *Ballot) validate() error {
+func (b *Ballot) Validate() error {
 	if b.pollID == "" {
 		return errors.New("poll ID cannot be empty")
 	}
@@ -90,6 +47,35 @@ func (b *Ballot) validate() error {
 			return errors.New("not a valid rank order")
 		}
 	}
+	return nil
+}
+
+func (b *Ballot) String() string {
+	shortPollID := b.pollID[:5] + "... "
+	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
+		b.userID, shortPollID, b.rankOrder)
+}
+
+// UnmarshalJSON is a custom JSON unmarshaler. If no user ID is provided, a new one is generated.
+func (b *Ballot) UnmarshalJSON(data []byte) error {
+	// Create an auxiliary struct with exported fields to unmarshal the data
+	var aux struct {
+		PollID    string `json:"pollId"`
+		UserID    string `json:"userId"`
+		RankOrder []int  `json:"rankOrder"`
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	// Create a new user ID if it's not provided
+	if aux.UserID == "" {
+		b.userID = uuid.New().String()
+	} else {
+		b.userID = aux.UserID
+	}
+	// Set the other unmarshaled values back to the main struct
+	b.pollID = aux.PollID
+	b.rankOrder = aux.RankOrder
 	return nil
 }
 

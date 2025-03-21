@@ -1,14 +1,16 @@
 package models_test
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/google/go-cmp/cmp"
+	"github.com/google/go-cmp/cmp/cmpopts"
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-func TestNewValidatedBallot_Invalid(t *testing.T) {
+func TestValidateBallot_Invalid(t *testing.T) {
 	tests := []struct {
 		errMsg    string
 		pollID    string
@@ -45,14 +47,14 @@ func TestNewValidatedBallot_Invalid(t *testing.T) {
 		{"not a valid rank order", "poll3", "user3", []int{0, 1, 1, 1}},
 	}
 	for _, test := range tests {
-		_, err := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
-		if err == nil || err.Error() != test.errMsg {
+		ballot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+		if err := ballot.Validate(); err == nil || err.Error() != test.errMsg {
 			t.Errorf("expected error with message %q, got %v", test.errMsg, err)
 		}
 	}
 }
 
-func TestNewValidatedBallot_Valid(t *testing.T) {
+func TestValidateBallot_Valid(t *testing.T) {
 	tests := []struct {
 		pollID    string
 		userID    string
@@ -63,54 +65,62 @@ func TestNewValidatedBallot_Valid(t *testing.T) {
 		{"poll2", "user4", []int{4, 1, 0, 3, 2}},
 	}
 	for _, test := range tests {
-		if _, err := models.NewValidatedBallot(
-			test.pollID, test.userID, test.rankOrder,
-		); err != nil {
+		ballot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+		if err := ballot.Validate(); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
 	}
 }
 
-func TestValidatedBallotFromJSON_Invalid(t *testing.T) {
+func TestBallotUnmarshalJSON(t *testing.T) {
 	tests := []struct {
-		errMsg     string
+		pollID     string
+		userID     string
+		rankOrder  []int
 		jsonString string
 	}{
-		{"invalid JSON", `{"pollId": "poll1", "userId": "user1", "rankOrder": 0, 1, 2]}`},
-		{"invalid JSON", `{"pollId": "poll1", "userId: "user1", "rankOrder": [0, 1, 2]}`},
-		{"poll ID cannot be empty", `{"userId": "user1", "rankOrder": [0, 1, 2]}`},
-		{"poll ID cannot be empty", `{"userId": "user1"}`},
-		{"poll ID cannot be empty", `{"rankOrder": [0, 1, 2]}`},
-		{"poll ID cannot be empty", `{"pollId": "", "userId": "user1", "rankOrder": [0, 1, 2]}`},
-		{"there must be at least two rankings",
-			`{"pollId": "poll2", "userId": "user2", "rankOrder": [0]}`},
-		{"there must be at least two rankings",
-			`{"pollId": "poll2", "userId": "user2", "rankOrder": []}`},
-		{"there must be at least two rankings", `{"pollId": "poll3", "userId": "user3"}`},
-		{"not a valid rank order",
-			`{"pollId": "poll2", "userId": "user2", "rankOrder": [3, 5, 1, 2, 4]}`},
-		{"not a valid rank order",
-			`{"pollId": "poll3", "userId": "user3", "rankOrder": [0, 1, 1, 1]}`},
-	}
-	for _, test := range tests {
-		_, err := models.ValidatedBallotFromJSON(test.jsonString)
-		if err == nil || err.Error() != test.errMsg {
-			t.Errorf("expected error with message %q, got %v", test.errMsg, err)
-		}
-	}
-}
-
-func TestValidatedBallotFromJSON_Valid(t *testing.T) {
-	tests := []string{
-		`{"pollId": "poll1", "userId": "user1", "rankOrder": [0, 1, 2]}`,
-		`{"pollId": "poll2", "userId": "user2", "rankOrder": [3, 0, 1, 2, 4]}`,
+		{"poll1", "user1", []int{0, 1, 2},
+			`{"pollId": "poll1", "userId": "user1", "rankOrder": [0, 1, 2]}`},
+		{"poll2", "user2", []int{3, 0, 1, 2, 4},
+			`{"pollId": "poll2", "userId": "user2", "rankOrder": [3, 0, 1, 2, 4]}`},
 		// Omitting user ID is valid
-		`{"pollId": "poll2", "rankOrder": [4, 0, 3, 2, 1]}`,
-		`{"pollId": "poll3", "rankOrder": [0, 3, 2, 1]}`,
+		{
+			pollID:     "poll2",
+			rankOrder:  []int{4, 0, 3, 2, 1},
+			jsonString: `{"pollId": "poll2", "rankOrder": [4, 0, 3, 2, 1]}`,
+		},
+		{
+			pollID:     "poll3",
+			rankOrder:  []int{0, 3, 2, 1},
+			jsonString: `{"pollId": "poll3", "rankOrder": [0, 3, 2, 1]}`,
+		},
 	}
 	for _, test := range tests {
-		if _, err := models.ValidatedBallotFromJSON(test); err != nil {
+		var unmarshaledBallot *models.Ballot
+		if err := json.Unmarshal([]byte(test.jsonString), &unmarshaledBallot); err != nil {
 			t.Errorf("expected success, got %v", err)
+		}
+		if test.userID != "" { // User ID provided cases
+			constructedBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+			if !cmp.Equal(
+				unmarshaledBallot,
+				constructedBallot,
+				cmp.AllowUnexported(models.Ballot{}),
+			) {
+				t.Error("unexpected unmarshaled ballot:", unmarshaledBallot)
+				t.Error("expected ballot:", constructedBallot)
+			}
+		} else { // User ID automatically generated cases
+			userID := "dummy user ID"
+			constructedBallot := models.NewBallot(test.pollID, userID, test.rankOrder)
+			if !cmp.Equal(
+				unmarshaledBallot,
+				constructedBallot,
+				cmp.AllowUnexported(models.Ballot{}),
+				cmpopts.IgnoreFields(models.Ballot{}, "userID"),
+			) {
+				t.Error("unexpected unmarshaled ballot:", unmarshaledBallot)
+			}
 		}
 	}
 }
@@ -126,7 +136,7 @@ func TestBallotMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"poll5", "user5", []int{3, 2, 0, 1, 5, 4}},
 	}
 	for _, test := range tests {
-		inputBallot, _ := models.NewValidatedBallot(test.pollID, test.userID, test.rankOrder)
+		inputBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
 		av, err := attributevalue.MarshalMap(inputBallot)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)

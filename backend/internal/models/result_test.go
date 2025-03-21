@@ -24,7 +24,7 @@ func ballotClosure(pollID string) func([]int) *models.Ballot {
 	userID := 0
 	return func(rankOrder []int) *models.Ballot {
 		userID++
-		ballot, _ := models.NewValidatedBallot(pollID, strconv.Itoa(userID), rankOrder)
+		ballot := models.NewBallot(pollID, strconv.Itoa(userID), rankOrder)
 		return ballot
 	}
 }

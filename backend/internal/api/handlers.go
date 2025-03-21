@@ -1,6 +1,8 @@
 package api
 
 import (
+	"encoding/json"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
@@ -34,13 +36,17 @@ func (h *handler) createBallot() events.APIGatewayProxyResponse {
 }
 
 func (h *handler) castBallot() events.APIGatewayProxyResponse {
-	// Unmarshal and validate the request
-	ballot, err := models.ValidatedBallotFromJSON(h.req.Body)
-	if err != nil {
+	// Unmarshal the request
+	var ballot *models.Ballot
+	if err := json.Unmarshal([]byte(h.req.Body), ballot); err != nil {
+		return response400("invalid JSON")
+	}
+	// Validate the fields
+	if err := ballot.Validate(); err != nil {
 		return response400(err.Error())
 	}
 	// Put the ballot in the database
-	if err = h.ds.PutBallot(h.ctx, ballot); err != nil {
+	if err := h.ds.PutBallot(h.ctx, ballot); err != nil {
 		return response500("failed to put the ballot in the database")
 	}
 	// Send a success message back in the response
