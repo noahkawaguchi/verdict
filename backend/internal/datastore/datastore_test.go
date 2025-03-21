@@ -66,14 +66,11 @@ func TestPollStore(t *testing.T) {
 
 	ts := &TableStore{}
 	for _, test := range tests {
-		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
-		if err != nil {
-			t.Error("unexpected error creating poll:", err)
-		}
-		if err = ts.PutPoll(context.TODO(), inputPoll); err != nil {
+		inputPoll := models.NewPoll(test.prompt, test.choices)
+		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
-		gotPoll, err := ts.getPoll(context.TODO(), inputPollID)
+		gotPoll, err := ts.getPoll(context.TODO(), inputPoll.GetPollID())
 		if err != nil {
 			t.Error("unexpected error getting poll:", err)
 		}
@@ -106,14 +103,11 @@ func TestGetPollData(t *testing.T) {
 
 	ts := &TableStore{}
 	for _, test := range tests {
-		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
-		if err != nil {
-			t.Error("unexpected error creating poll:", err)
-		}
-		if err = ts.PutPoll(context.TODO(), inputPoll); err != nil {
+		inputPoll := models.NewPoll(test.prompt, test.choices)
+		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
-		gotPollData, err := ts.GetPollData(context.TODO(), inputPollID)
+		gotPollData, err := ts.GetPollData(context.TODO(), inputPoll.GetPollID())
 		if err != nil {
 			t.Error("unexpected error getting poll data:", err)
 		}
@@ -190,22 +184,19 @@ func TestGetPollWithBallots(t *testing.T) {
 
 	ts := &TableStore{}
 	for _, test := range tests {
-		inputPoll, inputPollID, err := models.NewValidatedPoll(test.prompt, test.choices)
-		if err != nil {
-			t.Error("unexpected error creating poll:", err)
-		}
+		inputPoll := models.NewPoll(test.prompt, test.choices)
 		if err := ts.PutPoll(context.TODO(), inputPoll); err != nil {
 			t.Error("unexpected error putting poll:", err)
 		}
 		inputBallots := make([]*models.Ballot, len(test.ballots))
 		for i, b := range test.ballots {
-			inputBallot := models.NewBallot(inputPollID, b.userID, b.rankOrder)
+			inputBallot := models.NewBallot(inputPoll.GetPollID(), b.userID, b.rankOrder)
 			inputBallots[i] = inputBallot
 			if err := ts.PutBallot(context.TODO(), inputBallot); err != nil {
 				t.Error("unexpected error putting ballot:", err)
 			}
 		}
-		gotPoll, gotBallots, err := ts.GetPollWithBallots(context.TODO(), inputPollID)
+		gotPoll, gotBallots, err := ts.GetPollWithBallots(context.TODO(), inputPoll.GetPollID())
 		if err != nil {
 			t.Error("unexpected error getting poll with ballots:", err)
 		}

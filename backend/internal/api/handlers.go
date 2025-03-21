@@ -8,17 +8,21 @@ import (
 )
 
 func (h *handler) createPoll() events.APIGatewayProxyResponse {
-	// Unmarshal and validate the request
-	poll, pollID, err := models.ValidatedPollFromJSON(h.req.Body)
-	if err != nil {
+	// Unmarshal the request
+	var poll *models.Poll
+	if err := json.Unmarshal([]byte(h.req.Body), &poll); err != nil {
+		return response400("invalid JSON")
+	}
+	// Validate the fields 
+	if err := poll.Validate(); err != nil {
 		return response400(err.Error())
 	}
 	// Put the poll in the database
-	if err = h.ds.PutPoll(h.ctx, poll); err != nil {
+	if err := h.ds.PutPoll(h.ctx, poll); err != nil {
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
-	return response201(`{"pollId": "` + pollID + `"}`)
+	return response201(`{"pollId": "` + poll.GetPollID() + `"}`)
 }
 
 func (h *handler) createBallot() events.APIGatewayProxyResponse {

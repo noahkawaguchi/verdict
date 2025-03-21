@@ -9,15 +9,15 @@ import (
 )
 
 func threeOptionPoll() (*models.Poll, string) {
-	poll, pollID, _ := models.NewValidatedPoll("What is the best fruit?",
+	poll := models.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine"})
-	return poll, pollID
+	return poll, poll.GetPollID()
 }
 
 func fourOptionPoll() (*models.Poll, string) {
-	poll, pollID, _ := models.NewValidatedPoll("What is the best fruit?",
+	poll := models.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"})
-	return poll, pollID
+	return poll, poll.GetPollID()
 }
 
 func ballotClosure(pollID string) func([]int) *models.Ballot {

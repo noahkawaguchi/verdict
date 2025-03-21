@@ -17,58 +17,20 @@ type Poll struct {
 	choices []string
 }
 
-// NewValidatedPoll creates a new poll. If the prompt or any of the choices are empty, there are 
-// fewer than two choices, or choices are not unique, it returns an error.
-func NewValidatedPoll(prompt string, choices []string) (*Poll, string, error) {
-	poll := &Poll{
+// NewPoll creates a new poll with a newly generated poll ID.
+func NewPoll(prompt string, choices []string) *Poll {
+	return &Poll{
 		pollID:  uuid.New().String(),
 		prompt:  prompt,
 		choices: choices,
 	}
-	if err := poll.validate(); err != nil {
-		return nil, "", err
-	}
-	return poll, poll.pollID, nil
 }
 
-func (p *Poll) String() string {
-	shortID := p.pollID[:5] + "... "
-	ret := fmt.Sprintf("Poll with ID %v:\n%v\n", shortID, p.prompt)
-	for _, c := range p.choices {
-		ret += fmt.Sprintf("  %v\n", c)
-	}
-	return ret
-}
+func (p *Poll) GetPollID() string { return p.pollID }
 
-// ValidatedPollFromJSON unmarshals the provided JSON into a new poll. If the prompt or any of the
-// choices are empty, there are fewer than two choices, or choices are not unique, it returns an
-// error.
-func ValidatedPollFromJSON(jsonString string) (*Poll, string, error) {
-	// Create an auxiliary struct with exported fields to unmarshal the data
-	aux := &struct {
-		PollID  string   `json:"pollId"`
-		Prompt  string   `json:"prompt"`
-		Choices []string `json:"choices"`
-	}{}
-	if err := json.Unmarshal([]byte(jsonString), &aux); err != nil {
-		return nil, "", errors.New("invalid JSON")
-	}
-	// Create a poll with a new poll ID
-	poll := &Poll{
-		pollID:  uuid.New().String(),
-		prompt:  aux.Prompt,
-		choices: aux.Choices,
-	}
-	// Validate the other fields
-	if err := poll.validate(); err != nil {
-		return nil, "", err
-	}
-	return poll, poll.pollID, nil
-}
-
-// validate ensures that the prompt and all choices are non-empty, that there are at least two
+// Validate ensures that the prompt and all choices are non-empty, that there are at least two
 // choices, and that all choices are unique.
-func (p *Poll) validate() error {
+func (p *Poll) Validate() error {
 	if p.prompt == "" {
 		return errors.New("prompt cannot be empty")
 	}
@@ -89,6 +51,15 @@ func (p *Poll) validate() error {
 	return nil
 }
 
+func (p *Poll) String() string {
+	shortID := p.pollID[:5] + "... "
+	ret := fmt.Sprintf("Poll with ID %v:\n%v\n", shortID, p.prompt)
+	for _, c := range p.choices {
+		ret += fmt.Sprintf("  %v\n", c)
+	}
+	return ret
+}
+
 // MarshalJSON is a custom marshaler that omits the poll ID.
 func (p *Poll) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
@@ -98,6 +69,24 @@ func (p *Poll) MarshalJSON() ([]byte, error) {
 		Prompt:  p.prompt,
 		Choices: p.choices,
 	})
+}
+
+// UnmarshalJSON is a custom JSON unmarshaler. It generates a poll ID for the new poll.
+func (p *Poll) UnmarshalJSON(data []byte) error {
+	// Create an auxiliary struct with exported fields to unmarshal the data
+	var aux struct {
+		Prompt  string   `json:"prompt"`
+		Choices []string `json:"choices"`
+	}
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+	// Create a new poll ID
+	p.pollID = uuid.New().String()
+	// Set the other unmarshaled values back to the main struct
+	p.prompt = aux.Prompt
+	p.choices = aux.Choices
+	return nil
 }
 
 // MarshalDynamoDBAttributeValue is a custom marshaler to control how the struct is serialized
