@@ -18,9 +18,9 @@ type result struct {
 	winningRound int
 }
 
-// CalculateResultData performs instant runoff voting using the provided poll and ballots,
-// returning the computed data in JSON string format.
-func CalculateResultData(poll *Poll, ballots []*Ballot) (string, error) {
+// NewResult creates a result and performs instant runoff voting using the provided poll and
+// ballots.
+func NewResult(poll *Poll, ballots []*Ballot) (*result, error) {
 	// Initialize votes to empty slices so nil can be used for elimination
 	votes := make([][]int, len(poll.choices))
 	for i := range votes {
@@ -33,28 +33,28 @@ func CalculateResultData(poll *Poll, ballots []*Ballot) (string, error) {
 		winnerIdx:    -99,
 		winningRound: 0,
 	}
-	res.instantRunoffVoting() // Compute the result
-	if res.winnerIdx < 0 {    // Something went wrong
-		return "", errors.New("the result was not successfully computed")
+	// Compute the result from the constructor
+	if res.instantRunoffVoting(); res.winnerIdx < 0 {
+		return nil, errors.New("the result was not successfully computed")
 	}
-	// Marshal into JSON format
-	if body, err := json.Marshal(&struct {
+	return res, nil
+}
+
+// MarshalJSON is a custom marshaler that formats relevant data from the computed result.
+func (r *result) MarshalJSON() ([]byte, error) {
+	return json.Marshal(&struct {
 		Prompt        string `json:"prompt"`
 		TotalVotes    int    `json:"totalVotes"`
 		WinningVotes  int    `json:"winningVotes"`
 		WinningChoice string `json:"winningChoice"`
 		WinningRound  int    `json:"winningRound"`
 	}{
-		Prompt:        res.poll.prompt,
-		TotalVotes:    len(res.ballots),
-		WinningVotes:  len(res.votes[res.winnerIdx]),
-		WinningChoice: res.poll.choices[res.winnerIdx],
-		WinningRound:  res.winningRound,
-	}); err != nil {
-		return "", errors.New("failed to marshal result")
-	} else {
-		return string(body), nil
-	}
+		Prompt:        r.poll.prompt,
+		TotalVotes:    len(r.ballots),
+		WinningVotes:  len(r.votes[r.winnerIdx]),
+		WinningChoice: r.poll.choices[r.winnerIdx],
+		WinningRound:  r.winningRound,
+	})
 }
 
 // instantRunoffVoting implements ranked choice voting, specifically the instant runoff method, to

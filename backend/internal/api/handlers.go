@@ -78,9 +78,14 @@ func (h *handler) getResult() events.APIGatewayProxyResponse {
 		return response404("no ballots found for the specified poll")
 	}
 	// Calculate the result
-	if body, err := models.CalculateResultData(poll, ballots); err != nil {
+	result, err := models.NewResult(poll, ballots)
+	if err != nil {
 		return response500(err.Error())
+	}
+	// Marshal the response
+	if body, err := json.Marshal(result); err != nil {
+		return response500("failed to marshal response")
 	} else {
-		return response200(body)
+		return response200(string(body))
 	}
 }
