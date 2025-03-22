@@ -1,9 +1,6 @@
 package datastore
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
@@ -11,21 +8,15 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-var pollsTableInfo = &tableInfo{
-	name:         "Polls",
-	partitionKey: "PollID",
-	// (No sort key)
-}
-
 // PutPoll creates a new poll entry in the database.
-func (ts *TableStore) PutPoll(ctx context.Context, poll *models.Poll) error {
+func (ts *TableStore) PutPoll(poll *models.Poll) error {
 	// Marshal the struct into a DynamoDB-compatible map
 	av, err := attributevalue.MarshalMap(poll)
 	if err != nil {
 		return err
 	}
 	// Put the poll into DynamoDB
-	_, err = dbClient.PutItem(ctx, &dynamodb.PutItemInput{
+	_, err = ts.Client.PutItem(ts.Ctx, &dynamodb.PutItemInput{
 		TableName: aws.String(pollsTableInfo.name),
 		Item:      av,
 	})
@@ -33,18 +24,17 @@ func (ts *TableStore) PutPoll(ctx context.Context, poll *models.Poll) error {
 }
 
 // GetPoll retrieves a poll from the database by its poll ID.
-func (ts *TableStore) GetPoll(ctx context.Context, pollID string) (*models.Poll, error) {
-	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
+func (ts *TableStore) GetPoll(pollID string) (*models.Poll, error) {
+	// Define the input to get the poll by ID
+	input := &dynamodb.GetItemInput{
 		TableName: aws.String(pollsTableInfo.name),
 		Key: map[string]types.AttributeValue{
 			pollsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
 		},
-	})
+	}
+	out, err := ts.Client.GetItem(ts.Ctx, input)
 	if err != nil {
 		return nil, err
-	}
-	if out.Item == nil {
-		return nil, fmt.Errorf("poll with id %s not found in the database", pollID)
 	}
 	// Unmarshal the retrieved poll into a struct
 	var poll models.Poll

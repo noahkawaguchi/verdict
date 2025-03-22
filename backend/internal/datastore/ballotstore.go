@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -11,45 +10,38 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-var ballotsTableInfo = &tableInfo{
-	name:         "Ballots",
-	partitionKey: "PollID",
-	sortKey:      "UserID",
-}
-
 // PutBallot creates a new ballot entry in the database.
-func (ts *TableStore) PutBallot(ctx context.Context, ballot *models.Ballot) error {
+func (ts *TableStore) PutBallot(ballot *models.Ballot) error {
 	// Marshal the struct into a DynamoDB-compatible map
 	av, err := attributevalue.MarshalMap(ballot)
 	if err != nil {
 		return err
 	}
 	// Put the ballot into DynamoDB
-	_, err = dbClient.PutItem(ctx, &dynamodb.PutItemInput{
+	_, err = ts.Client.PutItem(ts.Ctx, &dynamodb.PutItemInput{
 		TableName: aws.String(ballotsTableInfo.name),
 		Item:      av,
 	})
 	return err
 }
 
-// getBallot retrieves a ballot from the database by its poll ID and user ID.
-func (ts *TableStore) getBallot(ctx context.Context, pollID, userID string) (*models.Ballot, error) {
-	out, err := dbClient.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: aws.String(ballotsTableInfo.name),
-		Key: map[string]types.AttributeValue{
-			ballotsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
-			ballotsTableInfo.sortKey:      &types.AttributeValueMemberS{Value: userID},
+// GetBallots retrieves all of the ballots for the specified poll from the database.
+func (ts *TableStore) GetBallots(pollID string) ([]*models.Ballot, error) {
+	// Define input to query by pollID
+	input := &dynamodb.QueryInput{
+		TableName:              aws.String(ballotsTableInfo.name),
+		KeyConditionExpression: aws.String(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey)),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":pk": &types.AttributeValueMemberS{Value: pollID},
 		},
-	})
+	}
+	// Perform the query
+	out, err := ts.Client.Query(ts.Ctx, input)
 	if err != nil {
 		return nil, err
 	}
-	if out.Item == nil {
-		return nil, fmt.Errorf("ballot with poll ID %s and user ID %s not found in the database",
-			pollID, userID)
-	}
-	// Unmarshal the retrieved ballot into a struct
-	var ballot models.Ballot
-	err = attributevalue.UnmarshalMap(out.Item, &ballot)
-	return &ballot, err
+	// Unmarshal the retrieved ballots
+	var ballots []*models.Ballot
+	err = attributevalue.UnmarshalListOfMaps(out.Items, &ballots)
+	return ballots, err
 }

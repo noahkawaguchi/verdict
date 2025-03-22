@@ -1,6 +1,6 @@
 //go:build (!dev && !test) || all
 
-package datastore
+package main
 
 import (
 	"context"
@@ -16,8 +16,7 @@ func init() {
 	// environment variables, `context.TODO()` because the persistent client does not need the
 	// context of each invocation)
 	if cfg, err := config.LoadDefaultConfig(context.TODO()); err != nil {
-		log.Printf("Unable to load SDK config (production).\ndbClient will be nil:\n%s\n",
-			err.Error())
+		log.Fatalf("Unable to load SDK config:\n%v\n", err)
 	} else { // Set the DynamoDB client
 		dbClient = dynamodb.NewFromConfig(cfg)
 	}

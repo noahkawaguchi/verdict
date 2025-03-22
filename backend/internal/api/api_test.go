@@ -1,7 +1,6 @@
 package api_test
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -15,44 +14,41 @@ import (
 
 // mockDatastore implements the datastore interface for testing purposes.
 type mockDatastore struct {
-	PutPollMock            func(ctx context.Context, poll *models.Poll) error
-	GetPollMock            func(ctx context.Context, pollID string) (*models.Poll, error)
-	PutBallotMock          func(ctx context.Context, ballot *models.Ballot) error
-	GetPollWithBallotsMock func(ctx context.Context, pollID string) (*models.Poll, []*models.Ballot, error)
+	PutPollMock    func(poll *models.Poll) error
+	GetPollMock    func(pollID string) (*models.Poll, error)
+	PutBallotMock  func(ballot *models.Ballot) error
+	GetBallotsMock func(pollID string) ([]*models.Ballot, error)
 }
 
-func (m *mockDatastore) PutPoll(ctx context.Context, poll *models.Poll) error {
+func (m *mockDatastore) PutPoll(poll *models.Poll) error {
 	if m.PutPollMock != nil {
-		return m.PutPollMock(ctx, poll)
+		return m.PutPollMock(poll)
 	}
 	return nil
 }
 
-func (m *mockDatastore) GetPoll(ctx context.Context, pollID string) (*models.Poll, error) {
+func (m *mockDatastore) GetPoll(pollID string) (*models.Poll, error) {
 	if m.GetPollMock != nil {
-		return m.GetPollMock(ctx, pollID)
+		return m.GetPollMock(pollID)
 	}
 	return nil, nil
 }
 
-func (m *mockDatastore) PutBallot(ctx context.Context, ballot *models.Ballot) error {
+func (m *mockDatastore) PutBallot(ballot *models.Ballot) error {
 	if m.PutBallotMock != nil {
-		return m.PutBallotMock(ctx, ballot)
+		return m.PutBallotMock(ballot)
 	}
 	return nil
 }
 
-func (m *mockDatastore) GetPollWithBallots(ctx context.Context, pollID string) (
-	*models.Poll, []*models.Ballot, error,
-) {
-	if m.GetPollWithBallotsMock != nil {
-		return m.GetPollWithBallotsMock(ctx, pollID)
+func (m *mockDatastore) GetBallots(pollID string) ([]*models.Ballot, error) {
+	if m.GetBallotsMock != nil {
+		return m.GetBallotsMock(pollID)
 	}
-	return nil, nil, nil
+	return nil, nil
 }
 
 func TestRouter_MethodNotAllowed(t *testing.T) {
-	routerFunc := api.Router(&mockDatastore{})
 	tests := []events.APIGatewayProxyRequest{
 		{
 			Path:       "/poll",
@@ -81,7 +77,8 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		resp, _ := routerFunc(context.TODO(), test)
+		handler := api.Handler{DS: &mockDatastore{}, Req: test}
+		resp := handler.Route()
 		if resp.StatusCode != http.StatusMethodNotAllowed {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
@@ -98,7 +95,6 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 }
 
 func TestRouter_PathNotFound(t *testing.T) {
-	routerFunc := api.Router(&mockDatastore{})
 	tests := []events.APIGatewayProxyRequest{
 		{
 			Path:       "/pole",
@@ -119,7 +115,8 @@ func TestRouter_PathNotFound(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		resp, _ := routerFunc(context.TODO(), test)
+		handler := api.Handler{DS: &mockDatastore{}, Req: test}
+		resp := handler.Route()
 		if resp.StatusCode != http.StatusNotFound {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
@@ -135,12 +132,6 @@ func quickJSON(anyStruct any) string {
 }
 
 func TestCreatePollHandler_Invalid(t *testing.T) {
-	routerFunc := api.Router(&mockDatastore{
-		PutPollMock: func(ctx context.Context, poll *models.Poll) error {
-			return errors.New("mock error")
-		},
-	})
-
 	tests := []struct {
 		statusCode int
 		errMsg     string
@@ -182,7 +173,10 @@ func TestCreatePollHandler_Invalid(t *testing.T) {
 			Path:       "/poll",
 			Body:       test.body,
 		}
-		resp, _ := routerFunc(context.TODO(), req)
+		handler := api.Handler{DS: &mockDatastore{
+			PutPollMock: func(poll *models.Poll) error { return errors.New("mock error") },
+		}, Req: req}
+		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
@@ -193,8 +187,6 @@ func TestCreatePollHandler_Invalid(t *testing.T) {
 }
 
 func TestCreatePollHandler_Valid(t *testing.T) {
-	routerFunc := api.Router(&mockDatastore{})
-
 	tests := []string{
 		quickJSON(struct {
 			Prompt  string   `json:"prompt"`
@@ -218,7 +210,8 @@ func TestCreatePollHandler_Valid(t *testing.T) {
 			Path:       "/poll",
 			Body:       test,
 		}
-		resp, _ := routerFunc(context.TODO(), req)
+		handler := api.Handler{DS: &mockDatastore{}, Req: req}
+		resp := handler.Route()
 		if resp.StatusCode != http.StatusCreated {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
