@@ -205,3 +205,90 @@ func TestGetPollInfoHandler_Valid(t *testing.T) {
 		}
 	}
 }
+
+func TestCastBallotHandler_Invalid(t *testing.T) {
+	tests := []struct {
+		statusCode int
+		errMsg     string
+		body       string
+	}{
+		{http.StatusBadRequest, "invalid JSON", `{"pollId":"poll1,"rankOrder":[1, 0, 3, 2]}`},
+		{
+			http.StatusBadRequest,
+			"not a valid rank order",
+			quickJSON(struct {
+				PollID    string `json:"pollId"`
+				RankOrder []int  `json:"rankOrder"`
+			}{
+				PollID:    "poll22",
+				RankOrder: []int{2, 4, 3, 1},
+			}),
+		},
+		{
+			http.StatusInternalServerError,
+			"failed to put the ballot in the database",
+			quickJSON(struct {
+				PollID    string `json:"pollId"`
+				RankOrder []int  `json:"rankOrder"`
+			}{
+				PollID:    "poll23",
+				RankOrder: []int{2, 0, 3, 1},
+			}),
+		},
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod: http.MethodPost,
+			Path:       "/ballot",
+			Body:       test.body,
+		}
+		handler := api.Handler{Store: &mockDatastore{
+			PutBallotMock: func(ballot *models.Ballot) error { return errors.New("mock error") },
+		}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != test.statusCode {
+			t.Error("unexpected status code:", resp.StatusCode)
+		}
+		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+			t.Error("unexpected response body:", resp.Body)
+		}
+	}
+}
+
+func TestCastBallotHandler_Valid(t *testing.T) {
+	tests := []string{
+		quickJSON(struct {
+			PollID    string `json:"pollId"`
+			RankOrder []int  `json:"rankOrder"`
+		}{
+			PollID:    "poll23",
+			RankOrder: []int{2, 0, 3, 1},
+		}),
+		quickJSON(struct {
+			PollID    string `json:"pollId"`
+			UserID    string `json:"userId"`
+			RankOrder []int  `json:"rankOrder"`
+		}{
+			PollID:    "poll24",
+			UserID:    "user123",
+			RankOrder: []int{0, 3, 1, 4, 2, 5},
+		}),
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod: http.MethodPost,
+			Path:       "/ballot",
+			Body:       test,
+		}
+		handler := api.Handler{Store: &mockDatastore{}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != http.StatusCreated {
+			t.Error("unexpected status code:", resp.StatusCode)
+		}
+		if resp.Body != `{"message": "successfully cast ballot"}` {
+			t.Error("unexpected response body:", resp.Body)
+		}
+	}
+}
