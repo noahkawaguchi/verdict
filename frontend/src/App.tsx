@@ -5,7 +5,7 @@ import HomePage from './pages/HomePage/HomePage';
 import CreatePollPage from './pages/CreatePoll/CreatePollPage';
 import CastBallotPage from './pages/CastBallot/CastBallotPage';
 import ViewResultsPage from './pages/ViewResults/ViewResultsPage';
-import NotFoundPage from './pages/NotFoundPage';
+import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const App = () => {
   return (
