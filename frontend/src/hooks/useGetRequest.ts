@@ -31,18 +31,13 @@ const useGetRequest = <TResponse>(endpoint: string) => {
       try {
         const response = await fetch(`${backendUrl}/${endpoint}/${pathParameter}`, {
           method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
         });
         const parsedBody = await response.json();
-        if (response.ok) {
-          setData(parsedBody);
-        } else {
-          throw new Error(parsedBody.error);
-        }
+        if (response.ok) setData(parsedBody);
+        else throw new Error(parsedBody.error);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        setError(err instanceof Error ? err : new Error('unknown error'));
       } finally {
         setLoading(false);
       }

@@ -42,19 +42,14 @@ const useMutationRequest = <TRequest, TResponse>(
       try {
         const response = await fetch(`${backendUrl}/${endpoint}`, {
           method: method,
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(body),
         });
         const parsedBody = await response.json();
-        if (response.ok) {
-          setData(parsedBody);
-        } else {
-          throw new Error(parsedBody.error);
-        }
+        if (response.ok) setData(parsedBody);
+        else throw new Error(parsedBody.error);
       } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
+        setError(err instanceof Error ? err : new Error('unknown error'));
       } finally {
         setLoading(false);
         isSubmitting.current = false;
