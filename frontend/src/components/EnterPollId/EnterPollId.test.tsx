@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import EnterPollId from './EnterPollId';
 
 describe('EnterPollId', () => {
-  it('redirects to the correct URL on submit', async () => {
+  it('should redirect to the correct URL on submit', async () => {
     render(
       <MemoryRouter initialEntries={['/dummy-path']}>
         <Routes>

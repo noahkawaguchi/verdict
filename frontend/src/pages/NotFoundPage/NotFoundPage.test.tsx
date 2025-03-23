@@ -4,7 +4,7 @@ import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import NotFoundPage from './NotFoundPage';
 
 describe('NotFoundPage', () => {
-  it('links back to the home page', async () => {
+  it('should link back to the home page', async () => {
     render(
       <MemoryRouter initialEntries={['/undefined-page']}>
         <Routes>
