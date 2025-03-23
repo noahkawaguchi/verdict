@@ -226,3 +226,97 @@ func TestCreatePollHandler_Valid(t *testing.T) {
 		}
 	}
 }
+
+func TestGetPollInfoHandler_Invalid(t *testing.T) {
+	tests := []struct {
+		statusCode     int
+		errMsg         string
+		path           string
+		pathParameters map[string]string
+		getPollMock    func(pollID string) (*models.Poll, error)
+	}{
+		// Not testing for the poll ID being missing from the path specifically (not the
+		// parameters map) because that is handled in the router
+		{
+			http.StatusBadRequest,
+			"missing poll ID",
+			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			map[string]string{"pollId": ""},
+			nil,
+		},
+		{
+			http.StatusBadRequest,
+			"missing poll ID",
+			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			map[string]string{},
+			nil,
+		},
+		{
+			http.StatusInternalServerError,
+			"failed to get the poll from the database",
+			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return nil, errors.New("mock error")
+			},
+		},
+		{
+			http.StatusNotFound,
+			"no poll found for the specified ID",
+			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return models.NewPoll("", []string{""}), nil
+			},
+		},
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod:     http.MethodGet,
+			Path:           test.path,
+			PathParameters: test.pathParameters,
+		}
+		handler := api.Handler{Store: &mockDatastore{GetPollMock: test.getPollMock}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != test.statusCode {
+			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
+		}
+		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+			t.Error("unexpected response body:", resp.Body)
+			t.Error(`expected: {"error":"` + test.errMsg + `"}`)
+		}
+	}
+}
+
+func TestGetPollInfoHandler_Valid(t *testing.T) {
+	tests := []*models.Poll{
+		models.NewPoll("What is the best day of the week?",
+			[]string{"Wednesday", "Tuesday", "None of the above"}),
+		models.NewPoll("What is the worst day of the week?",
+			[]string{"Monday", "Thursday", "Either Monday or Thursday"}),
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod:     http.MethodGet,
+			Path:           "/poll/" + test.GetPollID(),
+			PathParameters: map[string]string{"pollId": test.GetPollID()},
+		}
+		handler := api.Handler{Store: &mockDatastore{
+			GetPollMock: func(pollID string) (*models.Poll, error) { return test, nil },
+		}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)
+		}
+		body, err := json.Marshal(test)
+		if err != nil {
+			t.Error("unexpected error marshaling JSON")
+		}
+		if resp.Body != string(body) {
+			t.Error("unexpected response body:", resp.Body)
+			t.Error("expected:", string(body))
+		}
+	}
+}

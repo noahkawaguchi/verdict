@@ -11,7 +11,7 @@ import (
 // getShortPath extracts the base path without parameters for routing purposes.
 // For example: `/poll/abcdefg12345` => `/poll`. If no match is found, it returns "default".
 func getShortPath(longPath string) string {
-	matches := regexp.MustCompile(`^(/.+)/.*$`).FindStringSubmatch(longPath)
+	matches := regexp.MustCompile(`^(/.+)/.+$`).FindStringSubmatch(longPath)
 	if len(matches) > 1 {
 		return matches[1]
 	}

@@ -26,7 +26,7 @@ func (h *Handler) createPoll() events.APIGatewayProxyResponse {
 }
 
 func (h *Handler) getPollInfo() events.APIGatewayProxyResponse {
-	// Check for the poll ID
+	// Check for the poll ID (redundant with the path check in the router in most cases)
 	pollID := h.Req.PathParameters["pollId"]
 	if pollID == "" {
 		return response400("missing poll ID")
