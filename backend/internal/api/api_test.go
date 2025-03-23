@@ -77,7 +77,7 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		handler := api.Handler{DS: &mockDatastore{}, Req: test}
+		handler := api.Handler{Store: &mockDatastore{}, Req: test}
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusMethodNotAllowed {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -115,7 +115,7 @@ func TestRouter_PathNotFound(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		handler := api.Handler{DS: &mockDatastore{}, Req: test}
+		handler := api.Handler{Store: &mockDatastore{}, Req: test}
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusNotFound {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -173,7 +173,7 @@ func TestCreatePollHandler_Invalid(t *testing.T) {
 			Path:       "/poll",
 			Body:       test.body,
 		}
-		handler := api.Handler{DS: &mockDatastore{
+		handler := api.Handler{Store: &mockDatastore{
 			PutPollMock: func(poll *models.Poll) error { return errors.New("mock error") },
 		}, Req: req}
 		resp := handler.Route()
@@ -210,7 +210,7 @@ func TestCreatePollHandler_Valid(t *testing.T) {
 			Path:       "/poll",
 			Body:       test,
 		}
-		handler := api.Handler{DS: &mockDatastore{}, Req: req}
+		handler := api.Handler{Store: &mockDatastore{}, Req: req}
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusCreated {
 			t.Error("unexpected status code:", resp.StatusCode)

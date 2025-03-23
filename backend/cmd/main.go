@@ -18,7 +18,7 @@ func main() {
 		request events.APIGatewayProxyRequest,
 	) (events.APIGatewayProxyResponse, error) {
 		tableStore := &datastore.TableStore{Ctx: ctx, Client: dbClient}
-		handler := &api.Handler{DS: tableStore, Req: request}
+		handler := &api.Handler{Store: tableStore, Req: request}
 		return handler.Route(), nil
 	})
 }

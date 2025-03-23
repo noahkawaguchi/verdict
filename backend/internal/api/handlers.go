@@ -18,7 +18,7 @@ func (h *Handler) createPoll() events.APIGatewayProxyResponse {
 		return response400(err.Error())
 	}
 	// Put the poll in the database
-	if err := h.DS.PutPoll(poll); err != nil {
+	if err := h.Store.PutPoll(poll); err != nil {
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
@@ -32,7 +32,7 @@ func (h *Handler) createBallot() events.APIGatewayProxyResponse {
 		return response400("missing poll ID")
 	}
 	// Retrieve the poll from the database
-	poll, err := h.DS.GetPoll(pollID)
+	poll, err := h.Store.GetPoll(pollID)
 	if err != nil {
 		return response500("failed to get the poll from the database")
 	}
@@ -59,7 +59,7 @@ func (h *Handler) castBallot() events.APIGatewayProxyResponse {
 		return response400(err.Error())
 	}
 	// Put the ballot in the database
-	if err := h.DS.PutBallot(ballot); err != nil {
+	if err := h.Store.PutBallot(ballot); err != nil {
 		return response500("failed to put the ballot in the database")
 	}
 	// Send a success message back in the response
@@ -73,7 +73,7 @@ func (h *Handler) getResult() events.APIGatewayProxyResponse {
 		return response400("missing poll ID")
 	}
 	// Get the poll from the database
-	poll, err := h.DS.GetPoll(pollID)
+	poll, err := h.Store.GetPoll(pollID)
 	if err != nil {
 		return response500("failed to get the poll from the database")
 	}
@@ -82,7 +82,7 @@ func (h *Handler) getResult() events.APIGatewayProxyResponse {
 		return response404("no poll found for the specified ID")
 	}
 	// Get the poll's ballots from the database
-	ballots, err := h.DS.GetBallots(pollID)
+	ballots, err := h.Store.GetBallots(pollID)
 	if err != nil {
 		return response500("failed to get the poll's ballots from the database")
 	}
