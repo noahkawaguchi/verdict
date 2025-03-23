@@ -7,7 +7,7 @@ type CreatePollFormProps = {
 
 /**
  * A form for entering the prompt and choices for a new poll.
- * 
+ *
  * @param setQuestion - Function to update the question in the parent component.
  */
 const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
@@ -27,10 +27,7 @@ const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
       alert('choices must be unique');
       return;
     }
-    setQuestion({
-      prompt: prompt,
-      choices: choices,
-    });
+    setQuestion({ prompt: prompt, choices: choices });
   };
 
   return (
