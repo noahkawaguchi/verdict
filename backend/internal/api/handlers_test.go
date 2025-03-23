@@ -16,7 +16,7 @@ func quickJSON(anyStruct any) string {
 	return string(jsonBytes)
 }
 
-func TestCreatePollHandler_Invalid(t *testing.T) {
+func TestCreatePollHandler_Error(t *testing.T) {
 	tests := []struct {
 		statusCode int
 		errMsg     string
@@ -71,7 +71,7 @@ func TestCreatePollHandler_Invalid(t *testing.T) {
 	}
 }
 
-func TestCreatePollHandler_Valid(t *testing.T) {
+func TestCreatePollHandler_Success(t *testing.T) {
 	tests := []string{
 		quickJSON(struct {
 			Prompt  string   `json:"prompt"`
@@ -112,11 +112,10 @@ func TestCreatePollHandler_Valid(t *testing.T) {
 	}
 }
 
-func TestGetPollInfoHandler_Invalid(t *testing.T) {
+func TestGetPollInfoHandler_Error(t *testing.T) {
 	tests := []struct {
 		statusCode     int
 		errMsg         string
-		path           string
 		pathParameters map[string]string
 		getPollMock    func(pollID string) (*models.Poll, error)
 	}{
@@ -125,21 +124,18 @@ func TestGetPollInfoHandler_Invalid(t *testing.T) {
 		{
 			http.StatusBadRequest,
 			"missing poll ID",
-			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{"pollId": ""},
 			nil,
 		},
 		{
 			http.StatusBadRequest,
 			"missing poll ID",
-			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{},
 			nil,
 		},
 		{
 			http.StatusInternalServerError,
 			"failed to get the poll from the database",
-			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return nil, errors.New("mock error")
@@ -148,7 +144,6 @@ func TestGetPollInfoHandler_Invalid(t *testing.T) {
 		{
 			http.StatusNotFound,
 			"no poll found for the specified ID",
-			"/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return models.NewPoll("", []string{""}), nil
@@ -159,7 +154,7 @@ func TestGetPollInfoHandler_Invalid(t *testing.T) {
 	for _, test := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           test.path,
+			Path:           "/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			PathParameters: test.pathParameters,
 		}
 		handler := api.Handler{Store: &mockDatastore{GetPollMock: test.getPollMock}, Req: req}
@@ -174,7 +169,7 @@ func TestGetPollInfoHandler_Invalid(t *testing.T) {
 	}
 }
 
-func TestGetPollInfoHandler_Valid(t *testing.T) {
+func TestGetPollInfoHandler_Success(t *testing.T) {
 	tests := []*models.Poll{
 		models.NewPoll("What is the best day of the week?",
 			[]string{"Wednesday", "Tuesday", "None of the above"}),
@@ -206,7 +201,7 @@ func TestGetPollInfoHandler_Valid(t *testing.T) {
 	}
 }
 
-func TestCastBallotHandler_Invalid(t *testing.T) {
+func TestCastBallotHandler_Error(t *testing.T) {
 	tests := []struct {
 		statusCode int
 		errMsg     string
@@ -256,7 +251,7 @@ func TestCastBallotHandler_Invalid(t *testing.T) {
 	}
 }
 
-func TestCastBallotHandler_Valid(t *testing.T) {
+func TestCastBallotHandler_Success(t *testing.T) {
 	tests := []string{
 		quickJSON(struct {
 			PollID    string `json:"pollId"`
@@ -289,6 +284,158 @@ func TestCastBallotHandler_Valid(t *testing.T) {
 		}
 		if resp.Body != `{"message": "successfully cast ballot"}` {
 			t.Error("unexpected response body:", resp.Body)
+		}
+	}
+}
+
+func TestGetResultHandler_Error(t *testing.T) {
+	tests := []struct {
+		statusCode     int
+		errMsg         string
+		pathParameters map[string]string
+		getPollMock    func(pollID string) (*models.Poll, error)
+		getBallotsMock func(pollID string) ([]*models.Ballot, error)
+	}{
+		// Not testing for the poll ID being missing from the path specifically (not the
+		// parameters map) because that is handled in the router
+		{
+			http.StatusBadRequest,
+			"missing poll ID",
+			map[string]string{"pollId": ""},
+			nil,
+			nil,
+		},
+		{
+			http.StatusBadRequest,
+			"missing poll ID",
+			map[string]string{},
+			nil,
+			nil,
+		},
+		{
+			http.StatusInternalServerError,
+			"failed to get the poll from the database",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return nil, errors.New("mock error")
+			},
+			nil,
+		},
+		{
+			http.StatusNotFound,
+			"no poll found for the specified ID",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return models.NewPoll("", []string{""}), nil
+			},
+			nil,
+		},
+		{
+			http.StatusInternalServerError,
+			"failed to get the poll's ballots from the database",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return models.NewPoll(
+					"What is the best day of the week?",
+					[]string{"Wednesday", "Tuesday", "None of the above"},
+				), nil
+			},
+			func(pollID string) ([]*models.Ballot, error) {
+				return nil, errors.New("mock error")
+			},
+		},
+		{
+			http.StatusNotFound,
+			"no ballots found for the specified poll",
+			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
+			func(pollID string) (*models.Poll, error) {
+				return models.NewPoll(
+					"What is the best day of the week?",
+					[]string{"Wednesday", "Tuesday", "None of the above"},
+				), nil
+			},
+			func(pollID string) ([]*models.Ballot, error) {
+				return []*models.Ballot{}, nil
+			},
+		},
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod:     http.MethodGet,
+			Path:           "/result/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			PathParameters: test.pathParameters,
+		}
+		handler := api.Handler{Store: &mockDatastore{
+			GetPollMock:    test.getPollMock,
+			GetBallotsMock: test.getBallotsMock,
+		}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != test.statusCode {
+			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
+		}
+		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+			t.Error("unexpected response body:", resp.Body)
+			t.Error(`expected: {"error":"` + test.errMsg + `"}`)
+		}
+	}
+}
+
+func TestGetResultHandler_Success(t *testing.T) {
+	tests := []struct {
+		poll    *models.Poll
+		ballots []struct {
+			userID    string
+			rankOrder []int
+		}
+	}{
+		{
+			models.NewPoll("What is the best day of the week?",
+				[]string{"Wednesday", "Tuesday", "None of the above"}),
+			[]struct {
+				userID    string
+				rankOrder []int
+			}{{"user1", []int{0, 2, 1}}, {"user2", []int{0, 1, 2}}},
+		},
+		{
+			models.NewPoll("What is the worst day of the week?",
+				[]string{"Monday", "Thursday", "Either Monday or Thursday", "None of these"}),
+			[]struct {
+				userID    string
+				rankOrder []int
+			}{{"user4", []int{2, 3, 1, 0}}, {"user7", []int{2, 1, 0, 3}}},
+		},
+	}
+
+	for _, test := range tests {
+		req := events.APIGatewayProxyRequest{
+			HTTPMethod:     http.MethodGet,
+			Path:           "/result/" + test.poll.GetPollID(),
+			PathParameters: map[string]string{"pollId": test.poll.GetPollID()},
+		}
+		ballots := make([]*models.Ballot, len(test.ballots))
+		for i, ballot := range test.ballots {
+			ballots[i] = models.NewBallot(test.poll.GetPollID(), ballot.userID, ballot.rankOrder)
+		}
+		handler := api.Handler{Store: &mockDatastore{
+			GetPollMock:    func(pollID string) (*models.Poll, error) { return test.poll, nil },
+			GetBallotsMock: func(pollID string) ([]*models.Ballot, error) { return ballots, nil },
+		}, Req: req}
+		resp := handler.Route()
+		if resp.StatusCode != http.StatusOK {
+			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)
+		}
+		result, err := models.NewResult(test.poll, ballots)
+		if err != nil {
+			t.Error("unexpected error calculating result:", err)
+		}
+		body, err := json.Marshal(result)
+		if err != nil {
+			t.Error("unexpected error marshaling JSON")
+		}
+		if resp.Body != string(body) {
+			t.Error("unexpected response body:", resp.Body)
+			t.Error("expected:", string(body))
 		}
 	}
 }
