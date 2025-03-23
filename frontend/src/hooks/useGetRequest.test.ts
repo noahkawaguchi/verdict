@@ -11,7 +11,7 @@ describe('useGetRequest', () => {
   afterAll(() => vi.restoreAllMocks());
 
   it('should set the initial return values correctly', () => {
-    const { result } = renderHook(() => useGetRequest('dummy-endpoint'));
+    const { result } = renderHook(() => useGetRequest<Record<string, string>>('dummy-endpoint'));
     expect(result.current.data).toBeNull();
     expect(result.current.error).toBeNull();
     expect(result.current.loading).toEqual(false);
@@ -19,7 +19,7 @@ describe('useGetRequest', () => {
 
   it('should call fetch with the correct arguments', async () => {
     const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    const { result } = renderHook(() => useGetRequest('dummy-endpoint'));
+    const { result } = renderHook(() => useGetRequest<Record<string, string>>('dummy-endpoint'));
     await act(async () => result.current.sendRequest('dummy-parameter'));
     expect(mockedFetch).toHaveBeenCalledExactlyOnceWith(
       `${backendUrl}/dummy-endpoint/dummy-parameter`,
@@ -30,7 +30,7 @@ describe('useGetRequest', () => {
   it('should correctly handle a successful response', async () => {
     const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
     mockedFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
-    const { result } = renderHook(() => useGetRequest('dummy-endpoint'));
+    const { result } = renderHook(() => useGetRequest<{ message: string }>('dummy-endpoint'));
     await act(async () => result.current.sendRequest('dummy-parameter'));
     expect(result.current.loading).toEqual(false);
     expect(result.current.error).toBeNull();
@@ -43,7 +43,7 @@ describe('useGetRequest', () => {
       ok: false,
       json: async () => ({ error: 'something went wrong' }),
     });
-    const { result } = renderHook(() => useGetRequest('dummy-endpoint'));
+    const { result } = renderHook(() => useGetRequest<{ message: string }>('dummy-endpoint'));
     await act(async () => result.current.sendRequest('dummy-parameter'));
     expect(result.current.loading).toEqual(false);
     expect(result.current.data).toBeNull();
