@@ -34,7 +34,7 @@ func (h *Handler) Route() events.APIGatewayProxyResponse {
 	case http.MethodGet:
 		switch getShortPath(h.Req.Path) {
 		case "/poll":
-			return h.createBallot()
+			return h.getPollInfo()
 		case "/result":
 			return h.getResult()
 		default:

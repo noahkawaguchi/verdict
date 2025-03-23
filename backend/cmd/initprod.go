@@ -15,9 +15,10 @@ func init() {
 	// Load AWS config for production (region and credentials automatically detected from
 	// environment variables, `context.TODO()` because the persistent client does not need the
 	// context of each invocation)
-	if cfg, err := config.LoadDefaultConfig(context.TODO()); err != nil {
+	cfg, err := config.LoadDefaultConfig(context.TODO())
+	if err != nil {
 		log.Fatalf("Unable to load SDK config:\n%v\n", err)
-	} else { // Set the DynamoDB client
-		dbClient = dynamodb.NewFromConfig(cfg)
 	}
+	// Set the DynamoDB client
+	dbClient = dynamodb.NewFromConfig(cfg)
 }

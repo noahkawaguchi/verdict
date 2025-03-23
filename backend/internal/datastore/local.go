@@ -51,13 +51,11 @@ var createPollsTableInput = &dynamodb.CreateTableInput{
 
 // localTableExists checks if the specified table exists in the local DynamoDB in Docker.
 func localTableExists(client *dynamodb.Client, table *tableInfo) bool {
-	if _, err := client.DescribeTable(
+	_, err := client.DescribeTable(
 		context.TODO(),
 		&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
-	); err == nil {
-		return true
-	}
-	return false
+	)
+	return err == nil
 }
 
 // createLocalTable creates the specified table in the local DynamoDB in Docker.
@@ -69,10 +67,11 @@ func createLocalTable(client *dynamodb.Client, table *tableInfo, input *dynamodb
 	}
 	// Wait for the table to be created
 	for {
-		if out, err := client.DescribeTable(
+		out, err := client.DescribeTable(
 			context.TODO(),
 			&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
-		); err == nil && out.Table.TableStatus == types.TableStatusActive {
+		)
+		if err == nil && out.Table.TableStatus == types.TableStatusActive {
 			return
 		}
 		time.Sleep(1 * time.Second)
@@ -81,10 +80,8 @@ func createLocalTable(client *dynamodb.Client, table *tableInfo, input *dynamodb
 
 // printLocalTables prints a list of the tables in the local database.
 func printLocalTables(client *dynamodb.Client) {
-	if result, err := client.ListTables(
-		context.TODO(),
-		&dynamodb.ListTablesInput{},
-	); err != nil {
+	result, err := client.ListTables(context.TODO(), &dynamodb.ListTablesInput{})
+	if err != nil {
 		log.Printf("failed to print local tables: %v", err)
 	} else {
 		fmt.Println("Local tables:", result.TableNames)

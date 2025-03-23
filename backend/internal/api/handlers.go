@@ -25,7 +25,7 @@ func (h *Handler) createPoll() events.APIGatewayProxyResponse {
 	return response201(`{"pollId": "` + poll.GetPollID() + `"}`)
 }
 
-func (h *Handler) createBallot() events.APIGatewayProxyResponse {
+func (h *Handler) getPollInfo() events.APIGatewayProxyResponse {
 	// Check for the poll ID
 	pollID := h.Req.PathParameters["pollId"]
 	if pollID == "" {
@@ -41,11 +41,11 @@ func (h *Handler) createBallot() events.APIGatewayProxyResponse {
 		return response404("no poll found for the specified ID")
 	}
 	// Marshal the response
-	if body, err := json.Marshal(poll); err != nil {
+	body, err := json.Marshal(poll)
+	if err != nil {
 		return response500("failed to marshal response")
-	} else {
-		return response200(string(body))
 	}
+	return response200(string(body))
 }
 
 func (h *Handler) castBallot() events.APIGatewayProxyResponse {
@@ -96,9 +96,9 @@ func (h *Handler) getResult() events.APIGatewayProxyResponse {
 		return response500(err.Error())
 	}
 	// Marshal the response
-	if body, err := json.Marshal(result); err != nil {
+	body, err := json.Marshal(result)
+	if err != nil {
 		return response500("failed to marshal response")
-	} else {
-		return response200(string(body))
 	}
+	return response200(string(body))
 }

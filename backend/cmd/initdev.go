@@ -28,11 +28,12 @@ func init() {
 			credentials.NewStaticCredentialsProvider("dummy", "dummy", ""),
 		),
 	}
-	if cfg, err := config.LoadDefaultConfig(context.TODO(), configFunctions...); err != nil {
+	cfg, err := config.LoadDefaultConfig(context.TODO(), configFunctions...)
+	if err != nil {
 		log.Printf("Unable to load SDK config (development).\ndbClient will be nil:\n%v\n", err)
-	} else { // Set the DynamoDB client
-		dbClient = dynamodb.NewFromConfig(cfg)
 	}
+	// Set the DynamoDB client
+	dbClient = dynamodb.NewFromConfig(cfg)
 	// Create the tables if they don't exist
 	datastore.EnsureBothLocalTablesExist(dbClient)
 }
