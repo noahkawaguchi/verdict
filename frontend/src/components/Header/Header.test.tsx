@@ -1,11 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router-dom';
-import HomePage from '../../pages/HomePage/HomePage';
-import CreatePollPage from '../../pages/CreatePoll/CreatePollPage';
-import CastBallotPage from '../../pages/CastBallot/CastBallotPage';
-import ViewResultsPage from '../../pages/ViewResults/ViewResultsPage';
-import NotFoundPage from '../../pages/NotFoundPage/NotFoundPage';
 import Header from './Header';
 
 describe('Header', () => {
@@ -14,11 +9,10 @@ describe('Header', () => {
       <MemoryRouter initialEntries={['/']}>
         <Header />
         <Routes>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/create-poll' element={<CreatePollPage />} />
-          <Route path='/cast-ballot/:pollId?' element={<CastBallotPage />} />
-          <Route path='/view-results/:pollId?' element={<ViewResultsPage />} />
-          <Route path='*' element={<NotFoundPage />} />
+          <Route path='/' element={<p>Home page here</p>} />
+          <Route path='/create-poll' element={<p>Create poll page here</p>} />
+          <Route path='/cast-ballot/:pollId?' element={<p>Cast ballot page here</p>} />
+          <Route path='/view-results/:pollId?' element={<p>View results page here</p>} />
         </Routes>
       </MemoryRouter>,
     ),
@@ -30,15 +24,15 @@ describe('Header', () => {
     const user = userEvent.setup();
 
     await user.click(screen.getByText('Create Poll'));
-    expect(screen.getByText('Create a New Poll')).toBeInTheDocument();
+    expect(screen.getByText('Create poll page here')).toBeInTheDocument();
 
     await user.click(screen.getByText('Cast Ballot'));
-    expect(screen.getByText('Cast a New Ballot')).toBeInTheDocument();
+    expect(screen.getByText('Cast ballot page here')).toBeInTheDocument();
 
     await user.click(screen.getByText('View Results'));
-    expect(screen.getByText("View a Poll's Results")).toBeInTheDocument();
+    expect(screen.getByText('View results page here')).toBeInTheDocument();
 
     await user.click(screen.getByText('Verdict'));
-    expect(screen.getByText('Welcome to Verdict')).toBeInTheDocument();
+    expect(screen.getByText('Home page here')).toBeInTheDocument();
   });
 });
