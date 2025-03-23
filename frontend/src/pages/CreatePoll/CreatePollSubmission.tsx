@@ -7,9 +7,9 @@ type CreatePollSubmissionProps = {
 };
 
 /**
- * Makes a POST request to create the new poll. 
+ * Makes a POST request to create the new poll.
  * Displays loading, error, or links to vote in the poll and view its results.
- * 
+ *
  * @param question - The completed question to be used in the new poll.
  */
 const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question }) => {
