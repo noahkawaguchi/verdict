@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 /**
- * A simple form for entering a poll ID. 
+ * A simple form for entering a poll ID.
  * On submit, navigates to the current path with the poll ID appended as an additional subpath.
  */
 const EnterPollId = () => {
