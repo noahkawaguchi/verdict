@@ -20,7 +20,7 @@ describe('useMutationRequest', () => {
   });
 
   it('should call fetch with the correct arguments', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
     const { result } = renderHook(() =>
       useMutationRequest<{ field1: string; field2: string }, Record<string, string>>(
         'dummy-endpoint',
@@ -30,7 +30,7 @@ describe('useMutationRequest', () => {
     await act(async () =>
       result.current.sendRequest({ field1: 'some data', field2: 'other data' }),
     );
-    expect(mockedFetch).toHaveBeenCalledExactlyOnceWith(`${backendUrl}/dummy-endpoint`, {
+    expect(mockFetch).toHaveBeenCalledExactlyOnceWith(`${backendUrl}/dummy-endpoint`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: `{"field1":"some data","field2":"other data"}`,
@@ -38,8 +38,8 @@ describe('useMutationRequest', () => {
   });
 
   it('should correctly handle a successful response', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    mockedFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
     const { result } = renderHook(() =>
       useMutationRequest<{ field1: string; field2: string }, Record<string, string>>(
         'dummy-endpoint',
@@ -55,8 +55,8 @@ describe('useMutationRequest', () => {
   });
 
   it('should correctly handle an error response', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    mockedFetch.mockResolvedValueOnce({
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: 'something went wrong' }),
     });

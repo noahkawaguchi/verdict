@@ -18,18 +18,18 @@ describe('useGetRequest', () => {
   });
 
   it('should call fetch with the correct arguments', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
     const { result } = renderHook(() => useGetRequest<Record<string, string>>('dummy-endpoint'));
     await act(async () => result.current.sendRequest('dummy-parameter'));
-    expect(mockedFetch).toHaveBeenCalledExactlyOnceWith(
+    expect(mockFetch).toHaveBeenCalledExactlyOnceWith(
       `${backendUrl}/dummy-endpoint/dummy-parameter`,
       { method: 'GET', headers: { 'Content-Type': 'application/json' } },
     );
   });
 
   it('should correctly handle a successful response', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    mockedFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
     const { result } = renderHook(() => useGetRequest<{ message: string }>('dummy-endpoint'));
     await act(async () => result.current.sendRequest('dummy-parameter'));
     expect(result.current.loading).toEqual(false);
@@ -38,8 +38,8 @@ describe('useGetRequest', () => {
   });
 
   it('should correctly handle an error response', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    mockedFetch.mockResolvedValueOnce({
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce({
       ok: false,
       json: async () => ({ error: 'something went wrong' }),
     });

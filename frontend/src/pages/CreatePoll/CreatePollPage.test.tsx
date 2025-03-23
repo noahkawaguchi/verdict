@@ -10,8 +10,8 @@ describe('CreatePollPage', () => {
   afterAll(() => vi.restoreAllMocks());
 
   it('should show CreatePollForm before a question is set, CreatePollSubmission after', async () => {
-    const mockedFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
-    mockedFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ pollId: 'poll-12345' }) });
+    const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
+    mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ pollId: 'poll-12345' }) });
 
     render(<CreatePollPage />);
     const user = userEvent.setup();
