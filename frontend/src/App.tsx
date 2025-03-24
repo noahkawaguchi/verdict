@@ -4,7 +4,7 @@ import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage/HomePage';
 import CreatePollPage from './pages/CreatePoll/CreatePollPage';
 import CastBallotPage from './pages/CastBallot/CastBallotPage';
-import ViewResultsPage from './pages/ViewResults/ViewResultsPage';
+import ViewResultsPage from './pages/ViewResultsPage/ViewResultsPage';
 import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const App = () => {
