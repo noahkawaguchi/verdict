@@ -8,8 +8,9 @@ const MainLayout = () => {
       <main>
         <Outlet />
       </main>
+      <hr />
     </>
   );
 };
 
-export default MainLayout
+export default MainLayout;

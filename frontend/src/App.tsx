@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import MainLayout from './layouts/MainLayout';
-import HomePage from './pages/HomePage/HomePage';
+import HomePage from './pages/HomePage';
 import CreatePollPage from './pages/CreatePoll/CreatePollPage';
 import CastBallotPage from './pages/CastBallot/CastBallotPage';
 import ViewResultsPage from './pages/ViewResultsPage/ViewResultsPage';

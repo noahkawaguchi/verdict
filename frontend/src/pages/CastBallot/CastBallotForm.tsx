@@ -50,6 +50,7 @@ const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder 
       <p>
         <i>Prompt:</i> {question.prompt}
       </p>
+      <hr />
       {ranks.map((choice, idx) => (
         <div key={idx} className={styles.rank}>
           <p>

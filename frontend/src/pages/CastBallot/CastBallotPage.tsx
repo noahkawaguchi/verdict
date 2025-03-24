@@ -8,7 +8,7 @@ import CastBallotSubmission from './CastBallotSubmission';
 
 /**
  * Manages the display of `EnterPollId`, `CastBallotForm`, and `CastBallotSubmission` components.
- * Manages the timing of API requests to provide the voter with a ballot and to submit their 
+ * Manages the timing of API requests to provide the voter with a ballot and to submit their
  * choices.
  */
 const CastBallotPage = () => {
@@ -23,6 +23,7 @@ const CastBallotPage = () => {
   return (
     <>
       <h3>Cast a New Ballot</h3>
+      <hr />
       {!pollId ? (
         <EnterPollId />
       ) : !rankOrder ? (

@@ -16,6 +16,7 @@ const ViewResultsPage = () => {
   return (
     <>
       <h3>View a Poll's Results</h3>
+      <hr />
       {!pollId ? (
         <EnterPollId />
       ) : (

@@ -10,6 +10,7 @@ const CreatePollPage = () => {
   return (
     <>
       <h3>Create a New Poll</h3>
+      <hr />
       {!question ? (
         <CreatePollForm setQuestion={setQuestion} />
       ) : (

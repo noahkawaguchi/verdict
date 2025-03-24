@@ -25,3 +25,10 @@ form * {
   margin-left: 5px;
   margin-right: 5px;
 }
+
+code {
+  font-family: 'Courier New', Courier, monospace;
+  border: 1px solid var(--light-text);
+  padding: 5px;
+  border-radius: 5px;
+}

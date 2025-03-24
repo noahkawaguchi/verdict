@@ -33,6 +33,13 @@ const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question })
         <h4>
           <em>Your poll has been created!</em>
         </h4>
+        <p>
+          Its poll ID is <code>{data.pollId}</code>
+        </p>
+        <button type='button' onClick={() => navigator.clipboard.writeText(data.pollId)}>
+          Copy poll ID
+        </button>
+        <hr />
         <p>Voters can cast their ballots at this link:</p>
         <p>
           <a
@@ -45,8 +52,9 @@ const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question })
           type='button'
           onClick={() => navigator.clipboard.writeText(`${baseUrl}/cast-ballot/${data.pollId}`)}
         >
-          Copy voting link to clipboard
+          Copy voting link
         </button>
+        <hr />
         <p>The results will be available at this link:</p>
         <p>
           <a
@@ -59,7 +67,7 @@ const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question })
           type='button'
           onClick={() => navigator.clipboard.writeText(`${baseUrl}/view-results/${data.pollId}`)}
         >
-          Copy results link to clipboard
+          Copy results link
         </button>
       </>
     )
