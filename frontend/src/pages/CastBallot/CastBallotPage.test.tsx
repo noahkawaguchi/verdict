@@ -37,7 +37,7 @@ describe('CastBallotPage', () => {
     expect(screen.getByText(/something failed/)).toBeInTheDocument();
   });
 
-  it('should call fetch with the correct arguments', async () => {
+  it('should invoke useGetRequest with the correct arguments', async () => {
     const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
     mockFetch.mockResolvedValueOnce({
       ok: true,

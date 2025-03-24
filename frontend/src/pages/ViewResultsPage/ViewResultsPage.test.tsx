@@ -38,7 +38,7 @@ describe('ViewResultsPage', () => {
     expect(screen.getByText(/some error was encountered/)).toBeInTheDocument();
   });
 
-  it('should call fetch with the correct arguments', async () => {
+  it('should invoke useGetRequest with the correct arguments', async () => {
     const result: Result = {
       prompt: 'What is the best apple color?',
       totalVotes: 16,

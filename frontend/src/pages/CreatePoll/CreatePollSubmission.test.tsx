@@ -9,7 +9,7 @@ describe('CreatePollSubmission', () => {
 
   afterAll(() => vi.restoreAllMocks());
 
-  it('should make the correct POST request when it renders', async () => {
+  it('should correctly invoke useMutationRequest when it renders', async () => {
     const mockFetch = globalThis.fetch as ReturnType<typeof vi.fn>;
     mockFetch.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'success!' }) });
     const question = {
