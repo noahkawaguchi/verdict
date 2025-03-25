@@ -2,6 +2,7 @@ package api_test
 
 import (
 	"net/http"
+	"os"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -43,10 +44,14 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 		if resp.StatusCode != http.StatusMethodNotAllowed {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
-		if !cmp.Equal(
-			resp.Headers,
-			map[string]string{"Allow": "OPTIONS, GET, POST", "Content-Type": "application/json"},
-		) {
+		expectedHeaders := map[string]string{
+			"Content-Type":                 "application/json",
+			"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),
+			"Access-Control-Allow-Methods": "OPTIONS,GET,POST",
+			"Access-Control-Allow-Headers": "Content-Type,Authorization",
+			"Allow":                        "OPTIONS, GET, POST",
+		}
+		if !cmp.Equal(resp.Headers, expectedHeaders) {
 			t.Error("unexpected headers:", resp.Headers)
 		}
 		if resp.Body != `{"error":"method `+test.HTTPMethod+` not allowed"}` {

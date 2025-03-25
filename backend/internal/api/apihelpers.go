@@ -1,7 +1,9 @@
 package api
 
 import (
+	"maps"
 	"net/http"
+	"os"
 	"regexp"
 	"strings"
 
@@ -18,11 +20,18 @@ func getShortPath(longPath string) string {
 	return "default"
 }
 
+var defaultHeaders = map[string]string{
+	"Content-Type":                 "application/json",
+	"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),
+	"Access-Control-Allow-Methods": "OPTIONS,GET,POST",
+	"Access-Control-Allow-Headers": "Content-Type,Authorization",
+}
+
 // response200 creates a 200 OK HTTP response with the provided body.
 func response200(body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Headers:    defaultHeaders,
 		Body:       body,
 	}
 }
@@ -31,7 +40,7 @@ func response200(body string) events.APIGatewayProxyResponse {
 func response201(body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusCreated,
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Headers:    defaultHeaders,
 		Body:       body,
 	}
 }
@@ -40,7 +49,7 @@ func response201(body string) events.APIGatewayProxyResponse {
 func response400(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusBadRequest,
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Headers:    defaultHeaders,
 		Body:       `{"error":"` + errMsg + `"}`,
 	}
 }
@@ -49,7 +58,7 @@ func response400(errMsg string) events.APIGatewayProxyResponse {
 func response404(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusNotFound,
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Headers:    defaultHeaders,
 		Body:       `{"error":"` + errMsg + `"}`,
 	}
 }
@@ -57,13 +66,12 @@ func response404(errMsg string) events.APIGatewayProxyResponse {
 // response405 creates a 405 Method Not Allowed HTTP response with a custom error message and a
 // custom header specifying the allowed methods.
 func response405(receivedMethod string, allowedMethods ...string) events.APIGatewayProxyResponse {
+	headers405 := maps.Clone(defaultHeaders)
+	headers405["Allow"] = strings.Join(allowedMethods, ", ")
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusMethodNotAllowed,
-		Headers: map[string]string{
-			"Content-Type": "application/json",
-			"Allow":        strings.Join(allowedMethods, ", "),
-		},
-		Body: `{"error":"method ` + receivedMethod + ` not allowed"}`,
+		Headers:    headers405,
+		Body:       `{"error":"method ` + receivedMethod + ` not allowed"}`,
 	}
 }
 
@@ -71,7 +79,7 @@ func response405(receivedMethod string, allowedMethods ...string) events.APIGate
 func response500(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
-		Headers:    map[string]string{"Content-Type": "application/json"},
+		Headers:    defaultHeaders,
 		Body:       `{"error":"` + errMsg + `"}`,
 	}
 }

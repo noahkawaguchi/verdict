@@ -1,4 +1,4 @@
-.PHONY: dev test
+.PHONY: dev test deploy
 
 dev:
 	GOFLAGS="-tags=dev" sam build
@@ -7,3 +7,7 @@ dev:
 test:
 	clear
 	go test -tags test ./... -v
+
+deploy:
+	sam build
+	sam deploy --guided

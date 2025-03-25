@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import MainLayout from './layouts/MainLayout';
 import HomePage from './pages/HomePage';
@@ -9,7 +9,7 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const App = () => {
   return (
-    <Router>
+    <BrowserRouter basename='/verdict'>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path='/' element={<HomePage />} />
@@ -19,7 +19,7 @@ const App = () => {
           <Route path='*' element={<NotFoundPage />} />
         </Route>
       </Routes>
-    </Router>
+    </BrowserRouter>
   );
 };
 

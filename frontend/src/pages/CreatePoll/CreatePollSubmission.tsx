@@ -14,7 +14,7 @@ type CreatePollSubmissionProps = {
  */
 const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question }) => {
   // Get the base URL to dynamically combine with the poll ID later
-  const baseUrl = `${window.location.protocol}//${window.location.host}`;
+  const baseUrl = `${window.location.protocol}//${window.location.host}/verdict`;
   const { data, error, loading, sendRequest } = useMutationRequest<Question, { pollId: string }>(
     'poll',
     'POST',

@@ -36,6 +36,19 @@ Resources:
       Runtime: provided.al2023
       Architectures:
         - x86_64
+      Environment:
+        Variables:
+          FRONTEND_URL: !Ref FrontendUrl
+      Policies:
+        - Statement:
+            Effect: Allow
+            Action:
+              - dynamodb:PutItem
+              - dynamodb:GetItem
+              - dynamodb:Query
+            Resource:
+              - !GetAtt BallotsTable.Arn
+              - !GetAtt PollsTable.Arn
       Events:
         CreatePoll:
           Type: Api 
@@ -62,7 +75,36 @@ Resources:
             Method: GET
             RestApiId: !Ref VerdictApi
 
+  BallotsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Ballots
+      AttributeDefinitions:
+        - AttributeName: PollID
+          AttributeType: S
+        - AttributeName: UserID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PollID
+          KeyType: HASH
+        - AttributeName: UserID
+          KeyType: RANGE
+      BillingMode: PAY_PER_REQUEST
+
+  PollsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: Polls
+      AttributeDefinitions:
+        - AttributeName: PollID
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PollID
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
+
+
 Outputs:
   VerdictAPI:
     Description: "API Gateway endpoint for Verdict API"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
+    Value: !Sub "https://${VerdictApi}.execute-api.${AWS::Region}.amazonaws.com/${StageName}/"
