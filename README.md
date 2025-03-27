@@ -1,5 +1,7 @@
 # Verdict
 
+### [🔗 Live link here](https://noahkawaguchi.github.io/verdict/)
+
 Verdict is a full-stack web app for creating ranked choice polls, in which voters rank each choice by preference instead of choosing only one. The instant runoff algorithm calculates winners by repeatedly eliminating the choice with the fewest votes, redistributing ballots until a single choice achieves a strict majority.
 
 ## Table of Contents
@@ -12,9 +14,9 @@ Verdict is a full-stack web app for creating ranked choice polls, in which voter
 
 | | |
 | - | - |
-| ***Backend*** | ![Static Badge](https://img.shields.io/badge/Go-00ADD8) ![Static Badge](https://img.shields.io/badge/Lambda-FF9900) ![Static Badge](https://img.shields.io/badge/API_Gateway-FF4F8B) ![Static Badge](https://img.shields.io/badge/DynamoDB-4053D6) |
-| ***Frontend*** | ![Static Badge](https://img.shields.io/badge/TypeScript-3178C6) ![Static Badge](https://img.shields.io/badge/React-61DAFB) ![Static Badge](https://img.shields.io/badge/Vite-646CFF) ![Static Badge](https://img.shields.io/badge/Vitest-6E9F18) ![Static Badge](https://img.shields.io/badge/pnpm-F69220) |
-| ***Dev Tools*** | ![Static Badge](https://img.shields.io/badge/Docker-2496ED) |
+| ***Backend*** | ![Static Badge](https://img.shields.io/badge/Go-00ADD8) ![Static Badge](https://img.shields.io/badge/AWS-232F3E) ![Static Badge](https://img.shields.io/badge/Lambda-FF9900) ![Static Badge](https://img.shields.io/badge/API_Gateway-FF4F8B) ![Static Badge](https://img.shields.io/badge/DynamoDB-4053D6) |
+| ***Frontend*** | ![Static Badge](https://img.shields.io/badge/TypeScript-3178C6) ![Static Badge](https://img.shields.io/badge/React-61DAFB) ![Static Badge](https://img.shields.io/badge/Vite-646CFF) ![Static Badge](https://img.shields.io/badge/Vitest-6E9F18) ![Static Badge](https://img.shields.io/badge/React_Testing_Library-E33332) ![Static Badge](https://img.shields.io/badge/pnpm-F69220) ![Static Badge](https://img.shields.io/badge/GitHub_Pages-222222) |
+| ***Dev Tools*** | ![Static Badge](https://img.shields.io/badge/Docker-2496ED) ![Static Badge](https://img.shields.io/badge/AWS_SAM-232F3E) |
 
 ## Current Features
 
