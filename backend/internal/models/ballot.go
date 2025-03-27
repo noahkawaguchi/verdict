@@ -12,19 +12,14 @@ import (
 )
 
 type Ballot struct {
-	pollID string
-	userID string
+	pollID, userID string
 	// The indices of the voter's choices. For example, if the voter's first choice is at index 2
 	// in the poll's choices, then rankOrder[0] = 2.
 	rankOrder []int
 }
 
 func NewBallot(pollID, userID string, rankOrder []int) *Ballot {
-	return &Ballot{
-		pollID:    pollID,
-		userID:    userID,
-		rankOrder: rankOrder,
-	}
+	return &Ballot{pollID, userID, rankOrder}
 }
 
 // Validate ensures that none of the fields are empty, there are at least two rankings, and the
@@ -51,9 +46,8 @@ func (b *Ballot) Validate() error {
 }
 
 func (b *Ballot) String() string {
-	shortPollID := b.pollID[:5] + "... "
 	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
-		b.userID, shortPollID, b.rankOrder)
+		b.userID, b.pollID[:5]+"... ", b.rankOrder)
 }
 
 // UnmarshalJSON is a custom JSON unmarshaler. If no user ID is provided, a new one is generated.
@@ -74,8 +68,7 @@ func (b *Ballot) UnmarshalJSON(data []byte) error {
 		b.userID = aux.UserID
 	}
 	// Set the other unmarshaled values back to the main struct
-	b.pollID = aux.PollID
-	b.rankOrder = aux.RankOrder
+	b.pollID, b.rankOrder = aux.PollID, aux.RankOrder
 	return nil
 }
 
@@ -83,14 +76,9 @@ func (b *Ballot) UnmarshalJSON(data []byte) error {
 // to DynamoDB.
 func (b *Ballot) MarshalDynamoDBAttributeValue() (types.AttributeValue, error) {
 	m, err := attributevalue.MarshalMap(struct {
-		PollID    string
-		UserID    string
-		RankOrder []int
-	}{
-		PollID:    b.pollID,
-		UserID:    b.userID,
-		RankOrder: b.rankOrder,
-	})
+		PollID, UserID string
+		RankOrder      []int
+	}{b.pollID, b.userID, b.rankOrder})
 	if err != nil {
 		return nil, err
 	}
@@ -106,18 +94,15 @@ func (b *Ballot) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error 
 		return fmt.Errorf("expected *types.AttributeValueMemberM, got %T", av)
 	}
 	// Create a struct for custom unmarshaling
-	var result struct {
-		PollID    string
-		UserID    string
-		RankOrder []int
+	var aux struct {
+		PollID, UserID string
+		RankOrder      []int
 	}
 	// Try to unmarshal using the custom struct
-	if err := attributevalue.UnmarshalMap(m.Value, &result); err != nil {
+	if err := attributevalue.UnmarshalMap(m.Value, &aux); err != nil {
 		return err
 	}
 	// Set the unmarshaled values back to the main struct
-	b.pollID = result.PollID
-	b.userID = result.UserID
-	b.rankOrder = result.RankOrder
+	b.pollID, b.userID, b.rankOrder = aux.PollID, aux.UserID, aux.RankOrder
 	return nil
 }

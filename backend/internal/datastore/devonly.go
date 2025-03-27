@@ -8,7 +8,6 @@ import (
 	"log"
 	"time"
 
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
@@ -26,35 +25,33 @@ func EnsureBothLocalTablesExist(client *dynamodb.Client) {
 }
 
 var createBallotsTableInput = &dynamodb.CreateTableInput{
-	TableName: aws.String(ballotsTableInfo.name),
+	TableName: &ballotsTableInfo.name,
 	AttributeDefinitions: []types.AttributeDefinition{
-		{AttributeName: aws.String(ballotsTableInfo.partitionKey), AttributeType: types.ScalarAttributeTypeS},
-		{AttributeName: aws.String(ballotsTableInfo.sortKey), AttributeType: types.ScalarAttributeTypeS},
+		{AttributeName: &ballotsTableInfo.partitionKey, AttributeType: types.ScalarAttributeTypeS},
+		{AttributeName: &ballotsTableInfo.sortKey, AttributeType: types.ScalarAttributeTypeS},
 	},
 	KeySchema: []types.KeySchemaElement{
-		{AttributeName: aws.String(ballotsTableInfo.partitionKey), KeyType: types.KeyTypeHash},
-		{AttributeName: aws.String(ballotsTableInfo.sortKey), KeyType: types.KeyTypeRange},
+		{AttributeName: &ballotsTableInfo.partitionKey, KeyType: types.KeyTypeHash},
+		{AttributeName: &ballotsTableInfo.sortKey, KeyType: types.KeyTypeRange},
 	},
 	BillingMode: types.BillingModePayPerRequest,
 }
 
 var createPollsTableInput = &dynamodb.CreateTableInput{
-	TableName: aws.String(pollsTableInfo.name),
+	TableName: &pollsTableInfo.name,
 	AttributeDefinitions: []types.AttributeDefinition{
-		{AttributeName: aws.String(pollsTableInfo.partitionKey), AttributeType: types.ScalarAttributeTypeS},
+		{AttributeName: &pollsTableInfo.partitionKey, AttributeType: types.ScalarAttributeTypeS},
 	},
 	KeySchema: []types.KeySchemaElement{
-		{AttributeName: aws.String(pollsTableInfo.partitionKey), KeyType: types.KeyTypeHash},
+		{AttributeName: &pollsTableInfo.partitionKey, KeyType: types.KeyTypeHash},
 	},
 	BillingMode: types.BillingModePayPerRequest,
 }
 
 // localTableExists checks if the specified table exists in the local DynamoDB in Docker.
 func localTableExists(client *dynamodb.Client, table *tableInfo) bool {
-	_, err := client.DescribeTable(
-		context.TODO(),
-		&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
-	)
+	_, err := client.DescribeTable(context.TODO(),
+		&dynamodb.DescribeTableInput{TableName: &table.name})
 	return err == nil
 }
 
@@ -67,10 +64,8 @@ func createLocalTable(client *dynamodb.Client, table *tableInfo, input *dynamodb
 	}
 	// Wait for the table to be created
 	for {
-		out, err := client.DescribeTable(
-			context.TODO(),
-			&dynamodb.DescribeTableInput{TableName: aws.String(table.name)},
-		)
+		out, err := client.DescribeTable(context.TODO(),
+			&dynamodb.DescribeTableInput{TableName: &table.name})
 		if err == nil && out.Table.TableStatus == types.TableStatusActive {
 			return
 		}

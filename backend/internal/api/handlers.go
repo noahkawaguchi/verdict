@@ -7,10 +7,10 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
 )
 
-func (h *Handler) createPoll() events.APIGatewayProxyResponse {
+func (h *handler) createPoll() events.APIGatewayProxyResponse {
 	// Unmarshal the request
 	var poll *models.Poll
-	if err := json.Unmarshal([]byte(h.Req.Body), &poll); err != nil {
+	if err := json.Unmarshal([]byte(h.req.Body), &poll); err != nil {
 		return response400("invalid JSON")
 	}
 	// Validate the fields
@@ -18,21 +18,21 @@ func (h *Handler) createPoll() events.APIGatewayProxyResponse {
 		return response400(err.Error())
 	}
 	// Put the poll in the database
-	if err := h.Store.PutPoll(poll); err != nil {
+	if err := h.store.PutPoll(poll); err != nil {
 		return response500("failed to put the poll in the database")
 	}
 	// Send the poll ID back in the response
-	return response201(`{"pollId": "` + poll.GetPollID() + `"}`)
+	return response201(`{"pollId":"` + poll.GetPollID() + `"}`)
 }
 
-func (h *Handler) getPollInfo() events.APIGatewayProxyResponse {
+func (h *handler) getPollInfo() events.APIGatewayProxyResponse {
 	// Check for the poll ID (redundant with the path check in the router in most cases)
-	pollID := h.Req.PathParameters["pollId"]
+	pollID := h.req.PathParameters["pollId"]
 	if pollID == "" {
 		return response400("missing poll ID")
 	}
 	// Retrieve the poll from the database
-	poll, err := h.Store.GetPoll(pollID)
+	poll, err := h.store.GetPoll(pollID)
 	if err != nil {
 		return response500("failed to get the poll from the database")
 	}
@@ -48,10 +48,10 @@ func (h *Handler) getPollInfo() events.APIGatewayProxyResponse {
 	return response200(string(body))
 }
 
-func (h *Handler) castBallot() events.APIGatewayProxyResponse {
+func (h *handler) castBallot() events.APIGatewayProxyResponse {
 	// Unmarshal the request
 	var ballot *models.Ballot
-	if err := json.Unmarshal([]byte(h.Req.Body), &ballot); err != nil {
+	if err := json.Unmarshal([]byte(h.req.Body), &ballot); err != nil {
 		return response400("invalid JSON")
 	}
 	// Validate the fields
@@ -59,21 +59,21 @@ func (h *Handler) castBallot() events.APIGatewayProxyResponse {
 		return response400(err.Error())
 	}
 	// Put the ballot in the database
-	if err := h.Store.PutBallot(ballot); err != nil {
+	if err := h.store.PutBallot(ballot); err != nil {
 		return response500("failed to put the ballot in the database")
 	}
 	// Send a success message back in the response
-	return response201(`{"message": "successfully cast ballot"}`)
+	return response201(`{"message":"successfully cast ballot"}`)
 }
 
-func (h *Handler) getResult() events.APIGatewayProxyResponse {
+func (h *handler) getResult() events.APIGatewayProxyResponse {
 	// Check for the poll ID
-	pollID := h.Req.PathParameters["pollId"]
+	pollID := h.req.PathParameters["pollId"]
 	if pollID == "" {
 		return response400("missing poll ID")
 	}
 	// Get the poll from the database
-	poll, err := h.Store.GetPoll(pollID)
+	poll, err := h.store.GetPoll(pollID)
 	if err != nil {
 		return response500("failed to get the poll from the database")
 	}
@@ -82,7 +82,7 @@ func (h *Handler) getResult() events.APIGatewayProxyResponse {
 		return response404("no poll found for the specified ID")
 	}
 	// Get the poll's ballots from the database
-	ballots, err := h.Store.GetBallots(pollID)
+	ballots, err := h.store.GetBallots(pollID)
 	if err != nil {
 		return response500("failed to get the poll's ballots from the database")
 	}

@@ -14,11 +14,10 @@ var dbClient *dynamodb.Client // Set in the init function
 
 func main() {
 	lambda.Start(func(
-		ctx context.Context,
-		request events.APIGatewayProxyRequest,
+		ctx context.Context, request events.APIGatewayProxyRequest,
 	) (events.APIGatewayProxyResponse, error) {
-		tableStore := &datastore.TableStore{Ctx: ctx, Client: dbClient}
-		handler := &api.Handler{Store: tableStore, Req: request}
+		store := datastore.NewDynamoStore(ctx, dbClient)
+		handler := api.NewHandler(store, request)
 		return handler.Route(), nil
 	})
 }

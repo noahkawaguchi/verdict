@@ -13,9 +13,8 @@ type result struct {
 	poll    *Poll
 	ballots []*Ballot
 	// The slice at each index holds the indices of the ballots currently counting for that choice
-	votes        [][]int
-	winnerIdx    int
-	winningRound int
+	votes                   [][]int
+	winnerIdx, winningRound int
 }
 
 // NewResult creates a result and performs instant runoff voting using the provided poll and
@@ -76,13 +75,11 @@ func (r *result) instantRunoffVoting() {
 			}
 		}
 		// Find the choice(s) in last place
-		minVotes := math.MaxInt
-		var minIndices []int
+		minVotes, minIndices := math.MaxInt, make([]int, 0)
 		for j, choiceBallots := range r.votes {
 			if choiceBallots != nil { // Don't consider eliminated choices
 				if len(choiceBallots) < minVotes { // New last place found
-					minVotes = len(choiceBallots)
-					minIndices = []int{j}
+					minVotes, minIndices = len(choiceBallots), []int{j}
 				} else if len(choiceBallots) == minVotes { // Tie for last
 					minIndices = append(minIndices, j)
 				}
@@ -125,12 +122,10 @@ func (r *result) breakTiesForLast(tiedIndices []int) int {
 		}
 	}
 	// Find the choice(s) in last place
-	minVotes := math.MaxInt
-	var minIndices []int
+	minVotes, minIndices := math.MaxInt, make([]int, 0)
 	for _, tiedIdx := range tiedIndices {
 		if tieBreakVotes[tiedIdx] < minVotes { // New last place found
-			minVotes = tieBreakVotes[tiedIdx]
-			minIndices = []int{tiedIdx}
+			minVotes, minIndices = tieBreakVotes[tiedIdx], []int{tiedIdx}
 		} else if tieBreakVotes[tiedIdx] == minVotes { // Tie for last again
 			minIndices = append(minIndices, tiedIdx)
 		}
@@ -150,8 +145,8 @@ func (r *result) String() string {
 		return "The result was not successfully computed. Was the poll valid with at least one " +
 			"corresponding ballot?"
 	}
-	return fmt.Sprintf("\nIn the poll \"%s,\" the choice %q won with "+
-		"%d out of %d votes in round %d.\n",
+	return fmt.Sprintf(
+		"\nIn the poll \"%s,\" the choice %q won with %d out of %d votes in round %d.\n",
 		r.poll.prompt,
 		r.poll.choices[r.winnerIdx],
 		len(r.votes[r.winnerIdx]),

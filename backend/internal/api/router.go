@@ -14,33 +14,37 @@ type datastore interface {
 	GetBallots(pollID string) ([]*models.Ballot, error)
 }
 
-type Handler struct {
-	Store datastore
-	Req   events.APIGatewayProxyRequest
+type handler struct {
+	store datastore
+	req   events.APIGatewayProxyRequest
+}
+
+func NewHandler(store datastore, req events.APIGatewayProxyRequest) *handler {
+	return &handler{store, req}
 }
 
 // Route matches the method and path of the request and calls the relevant method.
-func (h *Handler) Route() events.APIGatewayProxyResponse {
-	switch h.Req.HTTPMethod {
+func (h *handler) Route() events.APIGatewayProxyResponse {
+	switch h.req.HTTPMethod {
 	case http.MethodPost:
-		switch h.Req.Path {
+		switch h.req.Path {
 		case "/poll":
 			return h.createPoll()
 		case "/ballot":
 			return h.castBallot()
 		default:
-			return response404("path not found for method POST: " + h.Req.Path)
+			return response404("path not found for method POST: " + h.req.Path)
 		}
 	case http.MethodGet:
-		switch getShortPath(h.Req.Path) {
+		switch getShortPath(h.req.Path) {
 		case "/poll":
 			return h.getPollInfo()
 		case "/result":
 			return h.getResult()
 		default:
-			return response404("path not found for method GET: " + h.Req.Path)
+			return response404("path not found for method GET: " + h.req.Path)
 		}
 	default:
-		return response405(h.Req.HTTPMethod, "OPTIONS", "GET", "POST")
+		return response405(h.req.HTTPMethod, "OPTIONS", "GET", "POST")
 	}
 }

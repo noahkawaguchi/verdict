@@ -58,9 +58,9 @@ func TestCreatePollHandler_Error(t *testing.T) {
 			Path:       "/poll",
 			Body:       test.body,
 		}
-		handler := api.Handler{Store: &mockDatastore{
+		handler := api.NewHandler(&mockDatastore{
 			PutPollMock: func(poll *models.Poll) error { return errors.New("mock error") },
-		}, Req: req}
+		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -95,7 +95,7 @@ func TestCreatePollHandler_Success(t *testing.T) {
 			Path:       "/poll",
 			Body:       test,
 		}
-		handler := api.Handler{Store: &mockDatastore{}, Req: req}
+		handler := api.NewHandler(&mockDatastore{}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusCreated {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -157,7 +157,7 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 			Path:           "/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			PathParameters: test.pathParameters,
 		}
-		handler := api.Handler{Store: &mockDatastore{GetPollMock: test.getPollMock}, Req: req}
+		handler := api.NewHandler(&mockDatastore{GetPollMock: test.getPollMock}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
 			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
@@ -183,9 +183,9 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 			Path:           "/poll/" + test.GetPollID(),
 			PathParameters: map[string]string{"pollId": test.GetPollID()},
 		}
-		handler := api.Handler{Store: &mockDatastore{
+		handler := api.NewHandler(&mockDatastore{
 			GetPollMock: func(pollID string) (*models.Poll, error) { return test, nil },
-		}, Req: req}
+		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusOK {
 			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)
@@ -238,9 +238,9 @@ func TestCastBallotHandler_Error(t *testing.T) {
 			Path:       "/ballot",
 			Body:       test.body,
 		}
-		handler := api.Handler{Store: &mockDatastore{
+		handler := api.NewHandler(&mockDatastore{
 			PutBallotMock: func(ballot *models.Ballot) error { return errors.New("mock error") },
-		}, Req: req}
+		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -277,12 +277,12 @@ func TestCastBallotHandler_Success(t *testing.T) {
 			Path:       "/ballot",
 			Body:       test,
 		}
-		handler := api.Handler{Store: &mockDatastore{}, Req: req}
+		handler := api.NewHandler(&mockDatastore{}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusCreated {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
-		if resp.Body != `{"message": "successfully cast ballot"}` {
+		if resp.Body != `{"message":"successfully cast ballot"}` {
 			t.Error("unexpected response body:", resp.Body)
 		}
 	}
@@ -366,10 +366,10 @@ func TestGetResultHandler_Error(t *testing.T) {
 			Path:           "/result/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			PathParameters: test.pathParameters,
 		}
-		handler := api.Handler{Store: &mockDatastore{
+		handler := api.NewHandler(&mockDatastore{
 			GetPollMock:    test.getPollMock,
 			GetBallotsMock: test.getBallotsMock,
-		}, Req: req}
+		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
 			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
@@ -417,10 +417,10 @@ func TestGetResultHandler_Success(t *testing.T) {
 		for i, ballot := range test.ballots {
 			ballots[i] = models.NewBallot(test.poll.GetPollID(), ballot.userID, ballot.rankOrder)
 		}
-		handler := api.Handler{Store: &mockDatastore{
+		handler := api.NewHandler(&mockDatastore{
 			GetPollMock:    func(pollID string) (*models.Poll, error) { return test.poll, nil },
 			GetBallotsMock: func(pollID string) ([]*models.Ballot, error) { return ballots, nil },
-		}, Req: req}
+		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusOK {
 			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)

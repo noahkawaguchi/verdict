@@ -39,7 +39,7 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		handler := api.Handler{Store: &mockDatastore{}, Req: test}
+		handler := api.NewHandler(&mockDatastore{}, test)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusMethodNotAllowed {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -81,7 +81,7 @@ func TestRouter_PathNotFound(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		handler := api.Handler{Store: &mockDatastore{}, Req: test}
+		handler := api.NewHandler(&mockDatastore{}, test)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusNotFound {
 			t.Error("unexpected status code:", resp.StatusCode)
