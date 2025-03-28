@@ -16,7 +16,7 @@ type CastBallotFormProps = {
 const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder }) => {
   const [ranks, setRanks] = useState(question.choices);
 
-  // Clear old ranks and rank order when the question changes in case this component was just 
+  // Clear old ranks and rank order when the question changes in case this component was just
   // hidden without fully remounting
   useEffect(() => {
     setRanks(question.choices);
@@ -80,7 +80,7 @@ const CastBallotForm: React.FC<CastBallotFormProps> = ({ question, setRankOrder 
               Move down
             </button>
           </div>
-          <hr style={{ border: '1px solid black', width: '95%' }} />
+          <hr style={{ border: '1px solid black', width: '90%' }} />
         </div>
       ))}
       <button type='submit'>Submit</button>

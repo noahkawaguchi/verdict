@@ -1,6 +1,6 @@
 :root {
   --dark-gray1: rgb(30, 30, 30);
-  --dark-gray2: rgb(55, 55, 55);
+  --dark-gray2: rgb(50, 50, 50);
   --light-text: white;
   --main-blue-rgb: 0, 191, 255; /* deepskyblue */
   --highlight-blue: aqua;
@@ -13,8 +13,14 @@
 }
 
 body {
-  background-color: var(--dark-gray1);
+  background-color: var(--dark-gray2);
   color: var(--light-text);
   text-align: center;
   margin: 0px;
+}
+
+@media screen and (min-width: 1024px) {
+  body {
+    background-color: var(--dark-gray1);
+  }
 }
