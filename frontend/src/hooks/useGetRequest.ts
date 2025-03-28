@@ -25,8 +25,9 @@ const useGetRequest = <TResponse>(endpoint: string) => {
    */
   const sendRequest = useCallback(
     async (pathParameter: string) => {
-      setLoading(true);
+      setData(null);
       setError(null);
+      setLoading(true);
 
       try {
         const response = await fetch(`${backendUrl}/${endpoint}/${pathParameter}`, {

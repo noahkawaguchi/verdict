@@ -32,6 +32,9 @@ const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
 
   return (
     <form onSubmit={handleSubmit}>
+      <p style={{ fontSize: '0.85rem' }}>
+        <i>(all fields are required)</i>
+      </p>
       <label>
         Prompt:{' '}
         <input
@@ -53,7 +56,6 @@ const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
               required
             />
           </label>
-          {/* Specify the type as button so it doesn't try to submit the form */}
           <button
             type='button'
             onClick={() => setChoices((prev) => prev.filter((_, i) => i !== idx))}
@@ -64,9 +66,11 @@ const CreatePollForm: React.FC<CreatePollFormProps> = ({ setQuestion }) => {
         </div>
       ))}
       <button type='button' onClick={() => setChoices([...choices, ''])}>
-        Add Choice
+        Add choice
       </button>
-      <button type='submit'>Submit</button>
+      <button type='submit' disabled={!prompt || choices.includes('')}>
+        Submit
+      </button>
     </form>
   );
 };

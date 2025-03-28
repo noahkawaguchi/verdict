@@ -1,8 +1,10 @@
 :root {
-  --dark-background: rgb(40, 40, 40);
+  --dark-gray1: rgb(30, 30, 30);
+  --dark-gray2: rgb(55, 55, 55);
   --light-text: white;
   --main-blue-rgb: 0, 191, 255; /* deepskyblue */
   --highlight-blue: aqua;
+  --ballot-border: 1.5px dashed white;
 }
 
 * {
@@ -11,9 +13,8 @@
 }
 
 body {
-  background-color: var(--dark-background);
+  background-color: var(--dark-gray1);
   color: var(--light-text);
   text-align: center;
-  max-width: max-content;
-  margin: auto;
+  margin: 0px;
 }

@@ -34,7 +34,8 @@ const CreatePollSubmission: React.FC<CreatePollSubmissionProps> = ({ question })
           <em>Your poll has been created!</em>
         </h4>
         <p>
-          Its poll ID is <code>{data.pollId}</code>
+          Its poll ID is: <br />
+          <code>{data.pollId}</code>
         </p>
         <button type='button' onClick={() => navigator.clipboard.writeText(data.pollId)}>
           Copy poll ID

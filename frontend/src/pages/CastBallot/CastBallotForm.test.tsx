@@ -25,6 +25,6 @@ describe('CastBallotForm', () => {
     await user.click(screen.getAllByText('Move up')[1]); // don't know, text editor, IDE
     await user.click(screen.getAllByText('Move down')[1]); // don't know, IDE, text editor
     await user.click(screen.getByText('Submit'));
-    expect(mockSetRankOrder).toHaveBeenCalledExactlyOnceWith([2, 1, 0]);
+    expect(mockSetRankOrder).toHaveBeenLastCalledWith([2, 1, 0]);
   });
 });

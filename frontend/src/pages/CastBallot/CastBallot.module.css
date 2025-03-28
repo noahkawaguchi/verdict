@@ -6,3 +6,7 @@
 .rank > * {
   margin: 5px;
 }
+
+.moveUpBtn {
+  margin-left: auto;
+}

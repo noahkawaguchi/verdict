@@ -28,7 +28,9 @@ const EnterPollId = () => {
           autoFocus
         />
       </label>
-      <button type='submit'>Submit</button>
+      <button type='submit' disabled={idInput === ''}>
+        Submit
+      </button>
     </form>
   );
 };

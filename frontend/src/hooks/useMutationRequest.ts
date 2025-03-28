@@ -36,8 +36,9 @@ const useMutationRequest = <TRequest, TResponse>(
       if (isSubmitting.current) return;
       isSubmitting.current = true;
 
-      setLoading(true);
+      setData(null);
       setError(null);
+      setLoading(true);
 
       try {
         const response = await fetch(`${backendUrl}/${endpoint}`, {

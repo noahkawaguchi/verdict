@@ -18,6 +18,7 @@ const CastBallotPage = () => {
 
   useEffect(() => {
     if (pollId) sendRequest(pollId);
+    else setRankOrder(null); // Avoid stale state when casting multiple ballots
   }, [sendRequest, pollId]);
 
   return (

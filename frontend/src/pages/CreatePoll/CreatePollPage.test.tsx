@@ -15,7 +15,7 @@ describe('CreatePollPage', () => {
 
     render(<CreatePollPage />);
     const user = userEvent.setup();
-    const addChoiceBtn = screen.getByText('Add Choice');
+    const addChoiceBtn = screen.getByText('Add choice');
     expect(addChoiceBtn).toBeInTheDocument();
 
     await user.type(screen.getByLabelText('Prompt:'), 'What is the best color?');
