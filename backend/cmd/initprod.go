@@ -17,7 +17,7 @@ func init() {
 	// context of each invocation)
 	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
-		log.Fatalf("Unable to load SDK config:\n%v\n", err)
+		log.Fatal("Unable to load SDK config:", err)
 	}
 	// Set the DynamoDB client
 	dbClient = dynamodb.NewFromConfig(cfg)

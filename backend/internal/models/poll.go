@@ -22,7 +22,8 @@ func NewPoll(prompt string, choices []string) *Poll {
 	return &Poll{uuid.New().String(), prompt, choices}
 }
 
-func (p *Poll) GetPollID() string { return p.pollID }
+// ID gets the poll's poll ID.
+func (p *Poll) ID() string { return p.pollID }
 
 // Validate ensures that the prompt and all choices are non-empty, that there are at least two
 // choices, and that all choices are unique.

@@ -12,13 +12,13 @@ import (
 func threeOptionPoll() (*models.Poll, string) {
 	poll := models.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine"})
-	return poll, poll.GetPollID()
+	return poll, poll.ID()
 }
 
 func fourOptionPoll() (*models.Poll, string) {
 	poll := models.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"})
-	return poll, poll.GetPollID()
+	return poll, poll.ID()
 }
 
 func ballotClosure(pollID string) func([]int) *models.Ballot {

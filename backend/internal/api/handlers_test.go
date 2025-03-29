@@ -180,8 +180,8 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 	for _, test := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/poll/" + test.GetPollID(),
-			PathParameters: map[string]string{"pollId": test.GetPollID()},
+			Path:           "/poll/" + test.ID(),
+			PathParameters: map[string]string{"pollId": test.ID()},
 		}
 		handler := api.NewHandler(&mockDatastore{
 			GetPollMock: func(pollID string) (*models.Poll, error) { return test, nil },
@@ -410,12 +410,12 @@ func TestGetResultHandler_Success(t *testing.T) {
 	for _, test := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/result/" + test.poll.GetPollID(),
-			PathParameters: map[string]string{"pollId": test.poll.GetPollID()},
+			Path:           "/result/" + test.poll.ID(),
+			PathParameters: map[string]string{"pollId": test.poll.ID()},
 		}
 		ballots := make([]*models.Ballot, len(test.ballots))
 		for i, ballot := range test.ballots {
-			ballots[i] = models.NewBallot(test.poll.GetPollID(), ballot.userID, ballot.rankOrder)
+			ballots[i] = models.NewBallot(test.poll.ID(), ballot.userID, ballot.rankOrder)
 		}
 		handler := api.NewHandler(&mockDatastore{
 			GetPollMock:    func(pollID string) (*models.Poll, error) { return test.poll, nil },

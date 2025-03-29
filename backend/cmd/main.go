@@ -16,7 +16,7 @@ func main() {
 	lambda.Start(func(
 		ctx context.Context, request events.APIGatewayProxyRequest,
 	) (events.APIGatewayProxyResponse, error) {
-		store := datastore.NewDynamoStore(ctx, dbClient)
+		store := datastore.New(ctx, dbClient)
 		handler := api.NewHandler(store, request)
 		return handler.Route(), nil
 	})

@@ -11,7 +11,7 @@ import (
 )
 
 func TestPutPoll_Error(t *testing.T) {
-	tableStore := datastore.NewDynamoStore(context.TODO(), &mockDynamo{
+	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
@@ -30,7 +30,7 @@ func TestPutPoll_Error(t *testing.T) {
 }
 
 func TestPutPoll_Success(t *testing.T) {
-	tableStore := datastore.NewDynamoStore(context.TODO(), &mockDynamo{
+	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
 			return &dynamodb.PutItemOutput{}, nil
 		},
@@ -49,7 +49,7 @@ func TestPutPoll_Success(t *testing.T) {
 }
 
 func TestGetPoll_Error(t *testing.T) {
-	tableStore := datastore.NewDynamoStore(context.TODO(), &mockDynamo{
+	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		GetItemMock: func(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
@@ -60,7 +60,7 @@ func TestGetPoll_Error(t *testing.T) {
 }
 
 func TestGetPoll_Success(t *testing.T) {
-	tableStore := datastore.NewDynamoStore(context.TODO(), &mockDynamo{
+	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		GetItemMock: func(ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.GetItemOutput, error) {
 			return &dynamodb.GetItemOutput{}, nil
 		},

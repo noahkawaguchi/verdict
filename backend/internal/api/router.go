@@ -33,7 +33,7 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 		case "/ballot":
 			return h.castBallot()
 		default:
-			return response404("path not found for method POST: " + h.req.Path)
+			return resp404("path not found for method POST: " + h.req.Path)
 		}
 	case http.MethodGet:
 		switch getShortPath(h.req.Path) {
@@ -42,9 +42,9 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 		case "/result":
 			return h.getResult()
 		default:
-			return response404("path not found for method GET: " + h.req.Path)
+			return resp404("path not found for method GET: " + h.req.Path)
 		}
 	default:
-		return response405(h.req.HTTPMethod, "OPTIONS", "GET", "POST")
+		return resp405(h.req.HTTPMethod, "OPTIONS", "GET", "POST")
 	}
 }

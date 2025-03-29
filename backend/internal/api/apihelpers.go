@@ -27,8 +27,8 @@ var defaultHeaders = map[string]string{
 	"Access-Control-Allow-Headers": "Content-Type,Authorization",
 }
 
-// response200 creates a 200 OK HTTP response with the provided body.
-func response200(body string) events.APIGatewayProxyResponse {
+// resp200 creates a 200 OK HTTP response with the provided body.
+func resp200(body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Headers:    defaultHeaders,
@@ -36,8 +36,8 @@ func response200(body string) events.APIGatewayProxyResponse {
 	}
 }
 
-// response201 creates a 201 Created HTTP response with the provided body.
-func response201(body string) events.APIGatewayProxyResponse {
+// resp201 creates a 201 Created HTTP response with the provided body.
+func resp201(body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusCreated,
 		Headers:    defaultHeaders,
@@ -45,8 +45,8 @@ func response201(body string) events.APIGatewayProxyResponse {
 	}
 }
 
-// response400 creates a 400 Bad Request HTTP response with a custom error message.
-func response400(errMsg string) events.APIGatewayProxyResponse {
+// resp400 creates a 400 Bad Request HTTP response with a custom error message.
+func resp400(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusBadRequest,
 		Headers:    defaultHeaders,
@@ -54,8 +54,8 @@ func response400(errMsg string) events.APIGatewayProxyResponse {
 	}
 }
 
-// response404 creates a 404 Not Found HTTP response with a custom error message.
-func response404(errMsg string) events.APIGatewayProxyResponse {
+// resp404 creates a 404 Not Found HTTP response with a custom error message.
+func resp404(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusNotFound,
 		Headers:    defaultHeaders,
@@ -63,9 +63,9 @@ func response404(errMsg string) events.APIGatewayProxyResponse {
 	}
 }
 
-// response405 creates a 405 Method Not Allowed HTTP response with a custom error message and a
+// resp405 creates a 405 Method Not Allowed HTTP response with a custom error message and a
 // custom header specifying the allowed methods.
-func response405(receivedMethod string, allowedMethods ...string) events.APIGatewayProxyResponse {
+func resp405(receivedMethod string, allowedMethods ...string) events.APIGatewayProxyResponse {
 	headers405 := maps.Clone(defaultHeaders)
 	headers405["Allow"] = strings.Join(allowedMethods, ", ")
 	return events.APIGatewayProxyResponse{
@@ -75,8 +75,8 @@ func response405(receivedMethod string, allowedMethods ...string) events.APIGate
 	}
 }
 
-// response500 creates a 500 Internal Server Error HTTP response with a custom error message.
-func response500(errMsg string) events.APIGatewayProxyResponse {
+// resp500 creates a 500 Internal Server Error HTTP response with a custom error message.
+func resp500(errMsg string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusInternalServerError,
 		Headers:    defaultHeaders,

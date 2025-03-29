@@ -27,9 +27,7 @@ var ballotsTableInfo = &tableInfo{"Ballots", "PollID", "UserID"}
 
 var pollsTableInfo = &tableInfo{name: "Polls", partitionKey: "PollID"} // No sort key
 
-func NewDynamoStore(ctx context.Context, client dynamoClient) *dynamoStore {
-	return &dynamoStore{ctx, client}
-}
+func New(ctx context.Context, client dynamoClient) *dynamoStore { return &dynamoStore{ctx, client} }
 
 // PutPoll creates a new poll entry in the database.
 func (ds *dynamoStore) PutPoll(poll *models.Poll) error { return storeItem(ds, poll) }
