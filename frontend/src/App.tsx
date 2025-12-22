@@ -9,7 +9,7 @@ import NotFoundPage from './pages/NotFoundPage/NotFoundPage';
 
 const App = () => {
   return (
-    <BrowserRouter basename='/verdict'>
+    <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
           <Route path='/' element={<HomePage />} />

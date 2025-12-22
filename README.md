@@ -1,6 +1,6 @@
 # Verdict
 
-### [🔗 Live link here](https://noahkawaguchi.github.io/verdict/)
+### [🔗 Live link here](https://verdict.noahkawaguchi.com)
 
 Verdict is a full-stack web app for creating ranked choice polls, in which voters rank each choice by preference instead of choosing only one. The instant runoff algorithm calculates winners by repeatedly eliminating the choice with the fewest votes, redistributing ballots until a single choice achieves a strict majority.
 
@@ -10,7 +10,7 @@ Verdict is a full-stack web app for creating ranked choice polls, in which voter
 2. [Current Features](#current-features)
 3. [About Ranked Choice Voting](#about-ranked-choice-voting)
 
-## Tech Stack 
+## Tech Stack
 
 | | |
 | - | - |
