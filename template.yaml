@@ -32,8 +32,7 @@ Resources:
       CodeUri: .
       Handler: cmd
       Runtime: provided.al2023
-      Architectures:
-        - x86_64
+      Architectures: [arm64]
       Environment:
         Variables:
           FRONTEND_URL: !Ref FrontendUrl
