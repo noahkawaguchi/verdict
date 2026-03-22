@@ -75,11 +75,10 @@ func resp405(receivedMethod string, allowedMethods ...string) events.APIGatewayP
 	}
 }
 
-// resp500 creates a 500 Internal Server Error HTTP response with a custom error message.
-func resp500(errMsg string) events.APIGatewayProxyResponse {
-	return events.APIGatewayProxyResponse{
-		StatusCode: http.StatusInternalServerError,
-		Headers:    defaultHeaders,
-		Body:       `{"error":"` + errMsg + `"}`,
-	}
+// resp500 is a 500 Internal Server Error HTTP response with an "internal server error" error
+// message.
+var resp500 events.APIGatewayProxyResponse = events.APIGatewayProxyResponse{
+	StatusCode: http.StatusInternalServerError,
+	Headers:    defaultHeaders,
+	Body:       `{"error":"internal server error"}`,
 }

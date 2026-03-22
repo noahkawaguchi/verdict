@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"log/slog"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/noahkawaguchi/verdict/backend/internal/models"
@@ -19,7 +20,8 @@ func (h *handler) createPoll() events.APIGatewayProxyResponse {
 	}
 	// Put the poll in the database
 	if err := h.store.PutPoll(poll); err != nil {
-		return resp500("failed to put the poll in the database")
+		slog.Error("failed to put poll in DB", "ID", poll.ID(), "err", err)
+		return resp500
 	}
 	// Send the poll ID back in the response
 	return resp201(`{"pollId":"` + poll.ID() + `"}`)
@@ -34,7 +36,8 @@ func (h *handler) getPollInfo() events.APIGatewayProxyResponse {
 	// Retrieve the poll from the database
 	poll, err := h.store.GetPoll(pollID)
 	if err != nil {
-		return resp500("failed to get the poll from the database")
+		slog.Error("failed to get poll from DB", "ID", pollID, "err", err)
+		return resp500
 	}
 	// Handle nonexistent polls
 	if err = poll.Validate(); err != nil {
@@ -43,7 +46,8 @@ func (h *handler) getPollInfo() events.APIGatewayProxyResponse {
 	// Marshal the response
 	body, err := json.Marshal(poll)
 	if err != nil {
-		return resp500("failed to marshal response")
+		slog.Error("failed to marshal response", "err", err)
+		return resp500
 	}
 	return resp200(string(body))
 }
@@ -60,7 +64,8 @@ func (h *handler) castBallot() events.APIGatewayProxyResponse {
 	}
 	// Put the ballot in the database
 	if err := h.store.PutBallot(ballot); err != nil {
-		return resp500("failed to put the ballot in the database")
+		slog.Error("failed to put ballot in DB", "err", err)
+		return resp500
 	}
 	// Send a success message back in the response
 	return resp201(`{"message":"successfully cast ballot"}`)
@@ -75,7 +80,8 @@ func (h *handler) getResult() events.APIGatewayProxyResponse {
 	// Get the poll from the database
 	poll, err := h.store.GetPoll(pollID)
 	if err != nil {
-		return resp500("failed to get the poll from the database")
+		slog.Error("failed to get poll from DB", "err", err)
+		return resp500
 	}
 	// Handle nonexistent polls
 	if err = poll.Validate(); err != nil {
@@ -84,7 +90,8 @@ func (h *handler) getResult() events.APIGatewayProxyResponse {
 	// Get the poll's ballots from the database
 	ballots, err := h.store.GetBallots(pollID)
 	if err != nil {
-		return resp500("failed to get the poll's ballots from the database")
+		slog.Error("failed to get poll's ballots from DB", "err", err)
+		return resp500
 	}
 	// Handle the case where no ballots are found
 	if len(ballots) == 0 {
@@ -93,12 +100,14 @@ func (h *handler) getResult() events.APIGatewayProxyResponse {
 	// Calculate the result
 	result, err := models.NewResult(poll, ballots)
 	if err != nil {
-		return resp500(err.Error())
+		slog.Error("failed to calculate result", "err", err)
+		return resp500
 	}
 	// Marshal the response
 	body, err := json.Marshal(result)
 	if err != nil {
-		return resp500("failed to marshal response")
+		slog.Error("failed to marshal response", "err", err)
+		return resp500
 	}
 	return resp200(string(body))
 }
