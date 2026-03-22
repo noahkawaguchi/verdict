@@ -1,0 +1,12 @@
+{
+  "useGitignore": true,
+  "ignorePaths": ["go.mod", "go.sum"],
+  "words": [
+    "GOFLAGS",
+    "noahkawaguchi",
+    "attributevalue",
+    "cmpopts",
+    "yuzu",
+    "unmarshals"
+  ]
+}
