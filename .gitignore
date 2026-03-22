@@ -1,24 +1,6 @@
-# OS/Editor
-.DS_Store/
-.vscode/
-.vscode/*
-
-# Logs
-logs
-*.log
-npm-debug.log*
-pnpm-debug.log*
-
-# Dependencies and build
-node_modules
-dist
-
-# Environment variables
 .env*
+!.env.example
 
-# AWS
-.aws-sam/ 
+.aws-sam/
 .sam/
 samconfig.toml
-
-sam_project_template/
