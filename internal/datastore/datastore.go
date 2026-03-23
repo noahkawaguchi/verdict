@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/noahkawaguchi/verdict/internal/utils"
 	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
@@ -59,7 +59,7 @@ func (ds *dynamoStore) GetPoll(pollID string) (*voting.Poll, error) {
 // GetBallots retrieves all of the ballots for the specified poll from the database.
 func (ds *dynamoStore) GetBallots(pollID string) ([]*voting.Ballot, error) {
 	// Define the key condition expression and expression attribute values to query by poll ID
-	keyConExp := utils.Ref(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey))
+	keyConExp := aws.String(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey))
 	expAttVals := map[string]types.AttributeValue{
 		":pk": &types.AttributeValueMemberS{Value: pollID},
 	}

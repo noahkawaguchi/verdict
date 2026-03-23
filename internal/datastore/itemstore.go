@@ -4,7 +4,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/noahkawaguchi/verdict/internal/utils"
 	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
@@ -19,7 +18,7 @@ func tableNameFor[T tableModel](item *T) *string {
 		return &pollsTableInfo.name
 	}
 	// This will never be reached because all type terms in the type set are covered
-	return utils.Ref("")
+	return new(string)
 }
 
 // storeItem marshals and puts an item in the database or returns an error.
