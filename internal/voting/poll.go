@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"slices"
+	"strings"
 
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
@@ -47,11 +48,12 @@ func (p *Poll) Validate() error {
 }
 
 func (p *Poll) String() string {
-	ret := fmt.Sprintf("Poll with ID %s:\n%s\n", p.pollID[:5]+"... ", p.prompt)
+	var ret strings.Builder
+	fmt.Fprintf(&ret, "Poll with ID %s:\n%s\n", p.pollID[:5]+"... ", p.prompt)
 	for _, c := range p.choices {
-		ret += fmt.Sprintf("  %s\n", c)
+		fmt.Fprintf(&ret, "  %s\n", c)
 	}
-	return ret
+	return ret.String()
 }
 
 // MarshalJSON is a custom marshaler that omits the poll ID.
