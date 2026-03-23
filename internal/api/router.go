@@ -46,7 +46,7 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 
 		switch firstSegment {
 		case "/health":
-			return resp200("The function is available!")
+			return resp200Text("The function is available!")
 		case "/poll":
 			return h.getPollInfo()
 		case "/result":

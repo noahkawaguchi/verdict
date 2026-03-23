@@ -20,7 +20,7 @@ func getFirstSegment(fullPath string) (string, error) {
 	return "", errors.New("malformed path")
 }
 
-// defaultHeaders is the set of headers to include by default with every response.
+// defaultHeaders is the base set of headers to include by default in responses.
 var defaultHeaders = map[string]string{
 	"Content-Type":                 "application/json",
 	"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),
@@ -33,6 +33,17 @@ func resp200(body string) events.APIGatewayProxyResponse {
 	return events.APIGatewayProxyResponse{
 		StatusCode: http.StatusOK,
 		Headers:    defaultHeaders,
+		Body:       body,
+	}
+}
+
+// resp200Text creates a 200 OK HTTP response with the provided plain text body.
+func resp200Text(body string) events.APIGatewayProxyResponse {
+	headers := maps.Clone(defaultHeaders)
+	headers["Content-Type"] = "text/plain"
+	return events.APIGatewayProxyResponse{
+		StatusCode: http.StatusOK,
+		Headers:    headers,
 		Body:       body,
 	}
 }
