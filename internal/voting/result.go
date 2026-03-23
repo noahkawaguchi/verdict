@@ -42,11 +42,14 @@ func NewResult(poll *Poll, ballots []*Ballot) (*result, error) {
 // MarshalJSON is a custom marshaler that formats relevant data from the computed result.
 func (r *result) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
-		Prompt        string `json:"prompt"`
-		TotalVotes    int    `json:"totalVotes"`
+		Prompt string `json:"prompt"`
+		// The total number of votes cast.
+		TotalVotes int `json:"totalVotes"`
+		// The number of votes with which the winning choice won.
 		WinningVotes  int    `json:"winningVotes"`
 		WinningChoice string `json:"winningChoice"`
-		WinningRound  int    `json:"winningRound"`
+		// The round of ranked choice voting in which the winning choice won.
+		WinningRound int `json:"winningRound"`
 	}{
 		Prompt:        r.poll.prompt,
 		TotalVotes:    len(r.ballots),

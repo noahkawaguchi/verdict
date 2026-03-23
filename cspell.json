@@ -9,6 +9,7 @@
     "yuzu",
     "unmarshals",
     "initdev",
-    "justfile"
+    "justfile",
+    "dotenv"
   ]
 }

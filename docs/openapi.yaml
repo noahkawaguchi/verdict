@@ -1,0 +1,193 @@
+openapi: 3.0.3
+info:
+  title: Verdict
+  description: >
+    ### Ranked choice voting
+
+    Repository link: [github.com/noahkawaguchi/verdict](https://github.com/noahkawaguchi/verdict)
+
+
+    Each of the endpoints below can be used via the "try it out" functionality.
+
+    - From the servers below, use the AWS option (default) to hit the real deployed API when viewing these docs on verdict.noahkawaguchi.com.
+
+    - Or, if running the project locally, select the localhost option.
+  version: "0.1.0"
+servers:
+  - url: https://dmyjkyelca.execute-api.us-east-2.amazonaws.com/prod
+  - url: http://localhost:3000
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        "200":
+          description: Function is available
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: The function is available!
+  /poll:
+    post:
+      summary: Create a poll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Poll"
+      responses:
+        "201":
+          description: Poll created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  pollId:
+                    type: string
+                    format: uuid
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /poll/{pollId}:
+    get:
+      summary: Get a poll by ID
+      parameters:
+        - $ref: "#/components/parameters/pollId"
+      responses:
+        "200":
+          description: Poll found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Poll"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /ballot:
+    post:
+      summary: Cast a ballot
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Ballot"
+      responses:
+        "201":
+          description: Ballot cast
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: successfully cast ballot
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /result/{pollId}:
+    get:
+      summary: Get the ranked choice result for a poll
+      parameters:
+        - $ref: "#/components/parameters/pollId"
+      responses:
+        "200":
+          description: Result calculated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Result"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  parameters:
+    pollId:
+      name: pollId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  schemas:
+    Poll:
+      type: object
+      required: [prompt, choices]
+      properties:
+        prompt:
+          type: string
+          example: What is the best programming language?
+        choices:
+          type: array
+          minItems: 2
+          items:
+            type: string
+          example: [Go, Rust, Python]
+    Ballot:
+      type: object
+      required: [pollId, rankOrder]
+      properties:
+        pollId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          description: Optional. A new UUID is generated if not provided.
+        rankOrder:
+          type: array
+          minItems: 2
+          items:
+            type: integer
+          description: >
+            Indices into the poll's choices array, ordered by preference.
+            For example, [2, 0, 1] means the voter's first choice is choices[2],
+            second choice is choices[0], and third choice is choices[1].
+          example: [2, 0, 1]
+    Result:
+      type: object
+      properties:
+        prompt:
+          type: string
+        totalVotes:
+          type: integer
+          description: The total number of votes cast.
+        winningVotes:
+          type: integer
+          description: The number of votes with which the winning choice won.
+        winningChoice:
+          type: string
+        winningRound:
+          type: integer
+          description: The round of ranked choice voting in which the winning choice won.
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+  responses:
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
