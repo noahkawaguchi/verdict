@@ -24,8 +24,8 @@ func init() {
 	if err != nil {
 		log.Fatal("Unable to load SDK config:", err)
 	}
-	// Set the DynamoDB client
+	// Set the DynamoDB client (in main)
 	dbClient = dynamodb.NewFromConfig(cfg)
-	// Create the tables if they don't exist
+	// Create the development tables if they don't exist
 	datastore.EnsureBothLocalTablesExist(dbClient)
 }

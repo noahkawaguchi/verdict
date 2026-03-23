@@ -27,8 +27,14 @@ func EnsureBothLocalTablesExist(client *dynamodb.Client) {
 var createBallotsTableInput = &dynamodb.CreateTableInput{
 	TableName: &ballotsTableInfo.name,
 	AttributeDefinitions: []types.AttributeDefinition{
-		{AttributeName: &ballotsTableInfo.partitionKey, AttributeType: types.ScalarAttributeTypeS},
-		{AttributeName: &ballotsTableInfo.sortKey, AttributeType: types.ScalarAttributeTypeS},
+		{
+			AttributeName: &ballotsTableInfo.partitionKey,
+			AttributeType: types.ScalarAttributeTypeS,
+		},
+		{
+			AttributeName: &ballotsTableInfo.sortKey,
+			AttributeType: types.ScalarAttributeTypeS,
+		},
 	},
 	KeySchema: []types.KeySchemaElement{
 		{AttributeName: &ballotsTableInfo.partitionKey, KeyType: types.KeyTypeHash},
@@ -40,7 +46,10 @@ var createBallotsTableInput = &dynamodb.CreateTableInput{
 var createPollsTableInput = &dynamodb.CreateTableInput{
 	TableName: &pollsTableInfo.name,
 	AttributeDefinitions: []types.AttributeDefinition{
-		{AttributeName: &pollsTableInfo.partitionKey, AttributeType: types.ScalarAttributeTypeS},
+		{
+			AttributeName: &pollsTableInfo.partitionKey,
+			AttributeType: types.ScalarAttributeTypeS,
+		},
 	},
 	KeySchema: []types.KeySchemaElement{
 		{AttributeName: &pollsTableInfo.partitionKey, KeyType: types.KeyTypeHash},

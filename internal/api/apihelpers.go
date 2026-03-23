@@ -20,6 +20,7 @@ func getFirstSegment(fullPath string) (string, error) {
 	return "", errors.New("malformed path")
 }
 
+// defaultHeaders is the set of headers to include by default with every response.
 var defaultHeaders = map[string]string{
 	"Content-Type":                 "application/json",
 	"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),

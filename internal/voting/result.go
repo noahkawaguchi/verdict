@@ -95,8 +95,8 @@ func (r *result) instantRunoffVoting() {
 		// Redistribute the losing choice's votes to other choices
 		for _, ballotIdx := range r.votes[loserIdx] {
 			for _, choice := range r.ballots[ballotIdx].rankOrder {
-				// If this choice is not the one being eliminated now and has not been eliminated
-				// in a previous round, redistribute this ballot to the choice
+				// If this choice is not the one being eliminated now and has not been
+				// eliminated in a previous round, redistribute this ballot to the choice
 				if choice != loserIdx && r.votes[choice] != nil {
 					r.votes[choice] = append(r.votes[choice], ballotIdx)
 					break
@@ -131,11 +131,14 @@ func (r *result) breakTiesForLast(tiedIndices []int) int {
 		}
 	}
 	switch len(minIndices) {
-	case 1: // Single minimum found
+	case 1:
+		// A single minimum was found
 		return minIndices[0]
-	case len(tiedIndices): // No choices were eliminated
-		return minIndices[rand.IntN(len(minIndices))] // Choose randomly to avoid infinite recursion
+	case len(tiedIndices):
+		// No choices were eliminated, so choose randomly to avoid infinite recursion
+		return minIndices[rand.IntN(len(minIndices))]
 	default:
+		// At least one choice was eliminated, so continue breaking ties
 		return r.breakTiesForLast(minIndices)
 	}
 }

@@ -12,7 +12,11 @@ import (
 
 func TestPutBallot_Error(t *testing.T) {
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
-		PutItemMock: func(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
+		PutItemMock: func(
+			ctx context.Context,
+			params *dynamodb.PutItemInput,
+			optFns ...func(*dynamodb.Options),
+		) (*dynamodb.PutItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
 	})
@@ -32,7 +36,11 @@ func TestPutBallot_Error(t *testing.T) {
 
 func TestPutBallot_Success(t *testing.T) {
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
-		PutItemMock: func(ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
+		PutItemMock: func(
+			ctx context.Context,
+			params *dynamodb.PutItemInput,
+			optFns ...func(*dynamodb.Options),
+		) (*dynamodb.PutItemOutput, error) {
 			return &dynamodb.PutItemOutput{}, nil
 		},
 	})
@@ -52,7 +60,11 @@ func TestPutBallot_Success(t *testing.T) {
 
 func TestGetBallots_Error(t *testing.T) {
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
-		QueryMock: func(ctx context.Context, params *dynamodb.QueryInput, optFns ...func(*dynamodb.Options)) (*dynamodb.QueryOutput, error) {
+		QueryMock: func(
+			ctx context.Context,
+			params *dynamodb.QueryInput,
+			optFns ...func(*dynamodb.Options),
+		) (*dynamodb.QueryOutput, error) {
 			return nil, errors.New("mocked error")
 		},
 	})
@@ -66,7 +78,11 @@ func TestGetBallots_Error(t *testing.T) {
 
 func TestGetBallots_Success(t *testing.T) {
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
-		QueryMock: func(ctx context.Context, params *dynamodb.QueryInput, optFns ...func(*dynamodb.Options)) (*dynamodb.QueryOutput, error) {
+		QueryMock: func(
+			ctx context.Context,
+			params *dynamodb.QueryInput,
+			optFns ...func(*dynamodb.Options),
+		) (*dynamodb.QueryOutput, error) {
 			return &dynamodb.QueryOutput{}, nil
 		},
 	})
