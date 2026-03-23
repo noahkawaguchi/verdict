@@ -1,4 +1,4 @@
-package models_test
+package voting_test
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 func TestValidatePoll_Invalid(t *testing.T) {
@@ -50,7 +50,7 @@ func TestValidatePoll_Invalid(t *testing.T) {
 			[]string{"red", "blue", "blue", "green", "yellow", "orange"}},
 	}
 	for _, tt := range tests {
-		poll := models.NewPoll(tt.prompt, tt.choices)
+		poll := voting.NewPoll(tt.prompt, tt.choices)
 		if err := poll.Validate(); err == nil || err.Error() != tt.errMsg {
 			t.Errorf("expected error with message %q, got %v", tt.errMsg, err)
 		}
@@ -67,7 +67,7 @@ func TestValidatePoll_Valid(t *testing.T) {
 		{"What is the best color?", []string{"red", "blue", "green", "yellow", "orange"}},
 	}
 	for _, tt := range tests {
-		poll := models.NewPoll(tt.prompt, tt.choices)
+		poll := voting.NewPoll(tt.prompt, tt.choices)
 		if err := poll.Validate(); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
@@ -94,7 +94,7 @@ func TestPollMarshalUnmarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		inPoll := models.NewPoll(tt.prompt, tt.choices)
+		inPoll := voting.NewPoll(tt.prompt, tt.choices)
 		body, err := json.Marshal(inPoll)
 		if err != nil {
 			t.Error("failed to marshal JSON:", err)
@@ -102,15 +102,15 @@ func TestPollMarshalUnmarshalJSON(t *testing.T) {
 		if string(body) != tt.jsonString {
 			t.Error("unexpected JSON:", string(body))
 		}
-		var outPoll *models.Poll
+		var outPoll *voting.Poll
 		if err := json.Unmarshal(body, &outPoll); err != nil {
 			t.Error("failed to unmarshal JSON:", err)
 		}
 		if !cmp.Equal(
 			inPoll,
 			outPoll,
-			cmp.AllowUnexported(models.Poll{}),
-			cmpopts.IgnoreFields(models.Poll{}, "pollID"),
+			cmp.AllowUnexported(voting.Poll{}),
+			cmpopts.IgnoreFields(voting.Poll{}, "pollID"),
 		) {
 			t.Error("unexpected unmarshaled poll:", outPoll)
 		}
@@ -127,16 +127,16 @@ func TestPollMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"What is the best color?", []string{"red", "blue", "green", "yellow", "orange"}},
 	}
 	for _, tt := range tests {
-		inputPoll := models.NewPoll(tt.prompt, tt.choices)
+		inputPoll := voting.NewPoll(tt.prompt, tt.choices)
 		av, err := attributevalue.MarshalMap(inputPoll)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)
 		}
-		var p models.Poll
+		var p voting.Poll
 		if err = attributevalue.UnmarshalMap(av, &p); err != nil {
 			t.Errorf("failed to unmarshal map: %v", err)
 		}
-		if !cmp.Equal(&p, inputPoll, cmp.AllowUnexported(models.Poll{})) {
+		if !cmp.Equal(&p, inputPoll, cmp.AllowUnexported(voting.Poll{})) {
 			t.Errorf("unexpected unmarshaled result: %+v", p)
 		}
 	}

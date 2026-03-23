@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/noahkawaguchi/verdict/internal/datastore"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 func TestPutBallot_Error(t *testing.T) {
@@ -17,10 +17,10 @@ func TestPutBallot_Error(t *testing.T) {
 		},
 	})
 
-	tests := []*models.Ballot{
-		models.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
-		models.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
-		models.NewBallot("poll2", "user4", []int{1, 0, 2}),
+	tests := []*voting.Ballot{
+		voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
+		voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
+		voting.NewBallot("poll2", "user4", []int{1, 0, 2}),
 	}
 
 	for _, tt := range tests {
@@ -37,10 +37,10 @@ func TestPutBallot_Success(t *testing.T) {
 		},
 	})
 
-	tests := []*models.Ballot{
-		models.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
-		models.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
-		models.NewBallot("poll2", "user4", []int{1, 0, 2}),
+	tests := []*voting.Ballot{
+		voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
+		voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
+		voting.NewBallot("poll2", "user4", []int{1, 0, 2}),
 	}
 
 	for _, tt := range tests {

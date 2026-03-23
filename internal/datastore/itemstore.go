@@ -4,18 +4,18 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/noahkawaguchi/verdict/internal/models"
 	"github.com/noahkawaguchi/verdict/internal/utils"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
-type tableModel interface{ models.Ballot | models.Poll }
+type tableModel interface{ voting.Ballot | voting.Poll }
 
 // tableNameFor determines the appropriate table name based on the type of the item.
 func tableNameFor[T tableModel](item *T) *string {
 	switch any(item).(type) {
-	case *models.Ballot:
+	case *voting.Ballot:
 		return &ballotsTableInfo.name
-	case *models.Poll:
+	case *voting.Poll:
 		return &pollsTableInfo.name
 	}
 	// This will never be reached because all type terms in the type set are covered

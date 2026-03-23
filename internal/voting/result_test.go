@@ -1,4 +1,4 @@
-package models_test
+package voting_test
 
 import (
 	"encoding/json"
@@ -6,26 +6,26 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
-func threeOptionPoll() (*models.Poll, string) {
-	poll := models.NewPoll("What is the best fruit?",
+func threeOptionPoll() (*voting.Poll, string) {
+	poll := voting.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine"})
 	return poll, poll.ID()
 }
 
-func fourOptionPoll() (*models.Poll, string) {
-	poll := models.NewPoll("What is the best fruit?",
+func fourOptionPoll() (*voting.Poll, string) {
+	poll := voting.NewPoll("What is the best fruit?",
 		[]string{"apple", "banana", "clementine", "durian"})
 	return poll, poll.ID()
 }
 
-func ballotClosure(pollID string) func([]int) *models.Ballot {
+func ballotClosure(pollID string) func([]int) *voting.Ballot {
 	userID := 0
-	return func(rankOrder []int) *models.Ballot {
+	return func(rankOrder []int) *voting.Ballot {
 		userID++
-		ballot := models.NewBallot(pollID, strconv.Itoa(userID), rankOrder)
+		ballot := voting.NewBallot(pollID, strconv.Itoa(userID), rankOrder)
 		return ballot
 	}
 }
@@ -42,12 +42,12 @@ func expectedResultJSON(totalVotes, winningVotes, winningChoiceIdx, winningRound
 func TestResult_SimpleMajority(t *testing.T) {
 	poll, pollID := threeOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
-	ballots := []*models.Ballot{
+	ballots := []*voting.Ballot{
 		ballotWithRanks([]int{1, 0, 2}),
 		ballotWithRanks([]int{2, 0, 1}),
 		ballotWithRanks([]int{2, 1, 0}),
 	}
-	result, err := models.NewResult(poll, ballots)
+	result, err := voting.NewResult(poll, ballots)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -63,14 +63,14 @@ func TestResult_SimpleMajority(t *testing.T) {
 func TestResult_Runoff(t *testing.T) {
 	poll, pollID := threeOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
-	ballots := []*models.Ballot{
+	ballots := []*voting.Ballot{
 		ballotWithRanks([]int{0, 1, 2}),
 		ballotWithRanks([]int{1, 0, 2}),
 		ballotWithRanks([]int{1, 0, 2}),
 		ballotWithRanks([]int{2, 0, 1}),
 		ballotWithRanks([]int{2, 1, 0}),
 	}
-	result, err := models.NewResult(poll, ballots)
+	result, err := voting.NewResult(poll, ballots)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -86,7 +86,7 @@ func TestResult_Runoff(t *testing.T) {
 func TestResult_TieForLast(t *testing.T) {
 	poll, pollID := fourOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
-	ballots := []*models.Ballot{
+	ballots := []*voting.Ballot{
 		ballotWithRanks([]int{0, 2, 3, 1}),
 		ballotWithRanks([]int{1, 3, 0, 2}),
 		ballotWithRanks([]int{1, 3, 0, 2}),
@@ -108,7 +108,7 @@ func TestResult_TieForLast(t *testing.T) {
 		Round 3:
 			- 2 now has 4/6 votes, a strict majority, and wins.
 	*/
-	result, err := models.NewResult(poll, ballots)
+	result, err := voting.NewResult(poll, ballots)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -124,7 +124,7 @@ func TestResult_TieForLast(t *testing.T) {
 func TestResult_InfiniteTieForLast(t *testing.T) {
 	poll, pollID := fourOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
-	ballots := []*models.Ballot{
+	ballots := []*voting.Ballot{
 		ballotWithRanks([]int{0, 2, 3, 1}),
 		ballotWithRanks([]int{0, 3, 1, 2}),
 		ballotWithRanks([]int{1, 3, 0, 2}),
@@ -153,7 +153,7 @@ func TestResult_InfiniteTieForLast(t *testing.T) {
 			- Ballot state if 2 was eliminated: [0, 0, 3, 0, 3, 3, 3, 3]
 			- In either case, 3 now has 5 out of 8 votes, a strict majority, and wins.
 	*/
-	result, err := models.NewResult(poll, ballots)
+	result, err := voting.NewResult(poll, ballots)
 	if err != nil {
 		t.Error(err.Error())
 	}

@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/noahkawaguchi/verdict/internal/datastore"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 func TestPutPoll_Error(t *testing.T) {
@@ -17,12 +17,12 @@ func TestPutPoll_Error(t *testing.T) {
 		},
 	})
 
-	tests := []*models.Poll{
-		models.NewPoll(
+	tests := []*voting.Poll{
+		voting.NewPoll(
 			"What is the best programming language?",
 			[]string{"Go", "Rust", "C++"},
 		),
-		models.NewPoll(
+		voting.NewPoll(
 			"What is the best int size?",
 			[]string{"32", "64", "8", "anything unsigned"},
 		),
@@ -42,12 +42,12 @@ func TestPutPoll_Success(t *testing.T) {
 		},
 	})
 
-	tests := []*models.Poll{
-		models.NewPoll(
+	tests := []*voting.Poll{
+		voting.NewPoll(
 			"What is the best programming language?",
 			[]string{"Go", "Rust", "C++"},
 		),
-		models.NewPoll(
+		voting.NewPoll(
 			"What is the best int size?",
 			[]string{"32", "64", "8", "anything unsigned"},
 		),

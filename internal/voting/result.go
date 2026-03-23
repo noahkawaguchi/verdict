@@ -1,4 +1,4 @@
-package models
+package voting
 
 import (
 	"encoding/json"

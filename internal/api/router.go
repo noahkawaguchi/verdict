@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 type datastore interface {
-	PutPoll(poll *models.Poll) error
-	GetPoll(pollID string) (*models.Poll, error)
-	PutBallot(ballot *models.Ballot) error
-	GetBallots(pollID string) ([]*models.Ballot, error)
+	PutPoll(poll *voting.Poll) error
+	GetPoll(pollID string) (*voting.Poll, error)
+	PutBallot(ballot *voting.Ballot) error
+	GetBallots(pollID string) ([]*voting.Ballot, error)
 }
 
 type handler struct {

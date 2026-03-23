@@ -1,37 +1,37 @@
 package api_test
 
-import "github.com/noahkawaguchi/verdict/internal/models"
+import "github.com/noahkawaguchi/verdict/internal/voting"
 
 // mockDatastore implements the datastore interface for testing purposes.
 type mockDatastore struct {
-	PutPollMock    func(poll *models.Poll) error
-	GetPollMock    func(pollID string) (*models.Poll, error)
-	PutBallotMock  func(ballot *models.Ballot) error
-	GetBallotsMock func(pollID string) ([]*models.Ballot, error)
+	PutPollMock    func(poll *voting.Poll) error
+	GetPollMock    func(pollID string) (*voting.Poll, error)
+	PutBallotMock  func(ballot *voting.Ballot) error
+	GetBallotsMock func(pollID string) ([]*voting.Ballot, error)
 }
 
-func (m *mockDatastore) PutPoll(poll *models.Poll) error {
+func (m *mockDatastore) PutPoll(poll *voting.Poll) error {
 	if m.PutPollMock != nil {
 		return m.PutPollMock(poll)
 	}
 	return nil
 }
 
-func (m *mockDatastore) GetPoll(pollID string) (*models.Poll, error) {
+func (m *mockDatastore) GetPoll(pollID string) (*voting.Poll, error) {
 	if m.GetPollMock != nil {
 		return m.GetPollMock(pollID)
 	}
 	return nil, nil
 }
 
-func (m *mockDatastore) PutBallot(ballot *models.Ballot) error {
+func (m *mockDatastore) PutBallot(ballot *voting.Ballot) error {
 	if m.PutBallotMock != nil {
 		return m.PutBallotMock(ballot)
 	}
 	return nil
 }
 
-func (m *mockDatastore) GetBallots(pollID string) ([]*models.Ballot, error) {
+func (m *mockDatastore) GetBallots(pollID string) ([]*voting.Ballot, error) {
 	if m.GetBallotsMock != nil {
 		return m.GetBallotsMock(pollID)
 	}

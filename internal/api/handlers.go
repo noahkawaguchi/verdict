@@ -5,12 +5,12 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 func (h *handler) createPoll() events.APIGatewayProxyResponse {
 	// Unmarshal the request
-	var poll *models.Poll
+	var poll *voting.Poll
 	if err := json.Unmarshal([]byte(h.req.Body), &poll); err != nil {
 		return resp400("invalid JSON")
 	}
@@ -54,7 +54,7 @@ func (h *handler) getPollInfo() events.APIGatewayProxyResponse {
 
 func (h *handler) castBallot() events.APIGatewayProxyResponse {
 	// Unmarshal the request
-	var ballot *models.Ballot
+	var ballot *voting.Ballot
 	if err := json.Unmarshal([]byte(h.req.Body), &ballot); err != nil {
 		return resp400("invalid JSON")
 	}
@@ -98,7 +98,7 @@ func (h *handler) getResult() events.APIGatewayProxyResponse {
 		return resp404("no ballots found for the specified poll")
 	}
 	// Calculate the result
-	result, err := models.NewResult(poll, ballots)
+	result, err := voting.NewResult(poll, ballots)
 	if err != nil {
 		slog.Error("failed to calculate result", "err", err)
 		return resp500

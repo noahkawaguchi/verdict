@@ -1,4 +1,4 @@
-package models_test
+package voting_test
 
 import (
 	"encoding/json"
@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/voting"
 )
 
 func TestValidateBallot_Invalid(t *testing.T) {
@@ -47,7 +47,7 @@ func TestValidateBallot_Invalid(t *testing.T) {
 		{"not a valid rank order", "poll3", "user3", []int{0, 1, 1, 1}},
 	}
 	for _, tt := range tests {
-		ballot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
+		ballot := voting.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 		if err := ballot.Validate(); err == nil || err.Error() != tt.errMsg {
 			t.Errorf("expected error with message %q, got %v", tt.errMsg, err)
 		}
@@ -65,7 +65,7 @@ func TestValidateBallot_Valid(t *testing.T) {
 		{"poll2", "user4", []int{4, 1, 0, 3, 2}},
 	}
 	for _, tt := range tests {
-		ballot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
+		ballot := voting.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 		if err := ballot.Validate(); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
@@ -96,28 +96,28 @@ func TestBallotUnmarshalJSON(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		var unmarshaledBallot *models.Ballot
+		var unmarshaledBallot *voting.Ballot
 		if err := json.Unmarshal([]byte(tt.jsonString), &unmarshaledBallot); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
 		if tt.userID != "" { // User ID provided cases
-			constructedBallot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
+			constructedBallot := voting.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 			if !cmp.Equal(
 				unmarshaledBallot,
 				constructedBallot,
-				cmp.AllowUnexported(models.Ballot{}),
+				cmp.AllowUnexported(voting.Ballot{}),
 			) {
 				t.Error("unexpected unmarshaled ballot:", unmarshaledBallot)
 				t.Error("expected ballot:", constructedBallot)
 			}
 		} else { // User ID automatically generated cases
 			userID := "dummy user ID"
-			constructedBallot := models.NewBallot(tt.pollID, userID, tt.rankOrder)
+			constructedBallot := voting.NewBallot(tt.pollID, userID, tt.rankOrder)
 			if !cmp.Equal(
 				unmarshaledBallot,
 				constructedBallot,
-				cmp.AllowUnexported(models.Ballot{}),
-				cmpopts.IgnoreFields(models.Ballot{}, "userID"),
+				cmp.AllowUnexported(voting.Ballot{}),
+				cmpopts.IgnoreFields(voting.Ballot{}, "userID"),
 			) {
 				t.Error("unexpected unmarshaled ballot:", unmarshaledBallot)
 			}
@@ -136,16 +136,16 @@ func TestBallotMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"poll5", "user5", []int{3, 2, 0, 1, 5, 4}},
 	}
 	for _, tt := range tests {
-		inputBallot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
+		inputBallot := voting.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 		av, err := attributevalue.MarshalMap(inputBallot)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)
 		}
-		var b *models.Ballot
+		var b *voting.Ballot
 		if err = attributevalue.UnmarshalMap(av, &b); err != nil {
 			t.Errorf("failed to unmarshal map: %v", err)
 		}
-		if !cmp.Equal(inputBallot, b, cmp.AllowUnexported(models.Ballot{})) {
+		if !cmp.Equal(inputBallot, b, cmp.AllowUnexported(voting.Ballot{})) {
 			t.Errorf("unexpected unmarshaled result: %+v", b)
 		}
 	}
