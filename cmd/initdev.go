@@ -12,16 +12,22 @@ import (
 	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
 )
 
+// devDBContainerName is the name for the local DynamoDB container. It must match the one used in
+// the `justfile`.
+const devDBContainerName string = "verdict-dev-db"
+
 // init sets up the dbClient before main executes, once per cold start.
 func init() {
 	cfg, err := config.LoadDefaultConfig(
 		context.TODO(),
 		// (Ohio) Required but not used locally
 		config.WithRegion("us-east-2"),
-		// Local DynamoDB running in Docker, connected via SAM
-		config.WithBaseEndpoint("http://host.docker.internal:8000"),
+		// DynamoDB running in Docker via the local Docker network
+		config.WithBaseEndpoint("http://"+devDBContainerName+":8000"),
 		// Required but not checked locally
-		config.WithCredentialsProvider(credentials.NewStaticCredentialsProvider("dummy", "dummy", "")),
+		config.WithCredentialsProvider(
+			credentials.NewStaticCredentialsProvider("dummy", "dummy", ""),
+		),
 	)
 	if err != nil {
 		log.Fatal("Unable to load SDK config:", err)
