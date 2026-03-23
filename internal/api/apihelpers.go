@@ -25,7 +25,7 @@ var defaultHeaders = map[string]string{
 	"Content-Type":                 "application/json",
 	"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),
 	"Access-Control-Allow-Methods": "OPTIONS,GET,POST",
-	"Access-Control-Allow-Headers": "Content-Type,Authorization",
+	"Access-Control-Allow-Headers": "Content-Type",
 }
 
 // resp200 creates a 200 OK HTTP response with the provided body.

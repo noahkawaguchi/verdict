@@ -48,7 +48,7 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 			"Content-Type":                 "application/json",
 			"Access-Control-Allow-Origin":  os.Getenv("FRONTEND_URL"),
 			"Access-Control-Allow-Methods": "OPTIONS,GET,POST",
-			"Access-Control-Allow-Headers": "Content-Type,Authorization",
+			"Access-Control-Allow-Headers": "Content-Type",
 			"Allow":                        "OPTIONS, GET, POST",
 		}
 		if !cmp.Equal(resp.Headers, expectedHeaders) {
