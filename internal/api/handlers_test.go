@@ -35,13 +35,18 @@ func TestCreatePollHandler_Error(t *testing.T) {
 				Prompt  string   `json:"prompt"`
 				Choices []string `json:"choices"`
 			}{
-				Prompt:  "What is the best day of the week?",
-				Choices: []string{"Wednesday", "Tuesday", "None of the above", "Tuesday"},
+				Prompt: "What is the best day of the week?",
+				Choices: []string{
+					"Wednesday",
+					"Tuesday",
+					"None of the above",
+					"Tuesday",
+				},
 			}),
 		},
 		{
 			http.StatusInternalServerError,
-			"failed to put the poll in the database",
+			"internal server error",
 			quickJSON(struct {
 				Prompt  string   `json:"prompt"`
 				Choices []string `json:"choices"`
@@ -135,7 +140,7 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusInternalServerError,
-			"failed to get the poll from the database",
+			"internal server error",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return nil, errors.New("mock error")
@@ -143,7 +148,7 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusNotFound,
-			"no poll found for the specified ID",
+			"no poll found for poll ID da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return models.NewPoll("", []string{""}), nil
@@ -160,7 +165,11 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 		handler := api.NewHandler(&mockDatastore{GetPollMock: test.getPollMock}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
-			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
+			t.Errorf(
+				"unexpected status code: expected %d, got %d",
+				test.statusCode,
+				resp.StatusCode,
+			)
 		}
 		if resp.Body != `{"error":"`+test.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
@@ -188,7 +197,11 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)
+			t.Errorf(
+				"unexpected status code: expected %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
 		}
 		body, err := json.Marshal(test)
 		if err != nil {
@@ -207,7 +220,11 @@ func TestCastBallotHandler_Error(t *testing.T) {
 		errMsg     string
 		body       string
 	}{
-		{http.StatusBadRequest, "invalid JSON", `{"pollId":"poll1,"rankOrder":[1, 0, 3, 2]}`},
+		{
+			http.StatusBadRequest,
+			"invalid JSON",
+			`{"pollId":"poll1,"rankOrder":[1, 0, 3, 2]}`,
+		},
 		{
 			http.StatusBadRequest,
 			"not a valid rank order",
@@ -221,7 +238,7 @@ func TestCastBallotHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusInternalServerError,
-			"failed to put the ballot in the database",
+			"internal server error",
 			quickJSON(struct {
 				PollID    string `json:"pollId"`
 				RankOrder []int  `json:"rankOrder"`
@@ -314,7 +331,7 @@ func TestGetResultHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusInternalServerError,
-			"failed to get the poll from the database",
+			"internal server error",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return nil, errors.New("mock error")
@@ -323,7 +340,7 @@ func TestGetResultHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusNotFound,
-			"no poll found for the specified ID",
+			"no poll found for poll ID da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return models.NewPoll("", []string{""}), nil
@@ -332,7 +349,7 @@ func TestGetResultHandler_Error(t *testing.T) {
 		},
 		{
 			http.StatusInternalServerError,
-			"failed to get the poll's ballots from the database",
+			"internal server error",
 			map[string]string{"pollId": "da932fe1-9a4c-4e07-adb3-9f66b4767050"},
 			func(pollID string) (*models.Poll, error) {
 				return models.NewPoll(
@@ -372,7 +389,11 @@ func TestGetResultHandler_Error(t *testing.T) {
 		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != test.statusCode {
-			t.Errorf("unexpected status code: expected %d, got %d", test.statusCode, resp.StatusCode)
+			t.Errorf(
+				"unexpected status code: expected %d, got %d",
+				test.statusCode,
+				resp.StatusCode,
+			)
 		}
 		if resp.Body != `{"error":"`+test.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
@@ -398,8 +419,15 @@ func TestGetResultHandler_Success(t *testing.T) {
 			}{{"user1", []int{0, 2, 1}}, {"user2", []int{0, 1, 2}}},
 		},
 		{
-			models.NewPoll("What is the worst day of the week?",
-				[]string{"Monday", "Thursday", "Either Monday or Thursday", "None of these"}),
+			models.NewPoll(
+				"What is the worst day of the week?",
+				[]string{
+					"Monday",
+					"Thursday",
+					"Either Monday or Thursday",
+					"None of these",
+				},
+			),
 			[]struct {
 				userID    string
 				rankOrder []int
@@ -415,7 +443,11 @@ func TestGetResultHandler_Success(t *testing.T) {
 		}
 		ballots := make([]*models.Ballot, len(test.ballots))
 		for i, ballot := range test.ballots {
-			ballots[i] = models.NewBallot(test.poll.ID(), ballot.userID, ballot.rankOrder)
+			ballots[i] = models.NewBallot(
+				test.poll.ID(),
+				ballot.userID,
+				ballot.rankOrder,
+			)
 		}
 		handler := api.NewHandler(&mockDatastore{
 			GetPollMock:    func(pollID string) (*models.Poll, error) { return test.poll, nil },
@@ -423,7 +455,11 @@ func TestGetResultHandler_Success(t *testing.T) {
 		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusOK {
-			t.Errorf("unexpected status code: expected %d, got %d", http.StatusOK, resp.StatusCode)
+			t.Errorf(
+				"unexpected status code: expected %d, got %d",
+				http.StatusOK,
+				resp.StatusCode,
+			)
 		}
 		result, err := models.NewResult(test.poll, ballots)
 		if err != nil {
