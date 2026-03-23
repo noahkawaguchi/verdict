@@ -9,7 +9,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/google/uuid"
-	"github.com/noahkawaguchi/verdict/internal/utils"
 )
 
 type Poll struct {
@@ -37,8 +36,12 @@ func (p *Poll) Validate() error {
 	if slices.Contains(p.choices, "") {
 		return errors.New("none of the choices can be empty")
 	}
-	if len(p.choices) != utils.NewSet(p.choices...).Len() {
-		return errors.New("choices must be unique")
+	m := make(map[string]struct{}, len(p.choices))
+	for _, c := range p.choices {
+		if _, ok := m[c]; ok {
+			return errors.New("choices must be unique")
+		}
+		m[c] = struct{}{}
 	}
 	return nil
 }
