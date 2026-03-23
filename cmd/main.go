@@ -6,8 +6,8 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/noahkawaguchi/verdict/backend/internal/api"
-	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
+	"github.com/noahkawaguchi/verdict/internal/api"
+	"github.com/noahkawaguchi/verdict/internal/datastore"
 )
 
 var dbClient *dynamodb.Client // Set in the init function

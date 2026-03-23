@@ -7,7 +7,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/models"
 )
 
 func TestValidateBallot_Invalid(t *testing.T) {

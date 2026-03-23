@@ -1,4 +1,4 @@
-module github.com/noahkawaguchi/verdict/backend
+module github.com/noahkawaguchi/verdict
 
 go 1.26.1
 

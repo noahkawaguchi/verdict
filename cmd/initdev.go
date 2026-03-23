@@ -8,7 +8,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
+	"github.com/noahkawaguchi/verdict/internal/datastore"
 )
 
 // devDBContainerName is the name for the local DynamoDB container. It must match the one used in

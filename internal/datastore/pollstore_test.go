@@ -6,8 +6,8 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/datastore"
+	"github.com/noahkawaguchi/verdict/internal/models"
 )
 
 func TestPutPoll_Error(t *testing.T) {

@@ -1,6 +1,6 @@
 package api_test
 
-import "github.com/noahkawaguchi/verdict/backend/internal/models"
+import "github.com/noahkawaguchi/verdict/internal/models"
 
 // mockDatastore implements the datastore interface for testing purposes.
 type mockDatastore struct {

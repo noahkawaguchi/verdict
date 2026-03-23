@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/models"
 )
 
 type datastore interface {

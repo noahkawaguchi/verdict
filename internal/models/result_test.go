@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/models"
 )
 
 func threeOptionPoll() (*models.Poll, string) {

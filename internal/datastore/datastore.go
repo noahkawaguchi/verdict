@@ -6,8 +6,8 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
-	"github.com/noahkawaguchi/verdict/backend/internal/utils"
+	"github.com/noahkawaguchi/verdict/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/utils"
 )
 
 type dynamoClient interface {

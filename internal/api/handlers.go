@@ -5,7 +5,7 @@ import (
 	"log/slog"
 
 	"github.com/aws/aws-lambda-go/events"
-	"github.com/noahkawaguchi/verdict/backend/internal/models"
+	"github.com/noahkawaguchi/verdict/internal/models"
 )
 
 func (h *handler) createPoll() events.APIGatewayProxyResponse {

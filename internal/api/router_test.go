@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/google/go-cmp/cmp"
-	"github.com/noahkawaguchi/verdict/backend/internal/api"
+	"github.com/noahkawaguchi/verdict/internal/api"
 )
 
 func TestRouter_MethodNotAllowed(t *testing.T) {
