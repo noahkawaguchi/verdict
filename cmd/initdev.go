@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/noahkawaguchi/verdict/backend/internal/datastore"
 )
@@ -20,14 +19,7 @@ const devDBContainerName string = "verdict-dev-db"
 func init() {
 	cfg, err := config.LoadDefaultConfig(
 		context.TODO(),
-		// (Ohio) Required but not used locally
-		config.WithRegion("us-east-2"),
-		// DynamoDB running in Docker via the local Docker network
 		config.WithBaseEndpoint("http://"+devDBContainerName+":8000"),
-		// Required but not checked locally
-		config.WithCredentialsProvider(
-			credentials.NewStaticCredentialsProvider("dummy", "dummy", ""),
-		),
 	)
 	if err != nil {
 		log.Fatal("Unable to load SDK config:", err)
