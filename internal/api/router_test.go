@@ -91,3 +91,17 @@ func TestRouter_PathNotFound(t *testing.T) {
 		}
 	}
 }
+
+func TestRouter_HealthCheck(t *testing.T) {
+	req := events.APIGatewayProxyRequest{
+		Path:       "/health",
+		HTTPMethod: http.MethodGet,
+	}
+	resp := api.NewHandler(&mockDatastore{}, req).Route()
+	if resp.StatusCode != http.StatusOK {
+		t.Error("unexpected status code:", resp.StatusCode)
+	}
+	if resp.Body != "The function is available!" {
+		t.Error("unexpected response body:", resp.Body)
+	}
+}

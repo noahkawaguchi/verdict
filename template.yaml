@@ -47,7 +47,7 @@ Resources:
               - !GetAtt BallotsTable.Arn
               - !GetAtt PollsTable.Arn
       Events:
-        Health:
+        HealthCheck:
           Type: Api
           Properties:
             Path: /health
