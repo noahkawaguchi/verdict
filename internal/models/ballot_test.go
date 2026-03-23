@@ -46,10 +46,10 @@ func TestValidateBallot_Invalid(t *testing.T) {
 		{"not a valid rank order", "poll2", "user2", []int{3, 5, 1, 2, 4}},
 		{"not a valid rank order", "poll3", "user3", []int{0, 1, 1, 1}},
 	}
-	for _, test := range tests {
-		ballot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
-		if err := ballot.Validate(); err == nil || err.Error() != test.errMsg {
-			t.Errorf("expected error with message %q, got %v", test.errMsg, err)
+	for _, tt := range tests {
+		ballot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
+		if err := ballot.Validate(); err == nil || err.Error() != tt.errMsg {
+			t.Errorf("expected error with message %q, got %v", tt.errMsg, err)
 		}
 	}
 }
@@ -64,8 +64,8 @@ func TestValidateBallot_Valid(t *testing.T) {
 		{"poll2", "user2", []int{3, 0, 1, 2, 4}},
 		{"poll2", "user4", []int{4, 1, 0, 3, 2}},
 	}
-	for _, test := range tests {
-		ballot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+	for _, tt := range tests {
+		ballot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 		if err := ballot.Validate(); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
@@ -95,13 +95,13 @@ func TestBallotUnmarshalJSON(t *testing.T) {
 			jsonString: `{"pollId": "poll3", "rankOrder": [0, 3, 2, 1]}`,
 		},
 	}
-	for _, test := range tests {
+	for _, tt := range tests {
 		var unmarshaledBallot *models.Ballot
-		if err := json.Unmarshal([]byte(test.jsonString), &unmarshaledBallot); err != nil {
+		if err := json.Unmarshal([]byte(tt.jsonString), &unmarshaledBallot); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
-		if test.userID != "" { // User ID provided cases
-			constructedBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+		if tt.userID != "" { // User ID provided cases
+			constructedBallot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 			if !cmp.Equal(
 				unmarshaledBallot,
 				constructedBallot,
@@ -112,7 +112,7 @@ func TestBallotUnmarshalJSON(t *testing.T) {
 			}
 		} else { // User ID automatically generated cases
 			userID := "dummy user ID"
-			constructedBallot := models.NewBallot(test.pollID, userID, test.rankOrder)
+			constructedBallot := models.NewBallot(tt.pollID, userID, tt.rankOrder)
 			if !cmp.Equal(
 				unmarshaledBallot,
 				constructedBallot,
@@ -135,8 +135,8 @@ func TestBallotMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"poll2", "user3", []int{0, 1, 3, 2}},
 		{"poll5", "user5", []int{3, 2, 0, 1, 5, 4}},
 	}
-	for _, test := range tests {
-		inputBallot := models.NewBallot(test.pollID, test.userID, test.rankOrder)
+	for _, tt := range tests {
+		inputBallot := models.NewBallot(tt.pollID, tt.userID, tt.rankOrder)
 		av, err := attributevalue.MarshalMap(inputBallot)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)

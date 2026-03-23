@@ -31,8 +31,16 @@ func TestValidatePoll_Invalid(t *testing.T) {
 			errMsg: "there must be at least two choices",
 			prompt: "What is the best color?",
 		},
-		{"none of the choices can be empty", "What is the best fruit?", []string{"yuzu", ""}},
-		{"none of the choices can be empty", "What is the best vegetable?", []string{"", "", ""}},
+		{
+			"none of the choices can be empty",
+			"What is the best fruit?",
+			[]string{"yuzu", ""},
+		},
+		{
+			"none of the choices can be empty",
+			"What is the best vegetable?",
+			[]string{"", "", ""},
+		},
 		{"none of the choices can be empty", "What is the best color?",
 			[]string{"red", "blue", "", "yellow", "orange"}},
 		{"choices must be unique", "What is the best fruit?", []string{"yuzu", "yuzu"}},
@@ -41,10 +49,10 @@ func TestValidatePoll_Invalid(t *testing.T) {
 		{"choices must be unique", "What is the best color?",
 			[]string{"red", "blue", "blue", "green", "yellow", "orange"}},
 	}
-	for _, test := range tests {
-		poll := models.NewPoll(test.prompt, test.choices)
-		if err := poll.Validate(); err == nil || err.Error() != test.errMsg {
-			t.Errorf("expected error with message %q, got %v", test.errMsg, err)
+	for _, tt := range tests {
+		poll := models.NewPoll(tt.prompt, tt.choices)
+		if err := poll.Validate(); err == nil || err.Error() != tt.errMsg {
+			t.Errorf("expected error with message %q, got %v", tt.errMsg, err)
 		}
 	}
 }
@@ -58,8 +66,8 @@ func TestValidatePoll_Valid(t *testing.T) {
 		{"What is the best vegetable?", []string{"lettuce", "carrot", "green beans"}},
 		{"What is the best color?", []string{"red", "blue", "green", "yellow", "orange"}},
 	}
-	for _, test := range tests {
-		poll := models.NewPoll(test.prompt, test.choices)
+	for _, tt := range tests {
+		poll := models.NewPoll(tt.prompt, tt.choices)
 		if err := poll.Validate(); err != nil {
 			t.Errorf("expected success, got %v", err)
 		}
@@ -74,18 +82,24 @@ func TestPollMarshalUnmarshalJSON(t *testing.T) {
 	}{
 		{"What is the best fruit?", []string{"yuzu", "clementine"},
 			`{"prompt":"What is the best fruit?","choices":["yuzu","clementine"]}`},
-		{"What is the best vegetable?", []string{"lettuce", "carrot", "green beans"},
-			`{"prompt":"What is the best vegetable?","choices":["lettuce","carrot","green beans"]}`},
-		{"What is the best color?", []string{"red", "blue", "green", "yellow", "orange"},
-			`{"prompt":"What is the best color?","choices":["red","blue","green","yellow","orange"]}`},
+		{
+			"What is the best vegetable?",
+			[]string{"lettuce", "carrot", "green beans"},
+			`{"prompt":"What is the best vegetable?","choices":["lettuce","carrot","green beans"]}`,
+		},
+		{
+			"What is the best color?",
+			[]string{"red", "blue", "green", "yellow", "orange"},
+			`{"prompt":"What is the best color?","choices":["red","blue","green","yellow","orange"]}`,
+		},
 	}
-	for _, test := range tests {
-		inPoll := models.NewPoll(test.prompt, test.choices)
+	for _, tt := range tests {
+		inPoll := models.NewPoll(tt.prompt, tt.choices)
 		body, err := json.Marshal(inPoll)
 		if err != nil {
 			t.Error("failed to marshal JSON:", err)
 		}
-		if string(body) != test.jsonString {
+		if string(body) != tt.jsonString {
 			t.Error("unexpected JSON:", string(body))
 		}
 		var outPoll *models.Poll
@@ -112,8 +126,8 @@ func TestPollMarshalUnmarshalDynamoDBAttributeValue(t *testing.T) {
 		{"What is the best vegetable?", []string{"lettuce", "carrot", "green beans"}},
 		{"What is the best color?", []string{"red", "blue", "green", "yellow", "orange"}},
 	}
-	for _, test := range tests {
-		inputPoll := models.NewPoll(test.prompt, test.choices)
+	for _, tt := range tests {
+		inputPoll := models.NewPoll(tt.prompt, tt.choices)
 		av, err := attributevalue.MarshalMap(inputPoll)
 		if err != nil {
 			t.Errorf("failed to marshal map: %v", err)

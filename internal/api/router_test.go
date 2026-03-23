@@ -38,8 +38,8 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		handler := api.NewHandler(&mockDatastore{}, test)
+	for _, tt := range tests {
+		handler := api.NewHandler(&mockDatastore{}, tt)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusMethodNotAllowed {
 			t.Error("unexpected status code:", resp.StatusCode)
@@ -54,7 +54,7 @@ func TestRouter_MethodNotAllowed(t *testing.T) {
 		if !cmp.Equal(resp.Headers, expectedHeaders) {
 			t.Error("unexpected headers:", resp.Headers)
 		}
-		if resp.Body != `{"error":"method `+test.HTTPMethod+` not allowed"}` {
+		if resp.Body != `{"error":"method `+tt.HTTPMethod+` not allowed"}` {
 			t.Error("unexpected response body:", resp.Body)
 		}
 	}
@@ -80,13 +80,13 @@ func TestRouter_PathNotFound(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
-		handler := api.NewHandler(&mockDatastore{}, test)
+	for _, tt := range tests {
+		handler := api.NewHandler(&mockDatastore{}, tt)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusNotFound {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
-		if resp.Body != `{"error":"path not found for method `+test.HTTPMethod+`: `+test.Path+`"}` {
+		if resp.Body != `{"error":"path not found for method `+tt.HTTPMethod+`: `+tt.Path+`"}` {
 			t.Error("unexpected response body:", resp.Body)
 		}
 	}

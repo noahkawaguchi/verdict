@@ -18,12 +18,18 @@ func TestPutPoll_Error(t *testing.T) {
 	})
 
 	tests := []*models.Poll{
-		models.NewPoll("What is the best programming language?", []string{"Go", "Rust", "C++"}),
-		models.NewPoll("What is the best int size?", []string{"32", "64", "8", "anything unsigned"}),
+		models.NewPoll(
+			"What is the best programming language?",
+			[]string{"Go", "Rust", "C++"},
+		),
+		models.NewPoll(
+			"What is the best int size?",
+			[]string{"32", "64", "8", "anything unsigned"},
+		),
 	}
 
-	for _, test := range tests {
-		if err := tableStore.PutPoll(test); err == nil || err.Error() != "mocked error" {
+	for _, tt := range tests {
+		if err := tableStore.PutPoll(tt); err == nil || err.Error() != "mocked error" {
 			t.Error(`expected "mocked error", got:`, err)
 		}
 	}
@@ -37,12 +43,18 @@ func TestPutPoll_Success(t *testing.T) {
 	})
 
 	tests := []*models.Poll{
-		models.NewPoll("What is the best programming language?", []string{"Go", "Rust", "C++"}),
-		models.NewPoll("What is the best int size?", []string{"32", "64", "8", "anything unsigned"}),
+		models.NewPoll(
+			"What is the best programming language?",
+			[]string{"Go", "Rust", "C++"},
+		),
+		models.NewPoll(
+			"What is the best int size?",
+			[]string{"32", "64", "8", "anything unsigned"},
+		),
 	}
 
-	for _, test := range tests {
-		if err := tableStore.PutPoll(test); err != nil {
+	for _, tt := range tests {
+		if err := tableStore.PutPoll(tt); err != nil {
 			t.Error("expected success, got:", err)
 		}
 	}

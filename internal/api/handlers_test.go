@@ -57,20 +57,20 @@ func TestCreatePollHandler_Error(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
 			Path:       "/poll",
-			Body:       test.body,
+			Body:       tt.body,
 		}
 		handler := api.NewHandler(&mockDatastore{
 			PutPollMock: func(poll *models.Poll) error { return errors.New("mock error") },
 		}, req)
 		resp := handler.Route()
-		if resp.StatusCode != test.statusCode {
+		if resp.StatusCode != tt.statusCode {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
-		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+		if resp.Body != `{"error":"`+tt.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
 		}
 	}
@@ -94,11 +94,11 @@ func TestCreatePollHandler_Success(t *testing.T) {
 		}),
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
 			Path:       "/poll",
-			Body:       test,
+			Body:       tt,
 		}
 		handler := api.NewHandler(&mockDatastore{}, req)
 		resp := handler.Route()
@@ -156,24 +156,24 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
 			Path:           "/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
-			PathParameters: test.pathParameters,
+			PathParameters: tt.pathParameters,
 		}
-		handler := api.NewHandler(&mockDatastore{GetPollMock: test.getPollMock}, req)
+		handler := api.NewHandler(&mockDatastore{GetPollMock: tt.getPollMock}, req)
 		resp := handler.Route()
-		if resp.StatusCode != test.statusCode {
+		if resp.StatusCode != tt.statusCode {
 			t.Errorf(
 				"unexpected status code: expected %d, got %d",
-				test.statusCode,
+				tt.statusCode,
 				resp.StatusCode,
 			)
 		}
-		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+		if resp.Body != `{"error":"`+tt.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
-			t.Error(`expected: {"error":"` + test.errMsg + `"}`)
+			t.Error(`expected: {"error":"` + tt.errMsg + `"}`)
 		}
 	}
 }
@@ -186,14 +186,14 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 			[]string{"Monday", "Thursday", "Either Monday or Thursday"}),
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/poll/" + test.ID(),
-			PathParameters: map[string]string{"pollId": test.ID()},
+			Path:           "/poll/" + tt.ID(),
+			PathParameters: map[string]string{"pollId": tt.ID()},
 		}
 		handler := api.NewHandler(&mockDatastore{
-			GetPollMock: func(pollID string) (*models.Poll, error) { return test, nil },
+			GetPollMock: func(pollID string) (*models.Poll, error) { return tt, nil },
 		}, req)
 		resp := handler.Route()
 		if resp.StatusCode != http.StatusOK {
@@ -203,7 +203,7 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 				resp.StatusCode,
 			)
 		}
-		body, err := json.Marshal(test)
+		body, err := json.Marshal(tt)
 		if err != nil {
 			t.Error("unexpected error marshaling JSON")
 		}
@@ -249,20 +249,20 @@ func TestCastBallotHandler_Error(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
 			Path:       "/ballot",
-			Body:       test.body,
+			Body:       tt.body,
 		}
 		handler := api.NewHandler(&mockDatastore{
 			PutBallotMock: func(ballot *models.Ballot) error { return errors.New("mock error") },
 		}, req)
 		resp := handler.Route()
-		if resp.StatusCode != test.statusCode {
+		if resp.StatusCode != tt.statusCode {
 			t.Error("unexpected status code:", resp.StatusCode)
 		}
-		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+		if resp.Body != `{"error":"`+tt.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
 		}
 	}
@@ -288,11 +288,11 @@ func TestCastBallotHandler_Success(t *testing.T) {
 		}),
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
 			Path:       "/ballot",
-			Body:       test,
+			Body:       tt,
 		}
 		handler := api.NewHandler(&mockDatastore{}, req)
 		resp := handler.Route()
@@ -377,27 +377,27 @@ func TestGetResultHandler_Error(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
 			Path:           "/result/da932fe1-9a4c-4e07-adb3-9f66b4767050",
-			PathParameters: test.pathParameters,
+			PathParameters: tt.pathParameters,
 		}
 		handler := api.NewHandler(&mockDatastore{
-			GetPollMock:    test.getPollMock,
-			GetBallotsMock: test.getBallotsMock,
+			GetPollMock:    tt.getPollMock,
+			GetBallotsMock: tt.getBallotsMock,
 		}, req)
 		resp := handler.Route()
-		if resp.StatusCode != test.statusCode {
+		if resp.StatusCode != tt.statusCode {
 			t.Errorf(
 				"unexpected status code: expected %d, got %d",
-				test.statusCode,
+				tt.statusCode,
 				resp.StatusCode,
 			)
 		}
-		if resp.Body != `{"error":"`+test.errMsg+`"}` {
+		if resp.Body != `{"error":"`+tt.errMsg+`"}` {
 			t.Error("unexpected response body:", resp.Body)
-			t.Error(`expected: {"error":"` + test.errMsg + `"}`)
+			t.Error(`expected: {"error":"` + tt.errMsg + `"}`)
 		}
 	}
 }
@@ -435,22 +435,22 @@ func TestGetResultHandler_Success(t *testing.T) {
 		},
 	}
 
-	for _, test := range tests {
+	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/result/" + test.poll.ID(),
-			PathParameters: map[string]string{"pollId": test.poll.ID()},
+			Path:           "/result/" + tt.poll.ID(),
+			PathParameters: map[string]string{"pollId": tt.poll.ID()},
 		}
-		ballots := make([]*models.Ballot, len(test.ballots))
-		for i, ballot := range test.ballots {
+		ballots := make([]*models.Ballot, len(tt.ballots))
+		for i, ballot := range tt.ballots {
 			ballots[i] = models.NewBallot(
-				test.poll.ID(),
+				tt.poll.ID(),
 				ballot.userID,
 				ballot.rankOrder,
 			)
 		}
 		handler := api.NewHandler(&mockDatastore{
-			GetPollMock:    func(pollID string) (*models.Poll, error) { return test.poll, nil },
+			GetPollMock:    func(pollID string) (*models.Poll, error) { return tt.poll, nil },
 			GetBallotsMock: func(pollID string) ([]*models.Ballot, error) { return ballots, nil },
 		}, req)
 		resp := handler.Route()
@@ -461,7 +461,7 @@ func TestGetResultHandler_Success(t *testing.T) {
 				resp.StatusCode,
 			)
 		}
-		result, err := models.NewResult(test.poll, ballots)
+		result, err := models.NewResult(tt.poll, ballots)
 		if err != nil {
 			t.Error("unexpected error calculating result:", err)
 		}

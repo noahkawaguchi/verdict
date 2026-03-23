@@ -23,8 +23,8 @@ func TestPutBallot_Error(t *testing.T) {
 		models.NewBallot("poll2", "user4", []int{1, 0, 2}),
 	}
 
-	for _, test := range tests {
-		if err := tableStore.PutBallot(test); err == nil || err.Error() != "mocked error" {
+	for _, tt := range tests {
+		if err := tableStore.PutBallot(tt); err == nil || err.Error() != "mocked error" {
 			t.Error(`expected "mocked error", got:`, err)
 		}
 	}
@@ -43,8 +43,8 @@ func TestPutBallot_Success(t *testing.T) {
 		models.NewBallot("poll2", "user4", []int{1, 0, 2}),
 	}
 
-	for _, test := range tests {
-		if err := tableStore.PutBallot(test); err != nil {
+	for _, tt := range tests {
+		if err := tableStore.PutBallot(tt); err != nil {
 			t.Error("expected success, got:", err)
 		}
 	}
@@ -56,7 +56,10 @@ func TestGetBallots_Error(t *testing.T) {
 			return nil, errors.New("mocked error")
 		},
 	})
-	if _, err := tableStore.GetBallots("any poll"); err == nil || err.Error() != "mocked error" {
+	if _, err := tableStore.GetBallots(
+		"any poll",
+	); err == nil ||
+		err.Error() != "mocked error" {
 		t.Error(`expected "mocked error", got:`, err)
 	}
 }
