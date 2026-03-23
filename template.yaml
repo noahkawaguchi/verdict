@@ -47,6 +47,12 @@ Resources:
               - !GetAtt BallotsTable.Arn
               - !GetAtt PollsTable.Arn
       Events:
+        Health:
+          Type: Api
+          Properties:
+            Path: /health
+            Method: GET
+            RestApiId: !Ref VerdictApi
         CreatePoll:
           Type: Api
           Properties:

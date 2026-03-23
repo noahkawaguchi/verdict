@@ -23,9 +23,11 @@ func NewHandler(store datastore, req events.APIGatewayProxyRequest) *handler {
 	return &handler{store, req}
 }
 
-// Route matches the method and path of the request and calls the relevant method.
+// Route matches the method and path of the request and calls the relevant method or returns an
+// appropriate error response.
 func (h *handler) Route() events.APIGatewayProxyResponse {
 	switch h.req.HTTPMethod {
+
 	case http.MethodPost:
 		switch h.req.Path {
 		case "/poll":
@@ -35,8 +37,16 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 		default:
 			return resp404("path not found for method POST: " + h.req.Path)
 		}
+
 	case http.MethodGet:
-		switch getShortPath(h.req.Path) {
+		firstSegment, err := getFirstSegment(h.req.Path)
+		if err != nil {
+			return resp400(err.Error())
+		}
+
+		switch firstSegment {
+		case "/health":
+			return resp200("The function is available!")
 		case "/poll":
 			return h.getPollInfo()
 		case "/result":
@@ -44,6 +54,7 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 		default:
 			return resp404("path not found for method GET: " + h.req.Path)
 		}
+
 	default:
 		return resp405(h.req.HTTPMethod, "OPTIONS", "GET", "POST")
 	}

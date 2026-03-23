@@ -1,23 +1,23 @@
 package api
 
 import (
+	"errors"
 	"maps"
 	"net/http"
 	"os"
-	"regexp"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 )
 
-// getShortPath extracts the base path without parameters for routing purposes.
-// For example: `/poll/abcdefg12345` => `/poll`. If no match is found, it returns "default".
-func getShortPath(longPath string) string {
-	matches := regexp.MustCompile(`^(/.+)/.+$`).FindStringSubmatch(longPath)
-	if len(matches) > 1 {
-		return matches[1]
+// getFirstSegment extracts the first path segment for routing purposes.
+// For example: `/poll/abcdefg12345` => `/poll`, `/health` => `/health`.
+// It returns an error if the path is malformed, i.e. doesn't have at least one `/`.
+func getFirstSegment(fullPath string) (string, error) {
+	if parts := strings.SplitN(fullPath, "/", 3); len(parts) >= 2 {
+		return "/" + parts[1], nil
 	}
-	return "default"
+	return "", errors.New("malformed path")
 }
 
 var defaultHeaders = map[string]string{
