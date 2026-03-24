@@ -156,16 +156,21 @@ components:
       properties:
         prompt:
           type: string
+          example: What is the best fruit?
         totalVotes:
           type: integer
+          example: 8
           description: The total number of votes cast.
         winningVotes:
           type: integer
+          example: 5
           description: The number of votes with which the winning choice won.
         winningChoice:
           type: string
+          example: durian
         winningRound:
           type: integer
+          example: 3
           description: The round of ranked choice voting in which the winning choice won.
     Error:
       type: object
