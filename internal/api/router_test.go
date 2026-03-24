@@ -92,6 +92,20 @@ func TestRouter_PathNotFound(t *testing.T) {
 	}
 }
 
+func TestRouter_MalformedPath(t *testing.T) {
+	req := events.APIGatewayProxyRequest{
+		Path:       "no-leading-slash",
+		HTTPMethod: http.MethodGet,
+	}
+	resp := api.NewHandler(&mockDatastore{}, req).Route()
+	if resp.StatusCode != http.StatusBadRequest {
+		t.Error("unexpected status code:", resp.StatusCode)
+	}
+	if resp.Body != `{"error":"malformed path"}` {
+		t.Error("unexpected response body:", resp.Body)
+	}
+}
+
 func TestRouter_HealthCheck(t *testing.T) {
 	req := events.APIGatewayProxyRequest{
 		Path:       "/health",
