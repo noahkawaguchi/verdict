@@ -60,7 +60,7 @@ func TestCreatePollHandler_Error(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
-			Path:       "/poll",
+			Path:       "/polls",
 			Body:       tt.body,
 		}
 		handler := api.NewHandler(&mockDatastore{
@@ -97,7 +97,7 @@ func TestCreatePollHandler_Success(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
-			Path:       "/poll",
+			Path:       "/polls",
 			Body:       tt,
 		}
 		handler := api.NewHandler(&mockDatastore{}, req)
@@ -159,7 +159,7 @@ func TestGetPollInfoHandler_Error(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/poll/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			Path:           "/polls/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			PathParameters: tt.pathParameters,
 		}
 		handler := api.NewHandler(&mockDatastore{GetPollMock: tt.getPollMock}, req)
@@ -189,7 +189,7 @@ func TestGetPollInfoHandler_Success(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/poll/" + tt.ID(),
+			Path:           "/polls/" + tt.ID(),
 			PathParameters: map[string]string{"pollId": tt.ID()},
 		}
 		handler := api.NewHandler(&mockDatastore{
@@ -252,7 +252,7 @@ func TestCastBallotHandler_Error(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
-			Path:       "/ballot",
+			Path:       "/ballots",
 			Body:       tt.body,
 		}
 		handler := api.NewHandler(&mockDatastore{
@@ -291,7 +291,7 @@ func TestCastBallotHandler_Success(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod: http.MethodPost,
-			Path:       "/ballot",
+			Path:       "/ballots",
 			Body:       tt,
 		}
 		handler := api.NewHandler(&mockDatastore{}, req)
@@ -380,7 +380,7 @@ func TestGetResultHandler_Error(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/result/da932fe1-9a4c-4e07-adb3-9f66b4767050",
+			Path:           "/results/da932fe1-9a4c-4e07-adb3-9f66b4767050",
 			PathParameters: tt.pathParameters,
 		}
 		handler := api.NewHandler(&mockDatastore{
@@ -438,7 +438,7 @@ func TestGetResultHandler_Success(t *testing.T) {
 	for _, tt := range tests {
 		req := events.APIGatewayProxyRequest{
 			HTTPMethod:     http.MethodGet,
-			Path:           "/result/" + tt.poll.ID(),
+			Path:           "/results/" + tt.poll.ID(),
 			PathParameters: map[string]string{"pollId": tt.poll.ID()},
 		}
 		ballots := make([]*voting.Ballot, len(tt.ballots))

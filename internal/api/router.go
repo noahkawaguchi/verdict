@@ -30,9 +30,9 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 
 	case http.MethodPost:
 		switch h.req.Path {
-		case "/poll":
+		case "/polls":
 			return h.createPoll()
-		case "/ballot":
+		case "/ballots":
 			return h.castBallot()
 		default:
 			return resp404("path not found for method POST: " + h.req.Path)
@@ -47,9 +47,9 @@ func (h *handler) Route() events.APIGatewayProxyResponse {
 		switch firstSegment {
 		case "/health":
 			return resp200Text("The function is available!")
-		case "/poll":
+		case "/polls":
 			return h.getPollInfo()
-		case "/result":
+		case "/results":
 			return h.getResult()
 		default:
 			return resp404("path not found for method GET: " + h.req.Path)

@@ -11,7 +11,7 @@ import (
 )
 
 // getFirstSegment extracts the first path segment for routing purposes.
-// For example: `/poll/abcdefg12345` => `/poll`, `/health` => `/health`.
+// For example: `/polls/abcdefg12345` => `/polls`, `/health` => `/health`.
 // It returns an error if the path is malformed, i.e. doesn't have at least one `/`.
 func getFirstSegment(fullPath string) (string, error) {
 	if parts := strings.SplitN(fullPath, "/", 3); len(parts) >= 2 {

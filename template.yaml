@@ -56,25 +56,25 @@ Resources:
         CreatePoll:
           Type: Api
           Properties:
-            Path: /poll
+            Path: /polls
             Method: POST
             RestApiId: !Ref VerdictApi
         GetPoll:
           Type: Api
           Properties:
-            Path: /poll/{pollId}
+            Path: /polls/{pollId}
             Method: GET
             RestApiId: !Ref VerdictApi
         CastBallot:
           Type: Api
           Properties:
-            Path: /ballot
+            Path: /ballots
             Method: POST
             RestApiId: !Ref VerdictApi
         GetResult:
           Type: Api
           Properties:
-            Path: /result/{pollId}
+            Path: /results/{pollId}
             Method: GET
             RestApiId: !Ref VerdictApi
 

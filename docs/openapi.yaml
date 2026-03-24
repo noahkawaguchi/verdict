@@ -28,7 +28,7 @@ paths:
               schema:
                 type: string
                 example: The function is available!
-  /poll:
+  /polls:
     post:
       summary: Create a poll
       requestBody:
@@ -52,7 +52,7 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /poll/{pollId}:
+  /polls/{pollId}:
     get:
       summary: Get a poll by ID
       parameters:
@@ -68,7 +68,7 @@ paths:
           $ref: "#/components/responses/NotFound"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /ballot:
+  /ballots:
     post:
       summary: Cast a ballot
       requestBody:
@@ -92,9 +92,9 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "500":
           $ref: "#/components/responses/InternalServerError"
-  /result/{pollId}:
+  /results/{pollId}:
     get:
-      summary: Get the ranked choice result for a poll
+      summary: Get the ranked choice voting result for a poll
       parameters:
         - $ref: "#/components/parameters/pollId"
       responses:

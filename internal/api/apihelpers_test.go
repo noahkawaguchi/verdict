@@ -9,8 +9,8 @@ func TestGetFirstSegment(t *testing.T) {
 		wantErr bool
 	}{
 		{"/health", "/health", false},
-		{"/poll/abc123", "/poll", false},
-		{"/result/abc123/anything-else-here", "/result", false},
+		{"/polls/abc123", "/polls", false},
+		{"/results/abc123/anything-else-here", "/results", false},
 		{"noslash", "", true},
 		{"", "", true},
 	}

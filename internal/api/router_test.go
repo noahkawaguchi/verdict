@@ -13,27 +13,27 @@ import (
 func TestRouter_MethodNotAllowed(t *testing.T) {
 	tests := []events.APIGatewayProxyRequest{
 		{
-			Path:       "/poll",
+			Path:       "/polls",
 			HTTPMethod: http.MethodPut,
 		},
 		{
-			Path:       "/ballot",
+			Path:       "/ballots",
 			HTTPMethod: http.MethodPut,
 		},
 		{
-			Path:       "/poll",
+			Path:       "/polls",
 			HTTPMethod: http.MethodPatch,
 		},
 		{
-			Path:       "/ballot",
+			Path:       "/ballots",
 			HTTPMethod: http.MethodPatch,
 		},
 		{
-			Path:       "/poll",
+			Path:       "/polls",
 			HTTPMethod: http.MethodDelete,
 		},
 		{
-			Path:       "/ballot",
+			Path:       "/ballots",
 			HTTPMethod: http.MethodDelete,
 		},
 	}
