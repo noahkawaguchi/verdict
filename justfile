@@ -8,9 +8,6 @@ set dotenv-load := true
 # The host to use for the local API Gateway emulator and the API docs preview
 dev-host := env("VERDICT_DEV_HOST", "127.0.0.1")
 
-# The tag (version) for the local DynamoDB image. See https://hub.docker.com/r/amazon/dynamodb-local
-db-img-tag := "3.3.0"
-
 # The name for the local DynamoDB container. Must match the one used in `initdev.go`.
 dev-db := "verdict-dev-db"
 
@@ -33,9 +30,11 @@ dev-db:
     if ! docker network inspect {{ dev-network }} >/dev/null 2>&1; then \
         docker network create {{ dev-network }}; \
     fi
+    # Intentionally use the "latest" tag for the DynamoDB image because production DynamoDB is
+    # always the current version with no way to pin it
     if ! docker inspect {{ dev-db }} >/dev/null 2>&1; then \
         docker run -d --rm -e 8000 --network {{ dev-network }} --name {{ dev-db }} \
-            amazon/dynamodb-local:{{ db-img-tag }}; \
+            amazon/dynamodb-local:latest; \
     fi
 
 # Clean up the dev DB Docker container and network if they exist
