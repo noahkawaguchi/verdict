@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/dynamodb/attributevalue"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/noahkawaguchi/verdict/internal/voting"
@@ -12,19 +13,15 @@ import (
 
 type dynamoClient interface {
 	PutItem(
-		ctx context.Context,
-		params *dynamodb.PutItemInput,
-		optFns ...func(*dynamodb.Options),
+		ctx context.Context, params *dynamodb.PutItemInput, optFns ...func(*dynamodb.Options),
 	) (*dynamodb.PutItemOutput, error)
+
 	GetItem(
-		ctx context.Context,
-		params *dynamodb.GetItemInput,
-		optFns ...func(*dynamodb.Options),
+		ctx context.Context, params *dynamodb.GetItemInput, optFns ...func(*dynamodb.Options),
 	) (*dynamodb.GetItemOutput, error)
+
 	Query(
-		ctx context.Context,
-		params *dynamodb.QueryInput,
-		optFns ...func(*dynamodb.Options),
+		ctx context.Context, params *dynamodb.QueryInput, optFns ...func(*dynamodb.Options),
 	) (*dynamodb.QueryOutput, error)
 }
 
@@ -41,27 +38,66 @@ var pollsTableInfo = &tableInfo{name: "Polls", partitionKey: "PollID"} // No sor
 
 func New(ctx context.Context, client dynamoClient) *dynamoStore { return &dynamoStore{ctx, client} }
 
-// PutPoll creates a new poll entry in the database.
-func (ds *dynamoStore) PutPoll(poll *voting.Poll) error { return storeItem(ds, poll) }
-
-// PutBallot creates a new ballot entry in the database.
-func (ds *dynamoStore) PutBallot(ballot *voting.Ballot) error { return storeItem(ds, ballot) }
-
-// GetPoll retrieves a poll from the database by its poll ID.
-func (ds *dynamoStore) GetPoll(pollID string) (*voting.Poll, error) {
-	// Define the key to get the poll by ID
-	key := map[string]types.AttributeValue{
-		pollsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
+// PutPoll marshals a poll and puts it into the database.
+func (d *dynamoStore) PutPoll(poll *voting.Poll) error {
+	av, err := attributevalue.MarshalMap(poll)
+	if err != nil {
+		return err
 	}
-	return retrieveItem[voting.Poll](ds, key)
+	_, err = d.client.PutItem(
+		d.ctx,
+		&dynamodb.PutItemInput{TableName: &pollsTableInfo.name, Item: av},
+	)
+	return err
 }
 
-// GetBallots retrieves all of the ballots for the specified poll from the database.
-func (ds *dynamoStore) GetBallots(pollID string) ([]*voting.Ballot, error) {
-	// Define the key condition expression and expression attribute values to query by poll ID
-	keyConExp := aws.String(fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey))
-	expAttVals := map[string]types.AttributeValue{
-		":pk": &types.AttributeValueMemberS{Value: pollID},
+// PutBallot marshals a ballot and puts it into the database.
+func (d *dynamoStore) PutBallot(ballot *voting.Ballot) error {
+	av, err := attributevalue.MarshalMap(ballot)
+	if err != nil {
+		return err
 	}
-	return retrieveItems[voting.Ballot](ds, keyConExp, expAttVals)
+	_, err = d.client.PutItem(
+		d.ctx,
+		&dynamodb.PutItemInput{TableName: &ballotsTableInfo.name, Item: av},
+	)
+	return err
+}
+
+// GetPoll retrieves and unmarshals a poll from the database.
+func (d *dynamoStore) GetPoll(pollID string) (*voting.Poll, error) {
+	var out *voting.Poll
+	input := dynamodb.GetItemInput{
+		TableName: &pollsTableInfo.name,
+		Key: map[string]types.AttributeValue{
+			pollsTableInfo.partitionKey: &types.AttributeValueMemberS{Value: pollID},
+		},
+	}
+	dbOut, err := d.client.GetItem(d.ctx, &input)
+	if err != nil {
+		return nil, err
+	}
+	err = attributevalue.UnmarshalMap(dbOut.Item, &out)
+	return out, err
+}
+
+// GetBallots retrieves and unmarshals all of the ballots for the specified poll from the database.
+func (d *dynamoStore) GetBallots(pollID string) ([]*voting.Ballot, error) {
+	var out []*voting.Ballot
+	// Query for ballots by poll ID
+	q := dynamodb.QueryInput{
+		TableName: &ballotsTableInfo.name,
+		KeyConditionExpression: aws.String(
+			fmt.Sprintf("%s = :pk", pollsTableInfo.partitionKey),
+		),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":pk": &types.AttributeValueMemberS{Value: pollID},
+		},
+	}
+	dbOut, err := d.client.Query(d.ctx, &q)
+	if err != nil {
+		return nil, err
+	}
+	err = attributevalue.UnmarshalListOfMaps(dbOut.Items, &out)
+	return out, err
 }
