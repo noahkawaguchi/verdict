@@ -46,8 +46,10 @@ func (b *Ballot) Validate() error {
 }
 
 func (b *Ballot) String() string {
-	return fmt.Sprintf("Ballot from user %s for poll %s with choices %v",
-		b.userID, b.pollID[:5]+"... ", b.rankOrder)
+	return fmt.Sprintf(
+		"Ballot from user %s for poll %s with choices %v",
+		b.userID, b.pollID[:5]+"... ", b.rankOrder,
+	)
 }
 
 // UnmarshalJSON is a custom JSON unmarshaler. If no user ID is provided, a new one is generated.
@@ -61,13 +63,11 @@ func (b *Ballot) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	// Create a new user ID if it's not provided
 	if aux.UserID == "" {
 		b.userID = uuid.New().String()
 	} else {
 		b.userID = aux.UserID
 	}
-	// Set the other unmarshaled values back to the main struct
 	b.pollID, b.rankOrder = aux.PollID, aux.RankOrder
 	return nil
 }
@@ -78,7 +78,9 @@ func (b *Ballot) MarshalDynamoDBAttributeValue() (types.AttributeValue, error) {
 	m, err := attributevalue.MarshalMap(struct {
 		PollID, UserID string
 		RankOrder      []int
-	}{b.pollID, b.userID, b.rankOrder})
+	}{
+		b.pollID, b.userID, b.rankOrder,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -93,16 +95,14 @@ func (b *Ballot) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error 
 	if !ok {
 		return fmt.Errorf("expected *types.AttributeValueMemberM, got %T", av)
 	}
-	// Create a struct for custom unmarshaling
+	// Unmarshal using a custom struct
 	var aux struct {
 		PollID, UserID string
 		RankOrder      []int
 	}
-	// Try to unmarshal using the custom struct
 	if err := attributevalue.UnmarshalMap(m.Value, &aux); err != nil {
 		return err
 	}
-	// Set the unmarshaled values back to the main struct
 	b.pollID, b.userID, b.rankOrder = aux.PollID, aux.UserID, aux.RankOrder
 	return nil
 }

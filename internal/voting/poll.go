@@ -61,7 +61,9 @@ func (p *Poll) MarshalJSON() ([]byte, error) {
 	return json.Marshal(&struct {
 		Prompt  string   `json:"prompt"`
 		Choices []string `json:"choices"`
-	}{p.prompt, p.choices})
+	}{
+		p.prompt, p.choices,
+	})
 }
 
 // UnmarshalJSON is a custom JSON unmarshaler. It generates a poll ID for the new poll.
@@ -74,9 +76,7 @@ func (p *Poll) UnmarshalJSON(data []byte) error {
 	if err := json.Unmarshal(data, &aux); err != nil {
 		return err
 	}
-	// Create a new poll ID
 	p.pollID = uuid.New().String()
-	// Set the other unmarshaled values back to the main struct
 	p.prompt, p.choices = aux.Prompt, aux.Choices
 	return nil
 }
@@ -87,7 +87,9 @@ func (p *Poll) MarshalDynamoDBAttributeValue() (types.AttributeValue, error) {
 	m, err := attributevalue.MarshalMap(struct {
 		PollID, Prompt string
 		Choices        []string
-	}{p.pollID, p.prompt, p.choices})
+	}{
+		p.pollID, p.prompt, p.choices,
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -102,16 +104,14 @@ func (p *Poll) UnmarshalDynamoDBAttributeValue(av types.AttributeValue) error {
 	if !ok {
 		return fmt.Errorf("expected *types.AttributeValueMemberM, got %T", av)
 	}
-	// Create a struct for custom unmarshaling
+	// Unmarshal using a custom struct
 	var aux struct {
 		PollID, Prompt string
 		Choices        []string
 	}
-	// Try to unmarshal using the custom struct
 	if err := attributevalue.UnmarshalMap(m.Value, &aux); err != nil {
 		return err
 	}
-	// Set the unmarshaled values back to the main struct
 	p.pollID, p.prompt, p.choices = aux.PollID, aux.Prompt, aux.Choices
 	return nil
 }

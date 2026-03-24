@@ -32,7 +32,6 @@ func NewResult(poll *Poll, ballots []*Ballot) (*result, error) {
 		winnerIdx:    -99,
 		winningRound: 0,
 	}
-	// Compute the result from the constructor
 	if res.instantRunoffVoting(); res.winnerIdx < 0 {
 		return nil, errors.New("the result was not successfully computed")
 	}
