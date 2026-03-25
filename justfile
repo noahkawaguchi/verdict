@@ -50,9 +50,9 @@ dev-clean:
 docs:
     python3 -m http.server -d docs -b {{ dev-host }}
 
-# Run tests
-test:
-    go test -tags test ./... -v
+# Run tests, optionally passing args such as -v for verbose output
+test *ARGS:
+    go test -tags test ./... {{ ARGS }}
 
 ####################################################################################################
 # Deployment
