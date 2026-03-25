@@ -9,21 +9,15 @@ import (
 // mockDynamo implements the dynamoClient interface for testing purposes.
 type mockDynamo struct {
 	PutItemMock func(
-		ctx context.Context,
-		params *dynamodb.PutItemInput,
-		optFns ...func(*dynamodb.Options),
+		context.Context, *dynamodb.PutItemInput, ...func(*dynamodb.Options),
 	) (*dynamodb.PutItemOutput, error)
 
 	GetItemMock func(
-		ctx context.Context,
-		params *dynamodb.GetItemInput,
-		optFns ...func(*dynamodb.Options),
+		context.Context, *dynamodb.GetItemInput, ...func(*dynamodb.Options),
 	) (*dynamodb.GetItemOutput, error)
 
 	QueryMock func(
-		ctx context.Context,
-		params *dynamodb.QueryInput,
-		optFns ...func(*dynamodb.Options),
+		context.Context, *dynamodb.QueryInput, ...func(*dynamodb.Options),
 	) (*dynamodb.QueryOutput, error)
 }
 

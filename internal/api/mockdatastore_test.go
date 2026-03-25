@@ -4,10 +4,10 @@ import "github.com/noahkawaguchi/verdict/internal/voting"
 
 // mockDatastore implements the datastore interface for testing purposes.
 type mockDatastore struct {
-	PutPollMock    func(poll *voting.Poll) error
-	GetPollMock    func(pollID string) (*voting.Poll, error)
-	PutBallotMock  func(ballot *voting.Ballot) error
-	GetBallotsMock func(pollID string) ([]*voting.Ballot, error)
+	PutPollMock    func(*voting.Poll) error
+	GetPollMock    func(string) (*voting.Poll, error)
+	PutBallotMock  func(*voting.Ballot) error
+	GetBallotsMock func(string) ([]*voting.Ballot, error)
 }
 
 func (m *mockDatastore) PutPoll(poll *voting.Poll) error {

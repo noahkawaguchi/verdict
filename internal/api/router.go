@@ -8,10 +8,10 @@ import (
 )
 
 type datastore interface {
-	PutPoll(poll *voting.Poll) error
-	GetPoll(pollID string) (*voting.Poll, error)
-	PutBallot(ballot *voting.Ballot) error
-	GetBallots(pollID string) ([]*voting.Ballot, error)
+	PutPoll(*voting.Poll) error
+	GetPoll(string) (*voting.Poll, error)
+	PutBallot(*voting.Ballot) error
+	GetBallots(string) ([]*voting.Ballot, error)
 }
 
 type handler struct {
