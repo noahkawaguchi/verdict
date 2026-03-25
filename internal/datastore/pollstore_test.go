@@ -11,69 +11,93 @@ import (
 )
 
 func TestPutPoll_Error(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(
-			ctx context.Context,
-			params *dynamodb.PutItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.PutItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.PutItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
 	})
 
-	tests := []*voting.Poll{
-		voting.NewPoll(
-			"What is the best programming language?",
-			[]string{"Go", "Rust", "C++"},
-		),
-		voting.NewPoll(
-			"What is the best int size?",
-			[]string{"32", "64", "8", "anything unsigned"},
-		),
+	tests := []struct {
+		name string
+		poll *voting.Poll
+	}{
+		{
+			"three choices",
+			voting.NewPoll(
+				"What is the best programming language?",
+				[]string{"Go", "Rust", "C++"},
+			),
+		},
+		{
+			"four choices",
+			voting.NewPoll(
+				"What is the best int size?",
+				[]string{"32", "64", "8", "anything unsigned"},
+			),
+		},
 	}
 
 	for _, tt := range tests {
-		if err := tableStore.PutPoll(tt); err == nil || err.Error() != "mocked error" {
-			t.Error(`expected "mocked error", got:`, err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := tableStore.PutPoll(
+				tt.poll,
+			); err == nil ||
+				err.Error() != "mocked error" {
+				t.Error(`expected "mocked error", got:`, err)
+			}
+		})
 	}
 }
 
 func TestPutPoll_Success(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(
-			ctx context.Context,
-			params *dynamodb.PutItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.PutItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.PutItemOutput, error) {
 			return &dynamodb.PutItemOutput{}, nil
 		},
 	})
 
-	tests := []*voting.Poll{
-		voting.NewPoll(
-			"What is the best programming language?",
-			[]string{"Go", "Rust", "C++"},
-		),
-		voting.NewPoll(
-			"What is the best int size?",
-			[]string{"32", "64", "8", "anything unsigned"},
-		),
+	tests := []struct {
+		name string
+		poll *voting.Poll
+	}{
+		{
+			"three choices",
+			voting.NewPoll(
+				"What is the best programming language?",
+				[]string{"Go", "Rust", "C++"},
+			),
+		},
+		{
+			"four choices",
+			voting.NewPoll(
+				"What is the best int size?",
+				[]string{"32", "64", "8", "anything unsigned"},
+			),
+		},
 	}
 
 	for _, tt := range tests {
-		if err := tableStore.PutPoll(tt); err != nil {
-			t.Error("expected success, got:", err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := tableStore.PutPoll(tt.poll); err != nil {
+				t.Error("expected success, got:", err)
+			}
+		})
 	}
 }
 
 func TestGetPoll_Error(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		GetItemMock: func(
-			ctx context.Context,
-			params *dynamodb.GetItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.GetItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.GetItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
@@ -84,11 +108,10 @@ func TestGetPoll_Error(t *testing.T) {
 }
 
 func TestGetPoll_Success(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		GetItemMock: func(
-			ctx context.Context,
-			params *dynamodb.GetItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.GetItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.GetItemOutput, error) {
 			return &dynamodb.GetItemOutput{}, nil
 		},

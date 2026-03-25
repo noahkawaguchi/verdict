@@ -11,59 +11,71 @@ import (
 )
 
 func TestPutBallot_Error(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(
-			ctx context.Context,
-			params *dynamodb.PutItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.PutItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.PutItemOutput, error) {
 			return nil, errors.New("mocked error")
 		},
 	})
 
-	tests := []*voting.Ballot{
-		voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
-		voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
-		voting.NewBallot("poll2", "user4", []int{1, 0, 2}),
+	tests := []struct {
+		name   string
+		ballot *voting.Ballot
+	}{
+		{"poll1 user1", voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1})},
+		{"poll1 user2", voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2})},
+		{"poll2 user4", voting.NewBallot("poll2", "user4", []int{1, 0, 2})},
 	}
 
 	for _, tt := range tests {
-		if err := tableStore.PutBallot(tt); err == nil || err.Error() != "mocked error" {
-			t.Error(`expected "mocked error", got:`, err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := tableStore.PutBallot(
+				tt.ballot,
+			); err == nil ||
+				err.Error() != "mocked error" {
+				t.Error(`expected "mocked error", got:`, err)
+			}
+		})
 	}
 }
 
 func TestPutBallot_Success(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		PutItemMock: func(
-			ctx context.Context,
-			params *dynamodb.PutItemInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.PutItemInput, ...func(*dynamodb.Options),
 		) (*dynamodb.PutItemOutput, error) {
 			return &dynamodb.PutItemOutput{}, nil
 		},
 	})
 
-	tests := []*voting.Ballot{
-		voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1}),
-		voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2}),
-		voting.NewBallot("poll2", "user4", []int{1, 0, 2}),
+	tests := []struct {
+		name   string
+		ballot *voting.Ballot
+	}{
+		{"poll1 user1", voting.NewBallot("poll1", "user1", []int{0, 2, 3, 1})},
+		{"poll1 user2", voting.NewBallot("poll1", "user2", []int{1, 3, 0, 2})},
+		{"poll2 user4", voting.NewBallot("poll2", "user4", []int{1, 0, 2})},
 	}
 
 	for _, tt := range tests {
-		if err := tableStore.PutBallot(tt); err != nil {
-			t.Error("expected success, got:", err)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			if err := tableStore.PutBallot(tt.ballot); err != nil {
+				t.Error("expected success, got:", err)
+			}
+		})
 	}
 }
 
 func TestGetBallots_Error(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		QueryMock: func(
-			ctx context.Context,
-			params *dynamodb.QueryInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.QueryInput, ...func(*dynamodb.Options),
 		) (*dynamodb.QueryOutput, error) {
 			return nil, errors.New("mocked error")
 		},
@@ -77,11 +89,10 @@ func TestGetBallots_Error(t *testing.T) {
 }
 
 func TestGetBallots_Success(t *testing.T) {
+	t.Parallel()
 	tableStore := datastore.New(context.TODO(), &mockDynamo{
 		QueryMock: func(
-			ctx context.Context,
-			params *dynamodb.QueryInput,
-			optFns ...func(*dynamodb.Options),
+			context.Context, *dynamodb.QueryInput, ...func(*dynamodb.Options),
 		) (*dynamodb.QueryOutput, error) {
 			return &dynamodb.QueryOutput{}, nil
 		},

@@ -10,14 +10,15 @@ import (
 )
 
 func threeOptionPoll() (*voting.Poll, string) {
-	poll := voting.NewPoll("What is the best fruit?",
-		[]string{"apple", "banana", "clementine"})
+	poll := voting.NewPoll("What is the best fruit?", []string{"apple", "banana", "clementine"})
 	return poll, poll.ID()
 }
 
 func fourOptionPoll() (*voting.Poll, string) {
-	poll := voting.NewPoll("What is the best fruit?",
-		[]string{"apple", "banana", "clementine", "durian"})
+	poll := voting.NewPoll(
+		"What is the best fruit?",
+		[]string{"apple", "banana", "clementine", "durian"},
+	)
 	return poll, poll.ID()
 }
 
@@ -40,6 +41,7 @@ func expectedResultJSON(totalVotes, winningVotes, winningChoiceIdx, winningRound
 }
 
 func TestResult_SimpleMajority(t *testing.T) {
+	t.Parallel()
 	poll, pollID := threeOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
 	ballots := []*voting.Ballot{
@@ -61,6 +63,7 @@ func TestResult_SimpleMajority(t *testing.T) {
 }
 
 func TestResult_Runoff(t *testing.T) {
+	t.Parallel()
 	poll, pollID := threeOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
 	ballots := []*voting.Ballot{
@@ -84,6 +87,7 @@ func TestResult_Runoff(t *testing.T) {
 }
 
 func TestResult_TieForLast(t *testing.T) {
+	t.Parallel()
 	poll, pollID := fourOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
 	ballots := []*voting.Ballot{
@@ -122,6 +126,7 @@ func TestResult_TieForLast(t *testing.T) {
 }
 
 func TestResult_InfiniteTieForLast(t *testing.T) {
+	t.Parallel()
 	poll, pollID := fourOptionPoll()
 	ballotWithRanks := ballotClosure(pollID)
 	ballots := []*voting.Ballot{
