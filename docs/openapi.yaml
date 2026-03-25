@@ -71,6 +71,11 @@ paths:
   /ballots:
     post:
       summary: Cast a ballot
+      description: >
+        Cast a ballot for an existing poll. The `rankOrder` field is an array of
+        indices into the poll's `choices` array, ordered by preference. For example,
+        if the poll's choices are `["Go", "Rust", "Python"]` (indices 0, 1, 2), then
+        `[1, 0, 2]` means Rust first, Go second, Python third.
       requestBody:
         required: true
         content:
@@ -148,9 +153,9 @@ components:
             type: integer
           description: >
             Indices into the poll's choices array, ordered by preference.
-            For example, [2, 0, 1] means the voter's first choice is choices[2],
-            second choice is choices[0], and third choice is choices[1].
-          example: [2, 0, 1]
+            For example, [1, 0, 2] means the voter's first choice is choices[1],
+            second choice is choices[0], and third choice is choices[2].
+          example: [1, 0, 2]
     Result:
       type: object
       properties:
