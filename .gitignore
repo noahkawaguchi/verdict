@@ -3,4 +3,3 @@
 
 .aws-sam/
 .sam/
-samconfig.toml

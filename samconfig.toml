@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "verdict"
+resolve_s3 = true
+s3_prefix = "verdict"
+region = "us-east-2"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "StageName=\"prod\" FrontendUrl=\"https://verdict.noahkawaguchi.com\""
+image_repositories = []
+
+[default.global.parameters]
+region = "us-east-2"
