@@ -12,7 +12,7 @@ info:
     - From the servers below, use the AWS option (default) to hit the real deployed API when viewing these docs on verdict.noahkawaguchi.com.
 
     - Or, if running the project locally, select the localhost option.
-  version: "0.1.0"
+  version: "0.2.0"
 servers:
   - url: https://dmyjkyelca.execute-api.us-east-2.amazonaws.com/prod
   - url: http://localhost:3000
