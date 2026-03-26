@@ -1,3 +1,5 @@
+[English](README.md) | [日本語](README.ja.md)
+
 # Verdict
 
 ### 🔗 Live interactive docs: [verdict.noahkawaguchi.com](https://verdict.noahkawaguchi.com)
