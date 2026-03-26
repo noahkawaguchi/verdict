@@ -1,10 +1,10 @@
 # Verdict
 
-### [🔗 Live interactive docs here](https://verdict.noahkawaguchi.com)
+### 🔗 Live interactive docs: [verdict.noahkawaguchi.com](https://verdict.noahkawaguchi.com)
 
 ---
 
-Verdict is a serverless REST API (with interactive Swagger UI) for working with ranked choice voting. Consumers can create polls, cast ballots, and retrieve results.
+Verdict is a serverless REST API (with interactive Swagger UI) for working with [ranked choice voting](https://en.wikipedia.org/wiki/Instant-runoff_voting). Consumers can create polls, cast ballots, and retrieve results.
 
 Instead of selecting a single choice, voters rank all choices in order of preference. The instant runoff algorithm then calculates a winner by repeatedly eliminating the last-place choice, using a recursive tie-breaking sub-poll when needed, and redistributing votes until one choice achieves a strict majority.
 
@@ -41,7 +41,7 @@ The design of the codebase generally follows the common three-layer pattern of A
 
 ```
 verdict/
-├── cmd/              # Lambda entrypoint and dev/prod config initialization
+├── cmd/              # Lambda entrypoint and config initialization
 ├── internal/
 │   ├── api/          # HTTP routing and request handlers
 │   ├── voting/       # Domain types and their associated logic
@@ -56,7 +56,7 @@ verdict/
 ### Prerequisite Installations
 
 - **[Go](https://go.dev/doc/install)**: The main language of the project.
-- **[Python](https://www.python.org/downloads/)**: Only used to serve the static docs locally, but likely already installed on most systems.
+- **[Python](https://www.python.org/downloads/)**: Only used to serve the static docs locally.
 - **[Docker](https://docs.docker.com/get-started/get-docker/)**: For the local Lambda/API Gateway emulator and DynamoDB container.
 - **[AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html)**: For local emulation of SAM infrastructure and deployment.
 - **[Just](https://github.com/casey/just#installation)**: Command runner used to save and run the commands used in development.
@@ -71,10 +71,10 @@ just docs  # In a separate terminal, serves the Swagger UI docs (port 8000)
 ```
 
 2. View the interactive docs in a browser at [http://localhost:8000](http://localhost:8000).
-3. Use the server dropdown to select the `localhost` option.
-4. Use the "try it out" functionality to hit the local endpoints.
+3. Use the "Servers" dropdown to select the `http://localhost:3000` option.
+4. Use the "Try it out" functionality to hit the local endpoints.
 
-All available recipes are documented in the [`justfile`](justfile). (Run `just --list` to see a summary.)
+All available recipes (commands) are documented in the [`justfile`](justfile). (Run `just --list` to see a summary.)
 
 ## Testing
 
@@ -104,6 +104,6 @@ Instead of immediately selecting a choice that has only a plurality of votes, th
 
 ### What about ties for last?
 
-In each round, the choice with the fewest votes is eliminated, but what if multiple choices are tied for last place? In this case, a sub-poll is simulated between only the tied choices. This is possible because voters provide a rank for every choice, allowing the algorithm to determine their preferences amongst any subset of choices. If there is another tie for last place, the tie-breaking algorithm continues recursively.
+In each round, the choice with the fewest votes is eliminated, but what if multiple choices are tied for last place? In this case, a sub-poll is simulated between only the tied choices. This is possible because voters provide a rank for every choice, so the algorithm can be used to determine their preferences amongst any subset of choices. If there is another tie for last place, the tie-breaking algorithm continues recursively.
 
 While unlikely unless the numbers of choices and voters are very small, it is possible that multiple choices are tied for last place and received perfectly equivalent rankings. In this case, one of these lowest-ranking choices is eliminated by pseudorandom number generation.
