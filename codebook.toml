@@ -1,0 +1,14 @@
+words = [
+    "Arn",
+    "GOFLAGS",
+    "IAM",
+    "Twemoji",
+    "datastore",
+    "dotenv",
+    "initdev",
+    "justfile",
+    "noahkawaguchi",
+    "unmarshals",
+    "yuzu",
+]
+ignore_paths = ["go.sum"]
