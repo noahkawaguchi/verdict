@@ -59,7 +59,7 @@ func (r *result) MarshalJSON() ([]byte, error) {
 }
 
 // instantRunoffVoting implements ranked choice voting, specifically the instant runoff method, to
-// calculate the winning choice amongst the submitted ballots.
+// calculate the winning choice among the submitted ballots.
 func (r *result) instantRunoffVoting() {
 	// Tally first-choice votes
 	for i, ballot := range r.ballots {

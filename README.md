@@ -106,6 +106,6 @@ Instead of immediately selecting a choice that has only a plurality of votes, th
 
 ### What about ties for last?
 
-In each round, the choice with the fewest votes is eliminated, but what if multiple choices are tied for last place? In this case, a sub-poll is simulated between only the tied choices. This is possible because voters provide a rank for every choice, so the algorithm can be used to determine their preferences amongst any subset of choices. If there is another tie for last place, the tie-breaking algorithm continues recursively.
+In each round, the choice with the fewest votes is eliminated, but what if multiple choices are tied for last place? In this case, a sub-poll is simulated between only the tied choices. This is possible because voters provide a rank for every choice, so the algorithm can be used to determine their preferences among any subset of choices. If there is another tie for last place, the tie-breaking algorithm continues recursively.
 
 While unlikely unless the numbers of choices and voters are very small, it is possible that multiple choices are tied for last place and received perfectly equivalent rankings. In this case, one of these lowest-ranking choices is eliminated by pseudorandom number generation.

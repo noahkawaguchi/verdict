@@ -102,7 +102,7 @@ func TestResult_TieForLast(t *testing.T) {
 		Round 1:
 			- 0 and 3 tie for last.
 			- The tie-breaking algorithm chooses 0 for elimination because it has fewer
-			  second-choice votes amongst the ballots counting toward choices not under
+			  second-choice votes among the ballots counting toward choices not under
 			  consideration for elimination.
 			- The ballot with 0 as the first choice is redistributed to its second choice, 2.
 		Round 2:
